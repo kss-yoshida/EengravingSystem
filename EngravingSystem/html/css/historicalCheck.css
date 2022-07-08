@@ -1,0 +1,9 @@
+.historical-check-table {
+	width: 100%;
+}
+
+.historical-check-table th{
+	width: 16%;
+	background-color: dimgray;
+	color: white;
+}
