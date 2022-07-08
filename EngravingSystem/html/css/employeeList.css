@@ -1,0 +1,9 @@
+.employee-list-table{
+	width: 100%;
+}
+
+.employee-list-table th{
+	width: 25%;
+	background-color: dimgray;
+	color: white;
+}
