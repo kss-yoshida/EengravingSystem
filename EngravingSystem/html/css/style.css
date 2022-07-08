@@ -6,3 +6,13 @@
 	text-align: center;
 }
 
+body {
+    margin: 0;
+    background-color:ivory;
+}
+
+.text-left{
+	text-align: left;
+	padding-left: 5%;
+}
+
