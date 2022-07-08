@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lange="ja">
+	<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" href="css/menu.css">
+		<link rel="stylesheet" href="css/style.css">
+		<link rel="stylesheet" href="css/changeAttendance.css">
+		<title>勤怠情報変更</title>
+	</head>
+	<body>
+		<header>
+	        <nav class="nav-admin">
+	            <ul>
+	                <li>打刻プログラム</li>
+	                <li><a href="#">HOME</a></li>
+	                <li><a href="#">ログアウト</a></li>
+	            </ul>
+	        </nav>
+	    </header>
+		<div class="container">
+			<h3>勤怠情報変更</h3><br>
+			<p>社員番号 : 社員番号</p>
+			<p>名前 : 名前</p><br>
+			<form action="#" method="post">
+				<table class="change-attendance-table">
+					<tr>
+						<th>内容</th>
+						<th>変更前</th>
+						<th>変更後</th>
+					</tr>
+					<tr>
+						<th>日付</td>
+						<td>0000/0/0</td>
+						<td><input type="text" name="time"></td>
+					</tr>
+					<tr>
+						<th>出勤時間</td>
+						<td>00:00</td>
+						<td><input type="text" name="attendance"></td>
+					</tr>
+					<tr>
+						<th>休憩時間</th>
+						<td>00:00</td>
+						<td><input type="text" name="break"></td>
+					</tr>
+					<tr>
+						<th>退勤時間</th>
+						<td>00:00</td>
+						<td><input type="text" name="clock-out"></td>
+					</tr>
+					<tr>
+						<th>残業休憩時間</th>
+						<td>00:00</td>
+						<td><input type="text" name="overtime-break"></td>
+					</tr>
+					<tr>
+						<th>残業時間</th>
+						<td>00:00</td>
+						<td><input type="text" name="overtime"></td>
+					</tr>
+				</table>
+				<br>
+				<input type="submit" value="変更">
+			</form>
+		</div>
+	</body>
+</html>
