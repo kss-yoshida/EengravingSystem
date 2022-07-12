@@ -1,7 +1,7 @@
 package engravingsytem.entity;
 
 
-import java.sql.Date;
+
 import javax.persistence.*;
 
 @Entity
@@ -68,12 +68,12 @@ public class Change {
 	
 //	変更日時
 	@Column(name="is_updated" ,nullable=false)
-	private Date is_updated;
+	private String is_updated;
 	
-	public void setIs_updated(Date date) {
+	public void setIs_updated(String date) {
 		this.is_updated=date;
 	}
-	public Date getIs_updated() {
+	public String getIs_updated() {
 		return this.is_updated;
 	}
 }

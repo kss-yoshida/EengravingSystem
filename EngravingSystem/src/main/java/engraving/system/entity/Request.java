@@ -1,6 +1,6 @@
 package engravingsytem.entity;
 
-import java.sql.*;
+
 
 import javax.persistence.*;
 
@@ -42,17 +42,23 @@ public class Request {
 	
 //	変更希望出勤時間
 	@Column(name="change_start_engrave" ,nullable=true)
-	private Time change_start_engrave;
-	public void setChange_start_engrave(Time time) {
+	private String change_start_engrave;
+	public void setChange_start_engrave(String time) {
 		this.change_start_engrave=time;
 	}
-	public Time getChange_start_engrave() {
+	public String getChange_start_engrave() {
 		return this.change_start_engrave;
 	}
 	
 //	変更希望退勤時間
 	@Column(name="change_finish_engrave" ,nullable=true)
-	private Time change_finish_engrave;
+	private String change_finish_engrave;
+	public void setChange_finish_engrave(String time) {
+		this.change_finish_engrave=time;
+	}
+	public String getChange_finish_engrave() {
+		return this.change_finish_engrave;
+	}
 	
 //	変更希望理由
 	@Column(name="comment" ,nullable=false)
