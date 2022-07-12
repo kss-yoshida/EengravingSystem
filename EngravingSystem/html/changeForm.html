@@ -4,12 +4,12 @@
 		<meta charset="UTF-8">
 		<link rel="stylesheet" href="css/menu.css">
 		<link rel="stylesheet" href="css/style.css">
-		<link rel="stylesheet" href="css/changeAttendance.css">
+		<link rel="stylesheet" href="css/changeForm.css">
 		<title>勤怠情報変更フォーム</title>
 	</head>
 	<body>
 		<header>
-	        <nav class="nav-admin">
+	        <nav class="nav-normal">
 	            <ul>
 	                <li>打刻プログラム</li>
 	                <li><a href="#">HOME</a></li>
@@ -21,9 +21,9 @@
 			<h3>勤怠情報変更フォーム</h3><br>
 			<p>社員番号 : 社員番号</p>
 			<p>名前 : 名前</p>
-			<p>日付：日付</p><br>
+			<p>日付：日付</p>
 			<form action="#" method="post">
-				<table class="change-attendance-table">
+				<table class="change-form-table">
 					<tr>
 						<th>内容</th>
 						<th>変更前</th>
@@ -35,24 +35,14 @@
 						<td><input type="text" name="attendance"></td>
 					</tr>
 					<tr>
-						<th>休憩時間</th>
-						<td>00:00</td>
-						<td><input type="text" name="break"></td>
-					</tr>
-					<tr>
 						<th>退勤時間</th>
 						<td>00:00</td>
 						<td><input type="text" name="clock-out"></td>
 					</tr>
 					<tr>
-						<th>残業休憩時間</th>
-						<td>00:00</td>
-						<td><input type="text" name="overtime-break"></td>
-					</tr>
-					<tr>
-						<th>残業時間</th>
-						<td>00:00</td>
-						<td><input type="text" name="overtime"></td>
+						<th>変更理由</th>
+						<td></td>
+						<td><textarea name="comment" rows="5" cols="20"></textarea></td>
 					</tr>
 				</table>
 				<br>
