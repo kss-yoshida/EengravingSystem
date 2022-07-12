@@ -3,7 +3,7 @@
 }
 
 .employee-list-table th{
-	width: 25%;
+	width: 150px;
 	background-color: dimgray;
 	color: white;
 }
