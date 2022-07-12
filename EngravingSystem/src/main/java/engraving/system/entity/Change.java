@@ -12,6 +12,10 @@ public class Change {
 	@Id
 	private int change_id;
 	
+	private void setChange_id(int id){
+		this.change_id=id;
+	}
+	
 	public int getChange_id(){
 		return this.change_id;
 	}
