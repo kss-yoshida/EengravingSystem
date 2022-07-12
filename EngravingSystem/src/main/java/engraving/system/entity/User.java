@@ -19,7 +19,7 @@ public class User{
 	}
 	
 	//name
-	@Column(length = 100, nullable = true)
+	@Column(length = 100, nullable = false)
 	private String name;
 	
 	public String getName() {
@@ -31,7 +31,7 @@ public class User{
 	}
 	
 	//email
-	@Column(length = 100, nullable = true)
+	@Column(length = 100, nullable = false)
 	private String email;
 	
 	public String getEmail() {
@@ -43,7 +43,7 @@ public class User{
 	}
 	
 	//password
-	@Column(length = 100, nullable = true)
+	@Column(length = 100, nullable = false)
 	private String password;
 	
 	public String getPassword() {
@@ -67,7 +67,7 @@ public class User{
 	}
 	
 	//削除フラグ
-	@Column(nullable = true)
+	@Column(nullable = false)
 	private boolean isDeleted;
 	
 	public boolean getIsDeleted() {
