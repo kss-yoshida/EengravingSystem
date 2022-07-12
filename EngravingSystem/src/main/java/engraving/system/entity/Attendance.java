@@ -19,7 +19,7 @@ public class Attendance {
 	}
 	
 	//社員番号
-	@Column(nullable = true)
+	@Column(nullable = false)
 	private int employeeId;
 	
 	public int getEmployeeId() {
@@ -31,7 +31,7 @@ public class Attendance {
 	}
 	
 	//日付
-	@Column(nullable = true)
+	@Column(nullable = false)
 	private String day;
 	
 	public String getDay() {
@@ -43,7 +43,7 @@ public class Attendance {
 	}
 	
 	//出勤時間
-	@Column(nullable = true)
+	@Column(nullable = false)
 	private String startTime;
 	
 	public String getStartTime() {
@@ -55,7 +55,7 @@ public class Attendance {
 	}
 	
 	//退勤時間
-	@Column(nullable = true)
+	@Column(nullable = false)
 	private String finishTime;
 	
 	public String getFinishTime() {
@@ -67,7 +67,7 @@ public class Attendance {
 	}
 	
 	//出勤時打刻時間
-	@Column(nullable = true)
+	@Column(nullable = false)
 	private String startEngrave;
 	
 	public String getStartEngrove() {
@@ -79,7 +79,7 @@ public class Attendance {
 	}
 	
 	//退勤時打刻時間
-	@Column(nullable = true)
+	@Column(nullable = false)
 	private String finishEngrave;
 	
 	public String getFinishEngrave() {
@@ -91,7 +91,7 @@ public class Attendance {
 	}
 	
 	//休憩時間
-	@Column(nullable = true)
+	@Column(nullable = false)
 	private String breakTime;
 	
 	public String getBreakTime() {
@@ -103,7 +103,7 @@ public class Attendance {
 	}
 	
 	//残業時間
-	@Column(nullable = true)
+	@Column(nullable = false)
 	private String overTime;
 	
 	public String getOverTime() {
