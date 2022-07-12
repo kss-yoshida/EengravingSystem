@@ -12,6 +12,10 @@ public class Change {
 	@Id
 	private int change_id;
 	
+	public int getChange_id(){
+		return this.change_id;
+	}
+	
 //	変更対応管理者番号
 	@Column(name="admin_id" ,nullable=false)
 	private int admin_id;
