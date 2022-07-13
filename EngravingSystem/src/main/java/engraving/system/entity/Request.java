@@ -1,4 +1,4 @@
-package engravingsytem.entity;
+package engraving.system.entity;
 
 
 
