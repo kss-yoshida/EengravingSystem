@@ -1,4 +1,4 @@
-package engraving.entity;
+package engraving.system.entity;
 
 import javax.persistence.*;
 
