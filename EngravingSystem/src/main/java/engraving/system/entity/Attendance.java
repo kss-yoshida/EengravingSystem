@@ -55,7 +55,6 @@ public class Attendance {
 	}
 	
 	//退勤時間
-	@Column(nullable = false)
 	private String finishTime;
 	
 	public String getFinishTime() {
@@ -79,7 +78,6 @@ public class Attendance {
 	}
 	
 	//退勤時打刻時間
-	@Column(nullable = false)
 	private String finishEngrave;
 	
 	public String getFinishEngrave() {
@@ -91,7 +89,6 @@ public class Attendance {
 	}
 	
 	//休憩時間
-	@Column(nullable = false)
 	private String breakTime;
 	
 	public String getBreakTime() {
@@ -103,7 +100,6 @@ public class Attendance {
 	}
 	
 	//残業時間
-	@Column(nullable = false)
 	private String overTime;
 	
 	public String getOverTime() {
