@@ -22,6 +22,7 @@ public class EngravingController {
 	private AttendanceRepository attendanceinfo;
 	private ChangeRepository changeinfo;
 	private UserRepository userinfo;
+	private LoginLogRepository logininfo;
 	HttpSession session;
 	
 	//「/startEngraving」にアクセスがあった場合
@@ -101,6 +102,56 @@ public class EngravingController {
 		mav = new ModelAndView("redirect:/menu");
 		
 		//ModelとView情報を返す
+		return mav;
+	}
+	/*
+	 * ログインの処理
+	 * セッションの設定とログイン履歴の登録
+	 */
+	@RequestMapping(value = "/login", method = RequestMethod.POST)
+	public ModelAndView login(ModelAndView mav, @RequestParam("password") String pass,
+			@RequestParam("employee_id") int num) {
+//		ユーザーリストの取得
+		ArrayList<User> list = (ArrayList<User>)userinfo.findAll();
+		User user = new User();
+		LoginLog log = new LoginLog();
+		String cmd = "";
+
+//		入力した社員番号とパスワードがあるか確認
+		for (int i = 0; i < list.size(); i++) {
+			user = list.get(i);
+			if (user.getEmployeeId() == num && user.getPassword().equals(pass)) {
+//				ログイン履歴の設定
+				log.setEmployee_id(user.getEmployeeId());
+				Date date = new Date();
+				SimpleDateFormat format = new SimpleDateFormat("YY-MM-dd HH-mm-ss"); //年-月-日 時-分-秒
+				String datetime = format.format(date);
+				log.setLogin_time(datetime);
+				
+//				セッションの設定
+				session.setAttribute("user", user);
+//				ログイン履歴をDBに追加
+				logininfo.saveAndFlush(log);
+//				該当ユーザーがいたらcmdをOKにする
+				cmd = "ok";
+			}
+		}
+		
+		if (cmd.equals("")) {
+//			エラーがあったらログインに戻る
+			mav = new ModelAndView("redirect;/login");
+		} else {
+//			OKになってたらメニューに行く
+			mav = new ModelAndView("redirect;/menu");
+		}
+		return mav;
+
+	}
+
+	@RequestMapping("/loginForm")
+	public ModelAndView loginForm(ModelAndView mav) {
+		mav.setViewName("login");
+
 		return mav;
 	}
 	
