@@ -25,6 +25,9 @@ public class EngravingController {
 	private LoginLogRepository logininfo;
 	HttpSession session;
 	
+	/*
+	*出勤退勤処理
+	*/
 	//「/startEngraving」にアクセスがあった場合
 	@RequestMapping(value = "/startEngraving", method = RequestMethod.POST)
 	public ModelAndView engravingStart(ModelAndView mav) {
