@@ -1,43 +1,48 @@
 <!DOCTYPE html>
 <html lange="ja">
-	<head>
-		<meta charset="UTF-8">
-		<link rel="stylesheet" href="css/menu.css">
-		<link rel="stylesheet" href="css/style.css">
-		<link rel="stylesheet" href="css/adminMenu.css">
-		<title>メニュー</title>
-		
-	</head>
-	<body>
-		<header>
-	        <nav class="nav-normal">
-	            <ul>
-	                <li>打刻プログラム</li>
-	                <li><a href="#">HOME</a></li>
-	                <li><a href="#">ログアウト</a></li>
-	            </ul>
-	        </nav>
-	    </header>
-		<div class="container">
-			<h3>メニュー</h3><br>
-			<p><a href="#">勤怠情報変更フォーム</a></p>
-			<p><a href="#">勤怠情報確認</a></p>
-			<p></br>
-			<div class="engraving-flex">
-			
-			<p>06/21 09:30</p>
-			<p>退勤前</p>
-			
-			</div>
-			<div class="engraving-flex">
-			<form action="#" method="get">
-					<input type="submit" value="出勤">
-				</form>
-				
-				<form action="#" method="get">
-					<input type="submit" value="退勤">
-				</form>
-			</div>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="css/menu.css">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/adminMenu.css">
+<title>メニュー</title>
+
+</head>
+<body>
+	<header>
+		<nav class="nav-normal">
+			<ul>
+				<li>打刻プログラム</li>
+				<li><a href="#">HOME</a></li>
+				<li><a href="#">ログアウト</a></li>
+			</ul>
+		</nav>
+	</header>
+	<div class="container">
+		<h3>メニュー</h3>
+		<br>
+		<p>
+			<a href="#">勤怠情報変更フォーム</a>
+		</p>
+		<p>
+			<a href="#">勤怠情報確認</a>
+		</p>
+		<p>
+			<br>
+		<div class="engraving-flex">
+
 		</div>
-	</body>
+		<div class="engraving-flex">
+			<form action="startEngraving" method="post">
+			<p th:if="${attendance != null}">th.text="${attendance.getStartEngrave}"</p>
+				<input type="hidden" name="cmd" value="employeeMenu">
+				<input type="submit" value="出勤">
+			</form>
+			<form action="finishEngraving" method="post">
+				<input type="hidden" name="cmd" value="employeeMenu">
+				<input type="submit" value="退勤">
+			</form>
+		</div>
+	</div>
+</body>
 </html>
