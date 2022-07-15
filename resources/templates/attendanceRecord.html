@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lange="ja">
+	<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" href="css/menu.css">
+		<link rel="stylesheet" href="css/style.css">
+		<link rel="stylesheet" href="css/adminMenu.css">
+		<link rel="stylesheet" href="css/attendanceRecord.css">
+		<title>勤怠情報確認</title>
+	</head>
+	<body>
+		<header>
+	        <nav class="nav-normal">
+	            <ul>
+	                <li>打刻プログラム</li>
+	                <li><a href="#">HOME</a></li>
+	                <li><a href="#">ログアウト</a></li>
+	            </ul>
+	        </nav>
+	    </header>
+		<div class="container">
+			<h3>勤怠情報確認</h3><br>
+			<div class="engraving-flex">
+				<form action="#" method="post">
+					<input type="text" name="year">年
+					<input type="text" name="month">月
+					<input type="submit" value="検索">
+				</form>
+				<form action="#" method="post">
+					<input type="submit" value="全検索">
+				</form>
+			</div>
+			<br>
+			<h4 class="text-left">0000年00月</h4>
+			<table class="attendance-record-table">
+				<tr>
+					<th>日付</th>
+					<th>打刻出勤時間</th>
+					<th>打刻退勤時間</th>
+					<th>勤怠時間</th>
+					<th>休憩時間</th>
+					<th>残業時間</th>
+				</tr>
+				<tr>
+					<td>0日</td>
+					<td>00時00分</td>
+					<td>00時00分</td>
+					<td>0時間00分</td>
+					<td>0時間00分</td>
+					<td>0時間00分</td>
+				</tr>
+			</table>
+		</div>
+	</body>
+</html>
