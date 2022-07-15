@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lange="ja">
+	<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" href="css/menu.css">
+		<link rel="stylesheet" href="css/style.css">
+		<link rel="stylesheet" href="css/adminMenu.css">
+		<link rel="stylesheet" href="css/employeeList.css">
+		<title>社員一覧</title>
+	</head>
+	<body>
+		<header>
+	        <nav class="nav-admin">
+	            <ul>
+	                <li>打刻プログラム</li>
+	                <li><a href="#">HOME</a></li>
+	                <li><a href="#">ログアウト</a></li>
+	            </ul>
+	        </nav>
+	    </header>
+		<div class="container">
+			<h3>社員一覧</h3><br>
+			<div class="engraving-flex">
+				<form action="#" method="post">
+					<input type="text" name="number">社員番号
+					<input type="text" name="name">名前
+					<input type="submit" value="検索">
+				</form>
+				<form action="#" method="post">
+					<input type="submit" value="全検索">
+				</form>
+			</div>
+			<table class="employee-list-table">
+				<tr>
+					<th>写真</th>
+					<th>社員番号</th>
+					<th>氏名</th>
+					<th>管理者登録・削除</th>
+					<th>変更/削除</th>
+				</tr>
+				<tr>
+					<td>写真</td>
+					<td>0000000</td>
+					<td>名前</td>
+					<td><input type="submit" value="登録"></td>
+					<td>
+						<div class="engraving-flex">
+						<form action="#" method="post">
+							<input type="submit" value="変更">
+						</form>
+						<form action="#" method="post">
+							<input type="submit" value="削除">
+						</form>
+					</div>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</body>
+</html>
