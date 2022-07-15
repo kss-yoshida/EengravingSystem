@@ -5,7 +5,7 @@ import javax.persistence.*;
 @Entity
 
 @Table(name = "loginlog")
-public class Loginlog {
+public class LoginLog {
 
 	// ログインID
 	@Id
