@@ -66,6 +66,18 @@ public class User{
 		this.photo = photo;
 	}
 	
+	//権限
+	@Column(name = "authority",length = 1,nullable = false)
+	private String authority;
+	
+	public String getAuthorirty() {
+		return authority;
+	}
+	
+	public void setAuthority(String authority) {
+		this.authority = authority;
+	}
+	
 	//削除フラグ
 	@Column(nullable = false)
 	private boolean isDeleted;
