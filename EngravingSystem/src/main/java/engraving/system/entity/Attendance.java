@@ -69,11 +69,11 @@ public class Attendance {
 	@Column(nullable = false)
 	private String startEngrave;
 	
-	public String getStartEngrove() {
+	public String getStartEngrave() {
 		return startEngrave;
 	}
 	
-	public void setStartEngrove(String startEngrave) {
+	public void setStartEngrave(String startEngrave) {
 		this.startEngrave = startEngrave;
 	}
 	
