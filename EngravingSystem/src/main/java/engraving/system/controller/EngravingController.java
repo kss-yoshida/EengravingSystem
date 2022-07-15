@@ -158,4 +158,16 @@ public class EngravingController {
 		return mav;
 	}
 	
+	@RequestMapping("/employeeMenu")
+	public ModelAndView employeeMenu(ModelAndView mav) {
+		mav.setViewName("employeeMenu");
+		return mav;
+	}
+
+	@RequestMapping("/adminMenu")
+	public ModelAndView adminMenu(ModelAndView mav) {
+		mav.setViewName("adminMenu");
+		return mav;
+	}
+	
 }
