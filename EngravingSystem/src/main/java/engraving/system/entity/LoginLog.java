@@ -16,7 +16,7 @@ public class LoginLog {
 		return loginId;
 	}
 
-	public void setLogin_id(int loginId) {
+	public void setLoginId(int loginId) {
 		this.loginId = loginId;
 	}
 
