@@ -1,10 +1,12 @@
 package engraving.system.entity;
 
+import java.io.Serializable;
+
 import javax.persistence.*;
 
 @Entity
 @Table(name="userinfo")
-public class User{
+public class User implements Serializable {
 	
 	//employee
 	@Id
@@ -64,18 +66,6 @@ public class User{
 	
 	public void setPhoto(String photo) {
 		this.photo = photo;
-	}
-	
-	//権限
-	@Column(name = "authority",length = 1,nullable = false)
-	private String authority;
-	
-	public String getAuthorirty() {
-		return authority;
-	}
-	
-	public void setAuthority(String authority) {
-		this.authority = authority;
 	}
 	
 	//削除フラグ
