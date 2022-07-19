@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lange="ja">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
 <link rel="stylesheet" href="css/menu.css">
@@ -19,6 +19,7 @@
 		</nav>
 	</header>
 	<div class="container">
+		<h1 th:text="${user.getEmployeeId}"></h1>
 		<h3>メニュー</h3>
 		<br>
 		<p>
@@ -29,18 +30,20 @@
 		</p>
 		<p>
 			<br>
-		<div class="engraving-flex">
-
-		</div>
+		<div class="engraving-flex"></div>
 		<div class="engraving-flex">
 			<form action="startEngraving" method="post">
-			<p th:if="${attendance != null}">th.text="${attendance.getStartEngrave}"</p>
-				<input type="hidden" name="cmd" value="employeeMenu">
-				<input type="submit" value="出勤">
+				<p th:text="${attendance.getStartEngrave}"
+					th:if="${attendance != null}"></p>
+				<input type="hidden" name="cmd" value="employeeMenu"> <input
+					type="submit" value="出勤">
 			</form>
 			<form action="finishEngraving" method="post">
-				<input type="hidden" name="cmd" value="employeeMenu">
-				<input type="submit" value="退勤">
+				<p th:text="${attendance.getFinishEngrave}"
+					th:if="${attendance != null}"></p>
+
+				<input type="hidden" name="cmd" value="employeeMenu"> <input
+					type="submit" value="退勤">
 			</form>
 		</div>
 	</div>
