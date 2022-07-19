@@ -1,0 +1,10 @@
+.change-employee-table {
+	width: 50%;
+	margin: auto;
+}
+
+.change-employee-table th{
+	background-color: dimgray;
+	width: 50%;
+	color: white;
+}
