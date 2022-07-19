@@ -43,7 +43,7 @@ public class EngravingController {
 	 */
 	// 「/startEngraving」にアクセスがあった場合
 	@RequestMapping(value = "/startEngraving", method = RequestMethod.POST)
-	public ModelAndView engravingStart(ModelAndView mav) {
+	public ModelAndView engravingStart(@RequestParam("cmd") String cmd, ModelAndView mav) {
 		// 勤怠情報を格納するAttendanceの作成
 		Attendance attendance = new Attendance();
 		User user = (User) session.getAttribute("user");
@@ -60,7 +60,7 @@ public class EngravingController {
 		attendanceinfo.saveAndFlush(attendance);
 
 		// リダイレクト先を指定
-		mav = new ModelAndView("redirect;/menu");
+		mav = new ModelAndView(cmd);
 
 		// ModelとView情報を返す
 		return mav;
@@ -68,7 +68,7 @@ public class EngravingController {
 
 	// 「finishEngraving」にアクセスがあった場合
 	@RequestMapping(value = "/finishEngraving", method = RequestMethod.POST)
-	public ModelAndView finishEngraving(ModelAndView mav) {
+	public ModelAndView finishEngraving(@RequestParam("cmd") String cmd, ModelAndView mav) {
 
 		// 入力された情報を更新
 		Date date = new Date();
@@ -115,7 +115,7 @@ public class EngravingController {
 		attendanceinfo.saveAndFlush(attendance);
 
 		// リダイレクト先を指定
-		mav = new ModelAndView("redirect:/menu");
+		mav = new ModelAndView(cmd);
 
 		// ModelとView情報を返す
 		return mav;
@@ -138,11 +138,11 @@ public class EngravingController {
 			user = list.get(i);
 			if (user.getEmployeeId() == num && user.getPassword().equals(pass)) {
 //				ログイン履歴の設定
-				log.setEmployee_id(user.getEmployeeId());
+				log.setEmployeeId(user.getEmployeeId());
 				Date date = new Date();
 				SimpleDateFormat format = new SimpleDateFormat("YY-MM-dd HH-mm-ss"); // 年-月-日 時-分-秒
 				String datetime = format.format(date);
-				log.setLogin_time(datetime);
+				log.setLoginTime(datetime);
 
 //				セッションの設定
 				session.setAttribute("user", user);
@@ -181,6 +181,14 @@ public class EngravingController {
 	public ModelAndView adminMenu(ModelAndView mav) {
 		mav.setViewName("adminMenu");
 		return mav;
+	}
+	
+	@RequestMapping(value = "/getSession",  method = RequestMethod.POST)
+	public User session(ModelAndView mav) {
+		User user = (User)session.getAttribute("user");
+		mav.setViewName
+		return user;
+		
 	}
 
 }
