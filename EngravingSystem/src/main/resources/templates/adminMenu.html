@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lange="ja">
+<html>
 <head>
 <meta charset="UTF-8">
-<link rel="stylesheet" href="css/menu.css">
-<link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/adminMenu.css">
+<link rel="stylesheet"  th:href="@{/css/menu.css}">
+<link rel="stylesheet"  th:href="@{/css/style.css}">
+<link rel="stylesheet"  th:href="@{/css/adminMenu.css}">
 <title>管理者メニュー</title>
 </head>
 <body>
@@ -38,11 +38,14 @@
 		<br>
 		<div class="engraving-flex">
 			<form action="startEngraving" method="post">
-			<p th:if="${attendance != null}">th.text="${attendance.getStartEngrave}"</p>
+			<p th:if="${startTime != null}"  th:text="${startTime}"></p>
+			<p th:if="${startTime == null}" >&nbsp;</p>
 				<input type="hidden" name="cmd" value="employeeMenu">
 				<input type="submit" value="出勤">
 			</form>
 			<form action="finishEngraving" method="post">
+				<p th:if="${finishTime != null}"  th:text="${startTime}"></p>
+				<p th:if="${finishTime == null}" >&nbsp;</p>
 				<input type="hidden" name="cmd" value="employeeMenu">
 				<input type="submit" value="退勤">
 			</form>
