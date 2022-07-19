@@ -43,7 +43,7 @@ public class EngravingController {
 	 */
 	// 「/startEngraving」にアクセスがあった場合
 	@RequestMapping(value = "/startEngraving", method = RequestMethod.POST)
-	public ModelAndView engravingStart(@RequestParam("cmd") String cmd, ModelAndView mav) {
+	public ModelAndView engravingStart(ModelAndView mav) {
 		// 勤怠情報を格納するAttendanceの作成
 		Attendance attendance = new Attendance();
 		User user = (User) session.getAttribute("user");
@@ -60,7 +60,7 @@ public class EngravingController {
 		attendanceinfo.saveAndFlush(attendance);
 
 		// リダイレクト先を指定
-		mav = new ModelAndView(cmd);
+		mav = new ModelAndView("redirect;/menu");
 
 		// ModelとView情報を返す
 		return mav;
@@ -68,7 +68,7 @@ public class EngravingController {
 
 	// 「finishEngraving」にアクセスがあった場合
 	@RequestMapping(value = "/finishEngraving", method = RequestMethod.POST)
-	public ModelAndView finishEngraving(@RequestParam("cmd") String cmd, ModelAndView mav) {
+	public ModelAndView finishEngraving(ModelAndView mav) {
 
 		// 入力された情報を更新
 		Date date = new Date();
@@ -115,7 +115,7 @@ public class EngravingController {
 		attendanceinfo.saveAndFlush(attendance);
 
 		// リダイレクト先を指定
-		mav = new ModelAndView(cmd);
+		mav = new ModelAndView("redirect:/menu");
 
 		// ModelとView情報を返す
 		return mav;
@@ -125,7 +125,7 @@ public class EngravingController {
 	 * ログインの処理 セッションの設定とログイン履歴の登録
 	 */
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
-	public String login(ModelAndView mav, @RequestParam("password") String pass,
+	public ModelAndView login(ModelAndView mav, @RequestParam("password") String pass,
 			@RequestParam("employee_id") int num) {
 //		ユーザーリストの取得
 		ArrayList<User> list = (ArrayList<User>) userinfo.findAll();
@@ -138,11 +138,11 @@ public class EngravingController {
 			user = list.get(i);
 			if (user.getEmployeeId() == num && user.getPassword().equals(pass)) {
 //				ログイン履歴の設定
-				log.setEmployeeId(user.getEmployeeId());
+				log.setEmployee_id(user.getEmployeeId());
 				Date date = new Date();
 				SimpleDateFormat format = new SimpleDateFormat("YY-MM-dd HH-mm-ss"); // 年-月-日 時-分-秒
 				String datetime = format.format(date);
-				log.setLoginTime(datetime);
+				log.setLogin_time(datetime);
 
 //				セッションの設定
 				session.setAttribute("user", user);
@@ -155,13 +155,15 @@ public class EngravingController {
 
 		if (cmd.equals("")) {
 //			エラーがあったらログインに戻る
-			mav = new ModelAndView("redirect;/login");
-			return "login";
+			
 
 		} else {
 //			OKになってたらメニューに行く
-			return "employeeMenu";
+			mav.addObject("user", user);
+			mav.setViewName("employeeMenu");
+			
 		}
+		return mav;
 
 	}
 
@@ -174,6 +176,9 @@ public class EngravingController {
 
 	@RequestMapping("/employeeMenu")
 	public ModelAndView employeeMenu(ModelAndView mav) {
+		User user = (User)session.getAttribute("user");
+		mav.addObject("user",user);
+		mav.setViewName("employeeMenu");
 		return mav;
 	}
 
