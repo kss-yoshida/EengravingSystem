@@ -182,13 +182,5 @@ public class EngravingController {
 		mav.setViewName("adminMenu");
 		return mav;
 	}
-	
-	@RequestMapping(value = "/getSession",  method = RequestMethod.POST)
-	public User session(ModelAndView mav) {
-		User user = (User)session.getAttribute("user");
-		mav.setViewName
-		return user;
-		
-	}
 
 }
