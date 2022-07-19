@@ -5,6 +5,8 @@ import org.springframework.stereotype.Repository;
 
 import engraving.system.entity.Attendance;
 
+import java.util.*;
+
 @Repository
 public interface AttendanceRepository extends JpaRepository<Attendance, String> {
 
