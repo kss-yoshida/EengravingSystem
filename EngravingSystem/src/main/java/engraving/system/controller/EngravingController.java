@@ -139,11 +139,11 @@ public class EngravingController {
 			user = list.get(i);
 			if (user.getEmployeeId() == num && user.getPassword().equals(pass)) {
 //				ログイン履歴の設定
-				log.setEmployee_id(user.getEmployeeId());
+				log.setEmployeeId(user.getEmployeeId());
 				Date date = new Date();
 				SimpleDateFormat format = new SimpleDateFormat("YY-MM-dd HH-mm-ss"); // 年-月-日 時-分-秒
 				String datetime = format.format(date);
-				log.setLogin_time(datetime);
+				log.setLoginTime(datetime);
 
 //				セッションの設定
 				session.setAttribute("user", user);
