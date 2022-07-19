@@ -10,37 +10,37 @@ public class LoginLog {
 	// ログインID
 	@Id
 	@Column(name = "login_id")
-	private int login_id;
+	private int loginId;
 
-	public int getLogin_id() {
-		return login_id;
+	public int getLoginId() {
+		return loginId;
 	}
 
-	public void setLogin_id(int login_id) {
-		this.login_id = login_id;
+	public void setLogin_id(int loginId) {
+		this.loginId = loginId;
 	}
 
 	// 社員番号
-	@Column(name = "employee_id")
-	private int employee_id;
+	@Column(name = "employeeId")
+	private int employeeId;
 
-	public void setEmployee_id(int id) {
-		this.employee_id = id;
+	public void setEmployeeId(int id) {
+		this.employeeId = id;
 	}
 
-	public int getEmployee_id() {
-		return this.employee_id;
+	public int getEmployeeId() {
+		return this.employeeId;
 	}
 
 	// ログイン日時
 	@Column(name = "login_time")
-	private String login_time;
+	private String loginTime;
 
-	public String getLogin_time() {
-		return login_time;
+	public String getLoginTime() {
+		return loginTime;
 	}
 
-	public void setLogin_time(String login_time) {
-		this.login_time = login_time;
+	public void setLoginTime(String loginTime) {
+		this.loginTime = loginTime;
 	}
 }

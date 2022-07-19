@@ -6,10 +6,13 @@ import javax.persistence.*;
 
 @Entity
 @Table(name="userinfo")
-public class User implements Serializable {
+public class User implements Serializable{
+	
+	private static final long serialVersionUID = 1L;
 	
 	//employee
 	@Id
+	@Column(name = "employee_id")
 	private int employeeId;
 	
 	public int getEmployeeId() {
@@ -66,6 +69,18 @@ public class User implements Serializable {
 	
 	public void setPhoto(String photo) {
 		this.photo = photo;
+	}
+	
+	//権限
+	@Column(name = "authority",length = 1,nullable = false)
+	private String authority;
+	
+	public String getAuthorirty() {
+		return authority;
+	}
+	
+	public void setAuthority(String authority) {
+		this.authority = authority;
 	}
 	
 	//削除フラグ

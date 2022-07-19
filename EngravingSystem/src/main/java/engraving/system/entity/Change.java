@@ -10,78 +10,78 @@ public class Change {
 
 //	変更履歴ID
 	@Id
-	private int change_id;
+	private int changeId;
 	
-	private void setChange_id(int id){
-		this.change_id=id;
+	private void setChangeId(int id){
+		this.changeId=id;
 	}
 	
-	public int getChange_id(){
-		return this.change_id;
+	public int getChangeId(){
+		return this.changeId;
 	}
 	
 //	変更対応管理者番号
 	@Column(name="admin_id" ,nullable=false)
-	private int admin_id;
+	private int adminId;
 	
-	public void setAdmin_id(int id) {
-		this.admin_id=id;
+	public void setAdminId(int id) {
+		this.adminId=id;
 	}
-	public int getAdmin_id() {
-		return this.admin_id;
+	public int getAdminId() {
+		return this.adminId;
 	}
 	
 //	変更対象データ
 	@Column(name="data_name" ,nullable=false)
-	private String data_name;
+	private String dataName;
 	
-	public void setData_name(String name) {
-		this.data_name=name;
+	public void setDataName(String name) {
+		this.dataName=name;
 	}
-	public String getData_name() {
-		return this.data_name;
+	public String getDataName() {
+		return this.dataName;
 	}
 	
 //	変更前のデータ
 	@Column(name="before_name" ,nullable=false)
-	private String before_data;
+	private String beforeData;
 	
-	public void setBefore_data(String data) {
-		this.before_data=data;
+	public void setBeforeData(String data) {
+		this.beforeData=data;
 	}
-	public String getBefore_data() {
-		return this.before_data;
+	public String getBeforeData() {
+		return this.beforeData;
 	}
 	
 //	変更後のデータ
 	@Column(name="after_data" ,nullable=false)
-	private String after_data;
+	private String afterData;
 	
-	public void setafter_data(String data) {
-		this.after_data=data;
+	public void setafterData(String data) {
+		this.afterData=data;
 	}
-	public String getAfter_data() {
-		return this.after_data;
+	public String getAfterData() {
+		return this.afterData;
 	}
 //	変更対象社員番号
 	@Column(name="employee_id" ,nullable=false)
-	private int employee_id;
+	private int employeeId;
 	
-	public void setEmployee_id(int id) {
-		this.employee_id=id;
+	public void setEmployeeId(int id) {
+		this.employeeId=id;
 	}
-	public int getEmployee_id() {
-		return this.employee_id;
+	public int getEmployeeId() {
+		return this.employeeId;
 	}
 	
 //	変更日時
 	@Column(name="is_updated" ,nullable=false)
-	private String is_updated;
+	private String isUpdated;
 	
-	public void setIs_updated(String date) {
-		this.is_updated=date;
+	public void setIsUpdated(String date) {
+		this.isUpdated=date;
 	}
 	public String getIs_updated() {
-		return this.is_updated;
+		return this.isUpdated;
 	}
 }

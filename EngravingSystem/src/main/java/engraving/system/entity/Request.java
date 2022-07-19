@@ -10,54 +10,54 @@ public class Request {
 //	リクエストID
 	@Id
 	@Column(name="request_id")
-	private int request_id;
+	private int requestId;
 	
-	public void setRequest_id(int id) {
-		this.request_id=id;
+	public void setRequestId(int id) {
+		this.requestId=id;
 	}
-	public int getRequest_id() {
-		return this.request_id;
+	public int getRequestId() {
+		return this.requestId;
 	}
 	
 //	社員番号
 	@Column(name="employee_id" ,nullable=false)
-	private int employee_id;
+	private int employeeId;
 	
-	public void setEmployee_id(int id) {
-		this.employee_id=id;
+	public void setEmployeeId(int id) {
+		this.employeeId=id;
 	}
 	public int getEmployee_id() {
-		return this.employee_id;
+		return this.employeeId;
 	}
 	
 //	変更希望の勤怠情報ID
 	@Column(name="attendance_id" ,nullable=false)
-	private int attendance_id;
-	public void setAttendance_id(int id) {
-		this.attendance_id=id;
+	private int attendanceId;
+	public void setAttendanceId(int id) {
+		this.attendanceId=id;
 	}
-	public int getAttendance_id() {
-		return this.attendance_id;
+	public int getAttendanceId() {
+		return this.attendanceId;
 	}
 	
 //	変更希望出勤時間
 	@Column(name="change_start_engrave" ,nullable=true)
-	private String change_start_engrave;
-	public void setChange_start_engrave(String time) {
-		this.change_start_engrave=time;
+	private String changeStartEngrave;
+	public void setChangeStartEngrave(String time) {
+		this.changeStartEngrave=time;
 	}
 	public String getChange_start_engrave() {
-		return this.change_start_engrave;
+		return this.changeStartEngrave;
 	}
 	
 //	変更希望退勤時間
 	@Column(name="change_finish_engrave" ,nullable=true)
-	private String change_finish_engrave;
-	public void setChange_finish_engrave(String time) {
-		this.change_finish_engrave=time;
+	private String changeFinishEngrave;
+	public void setChangeFinishEngrave(String time) {
+		this.changeFinishEngrave=time;
 	}
-	public String getChange_finish_engrave() {
-		return this.change_finish_engrave;
+	public String getChangeFinishEngrave() {
+		return this.changeFinishEngrave;
 	}
 	
 //	変更希望理由
@@ -73,12 +73,12 @@ public class Request {
 	
 //	削除フラグ
 	@Column(name="is_deleted" ,nullable=false)
-	private Boolean is_deleted;
-	public void setIs_deleted(Boolean flag) {
-		this.is_deleted=flag;
+	private Boolean isDeleted;
+	public void setIsDeleted(Boolean flag) {
+		this.isDeleted=flag;
 	}
 	public Boolean getIs_deleted() {
-		return this.is_deleted;
+		return this.isDeleted;
 	}
 
 }
