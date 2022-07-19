@@ -79,42 +79,44 @@ public class EngravingController {
 		User user = (User)session.getAttribute("user");
 		int employeeId = user.getEmployeeId();
 		ArrayList<Attendance> attendanceList = (ArrayList<Attendance>)attendanceinfo.findByDayAndEmployeeId(day.format(date), employeeId);
-		Attendance attendance = attendanceList.get(0);
-		
-		if (attendance.getFinishEngrave() == null) {
-			// 退勤の打刻を行う
-			// 退勤時間をattendanceに格納
-			SimpleDateFormat time = new SimpleDateFormat("kk:mm");
-			attendance.setFinishEngrave(time.format(date));
-			attendance.setFinishTime(time.format(date));
-
-			// 勤務時間（時間）の計算
-			int hour = Integer.parseInt(attendance.getStartTime().substring(0, 1))
-					- Integer.parseInt(attendance.getFinishTime().substring(0, 1));
-			// 勤務時間（分）の計算
-			int minute = Integer.parseInt(attendance.getStartTime().substring(3, 4))
-					- Integer.parseInt(attendance.getFinishTime().substring(3, 4));
-			if (minute < 0) {
-				minute = 60 + minute;
-				hour = hour - 1;
-			}
-			// 休憩時間・残業時間の計算と格納
-			if (hour < 9) {// 8時間未満の勤務の場合
-				attendance.setBreakTime("01:00");
-				attendance.setOverTime("00:00");
-			} else {// ８時間以上の勤務の場合
-				attendance.setBreakTime("01:15");
-				// 残業時間の計算
-				hour = hour - 9;
-				minute = minute - 15;
+		if(attendanceList != null) {
+			Attendance attendance = attendanceList.get(0);
+			
+			if (attendance.getFinishEngrave() == null) {
+				// 退勤の打刻を行う
+				// 退勤時間をattendanceに格納
+				SimpleDateFormat time = new SimpleDateFormat("kk:mm");
+				attendance.setFinishEngrave(time.format(date));
+				attendance.setFinishTime(time.format(date));
+	
+				// 勤務時間（時間）の計算
+				int hour = Integer.parseInt(attendance.getStartTime().substring(0, 1))
+						- Integer.parseInt(attendance.getFinishTime().substring(0, 1));
+				// 勤務時間（分）の計算
+				int minute = Integer.parseInt(attendance.getStartTime().substring(3, 4))
+						- Integer.parseInt(attendance.getFinishTime().substring(3, 4));
 				if (minute < 0) {
 					minute = 60 + minute;
+					hour = hour - 1;
 				}
-				attendance.setOverTime(hour + ":" + minute);
+				// 休憩時間・残業時間の計算と格納
+				if (hour < 9) {// 8時間未満の勤務の場合
+					attendance.setBreakTime("01:00");
+					attendance.setOverTime("00:00");
+				} else {// ８時間以上の勤務の場合
+					attendance.setBreakTime("01:15");
+					// 残業時間の計算
+					hour = hour - 9;
+					minute = minute - 15;
+					if (minute < 0) {
+						minute = 60 + minute;
+					}
+					attendance.setOverTime(hour + ":" + minute);
+				}
 			}
+	
+			attendanceinfo.saveAndFlush(attendance);
 		}
-
-		attendanceinfo.saveAndFlush(attendance);
 
 		// リダイレクト先を指定
 		mav = new ModelAndView(cmd);
