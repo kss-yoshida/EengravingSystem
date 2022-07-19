@@ -52,7 +52,7 @@ public class EngravingController {
 		Date date = new Date();
 		SimpleDateFormat day = new SimpleDateFormat("yyyyMMdd");
 		attendance.setDay(day.format(date));
-		if((List<Attendance>)attendanceinfo.findByDayAndEmployeeId(day.format(date), user.getEmployeeId()) != null) {
+		if((List<Attendance>)attendanceinfo.findByDayAndEmployeeId(day.format(date), user.getEmployeeId()) == null) {
 		// 出勤時間の受け取りと格納
 		SimpleDateFormat time = new SimpleDateFormat("kk:mm");
 		attendance.setStartTime(time.format(date));
