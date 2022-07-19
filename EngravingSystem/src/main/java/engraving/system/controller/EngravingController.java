@@ -43,25 +43,37 @@ public class EngravingController {
 	// 「/startEngraving」にアクセスがあった場合
 	@RequestMapping(value = "/startEngraving", method = RequestMethod.POST)
 	public ModelAndView engravingStart(@RequestParam("cmd") String cmd, ModelAndView mav) {
+		
 		// 勤怠情報を格納するAttendanceの作成
-		Attendance attendance = new Attendance();
 		User user = (User) session.getAttribute("user");
-		attendance.setEmployeeId(user.getEmployeeId());
+		Attendance attendance = new Attendance();
+	
 		// 日付の受け取りと格納
 		Date date = new Date();
 		SimpleDateFormat day = new SimpleDateFormat("yyyyMMdd");
-		attendance.setDay(day.format(date));
-		if((List<Attendance>)attendanceinfo.findByDayAndEmployeeId(day.format(date), user.getEmployeeId()) == null) {
-		// 出勤時間の受け取りと格納
-		SimpleDateFormat time = new SimpleDateFormat("kk:mm");
-		attendance.setStartTime(time.format(date));
-		attendance.setStartEngrave(time.format(date));
-		// 情報をDBに保存
-		attendanceinfo.saveAndFlush(attendance);
+		
+		ArrayList<Attendance> attendanceList = (ArrayList<Attendance>)attendanceinfo.findByDayAndEmployeeId(day.format(date), user.getEmployeeId());
+		if(attendanceList.size() == 0) {
+			attendance.setEmployeeId(user.getEmployeeId());
+			attendance.setDay(day.format(date));
+			// 出勤時間の受け取りと格納
+			SimpleDateFormat time = new SimpleDateFormat("kk:mm");
+			attendance.setStartTime(time.format(date));
+			attendance.setStartEngrave(time.format(date));
+			// 情報をDBに保存
+			attendanceinfo.saveAndFlush(attendance);
+			String startTime = attendance.getStartTime();
+			mav.addObject("startTime", startTime);
+		}else {
+			attendance = attendanceList.get(0);
+			String startTime = attendance.getStartTime();
+			String finishTime = attendance.getFinishTime();
+			mav.addObject("startTime", startTime);
+			mav.addObject("finishTime",finishTime);
 		}
 
 		// リダイレクト先を指定
-		mav = new ModelAndView(cmd);
+		mav.setViewName(cmd);
 
 		// ModelとView情報を返す
 		return mav;
@@ -74,13 +86,15 @@ public class EngravingController {
 		// 入力された情報を更新
 		Date date = new Date();
 		SimpleDateFormat day = new SimpleDateFormat("yyyyMMdd");
+		Attendance attendance;
 		// ユーザーの当日の打刻情報を呼び出す
 		User user = (User)session.getAttribute("user");
 		int employeeId = user.getEmployeeId();
 		ArrayList<Attendance> attendanceList = (ArrayList<Attendance>)attendanceinfo.findByDayAndEmployeeId(day.format(date), employeeId);
 		
-		if (attendanceList.get(0).getFinishEngrave() == null && attendanceList != null) {
-			Attendance attendance = attendanceList.get(0);
+		if (attendanceList.get(0).getFinishEngrave() == null && attendanceList.size() != 0) {
+			attendance = attendanceList.get(0);
+			
 			// 退勤の打刻を行う
 			// 退勤時間をattendanceに格納
 			SimpleDateFormat time = new SimpleDateFormat("kk:mm");
@@ -112,10 +126,22 @@ public class EngravingController {
 				attendance.setOverTime(hour + ":" + minute);
 			}
 			attendanceinfo.saveAndFlush(attendance);
+			String startTime = attendance.getStartTime();
+			String finishTime = attendance.getFinishTime();
+			mav.addObject("startTime", startTime);
+			mav.addObject("finishTime",finishTime);
+		}else {
+			attendance = attendanceList.get(0);
+			String startTime = attendance.getStartTime();
+			String finishTime = attendance.getFinishTime();
+			mav.addObject("startTime", startTime);
+			mav.addObject("finishTime",finishTime);
 		}
+		
+		mav.addObject("attendance", attendance);
 
 		// リダイレクト先を指定
-		mav = new ModelAndView(cmd);
+		mav.setViewName(cmd);
 
 		// ModelとView情報を返す
 		return mav;
