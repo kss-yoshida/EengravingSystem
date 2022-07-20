@@ -65,11 +65,23 @@ public class EngravingController {
 			String startTime = attendance.getStartTime();
 			mav.addObject("startTime", startTime);
 		}else {
+			SimpleDateFormat time = new SimpleDateFormat("kk:mm");
 			attendance = attendanceList.get(0);
-			String startTime = attendance.getStartTime();
-			String finishTime = attendance.getFinishTime();
-			mav.addObject("startTime", startTime);
-			mav.addObject("finishTime",finishTime);
+			Date startEngrave;
+			try {
+				startEngrave = time.parse(attendance.getStartEngrave());
+				String strStartTime = (time.format(startEngrave));
+				mav.addObject("startTime", strStartTime);
+			} catch (Exception e) {
+			}
+			
+			Date finishEngrave;
+			try {
+				finishEngrave = time.parse(attendance.getFinishEngrave());
+				String strFinishTime = (time.format(finishEngrave));
+				mav.addObject("finishTime", strFinishTime);
+			} catch (Exception e) {
+			}
 		}
 
 		// リダイレクト先を指定
@@ -126,19 +138,41 @@ public class EngravingController {
 				attendance.setOverTime(hour + ":" + minute);
 			}
 			attendanceinfo.saveAndFlush(attendance);
-			String startTime = attendance.getStartTime();
-			String finishTime = attendance.getFinishTime();
-			mav.addObject("startTime", startTime);
-			mav.addObject("finishTime",finishTime);
-		}else {
+			//打刻時間を送る処理
+			Date startEngrave;
+			try {
+				startEngrave = time.parse(attendance.getStartEngrave());
+				String strStartTime = (time.format(startEngrave));
+				mav.addObject("startTime", strStartTime);
+			} catch (Exception e) {
+			}
+			
+			Date finishEngrave;
+			try {
+				finishEngrave = time.parse(attendance.getFinishEngrave());
+				String strFinishTime = (time.format(finishEngrave));
+				mav.addObject("finishTime", strFinishTime);
+			} catch (Exception e) {
+			}
+		}else {//すでに打刻している場合の打刻時間を送る処理
+			SimpleDateFormat time = new SimpleDateFormat("kk:mm");
 			attendance = attendanceList.get(0);
-			String startTime = attendance.getStartTime();
-			String finishTime = attendance.getFinishTime();
-			mav.addObject("startTime", startTime);
-			mav.addObject("finishTime",finishTime);
+			Date startEngrave;
+			try {
+				startEngrave = time.parse(attendance.getStartEngrave());
+				String strStartTime = (time.format(startEngrave));
+				mav.addObject("startTime", strStartTime);
+			} catch (Exception e) {
+			}
+			
+			Date finishEngrave;
+			try {
+				finishEngrave = time.parse(attendance.getFinishEngrave());
+				String strFinishTime = (time.format(finishEngrave));
+				mav.addObject("finishTime", strFinishTime);
+			} catch (Exception e) {
+			}
 		}
-		
-		mav.addObject("attendance", attendance);
 
 		// リダイレクト先を指定
 		mav.setViewName(cmd);
