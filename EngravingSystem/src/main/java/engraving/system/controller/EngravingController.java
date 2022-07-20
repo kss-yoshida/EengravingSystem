@@ -220,7 +220,7 @@ public class EngravingController {
 		ArrayList<Attendance> attendanceList = (ArrayList<Attendance>) attendanceinfo
 				.findByDayAndEmployeeId(day.format(date), employeeId);
 		Attendance attendance = new Attendance();
-		if (attendanceList != null) {
+		if (attendanceList.size() != 0) {
 //		ログイン日の出勤情報があった場合
 			attendance = attendanceList.get(0);
 			SimpleDateFormat time = new SimpleDateFormat("kk:mm");
