@@ -213,15 +213,38 @@ public class EngravingController {
 			}
 		}
 
+//		ログインした社員の勤怠情報の取得
+		Date date = new Date();
+		SimpleDateFormat day = new SimpleDateFormat("yyyyMMdd");
+		int employeeId = user.getEmployeeId();
+		ArrayList<Attendance> attendanceList = (ArrayList<Attendance>) attendanceinfo
+				.findByDayAndEmployeeId(day.format(date), employeeId);
+		Attendance attendance = new Attendance();
+		if (attendanceList != null) {
+//		ログイン日の出勤情報があった場合
+			attendance = attendanceList.get(0);
+			SimpleDateFormat time = new SimpleDateFormat("kk:mm");
+			Date startEngrave;
+			Date finishEngrave;
+			try {
+				startEngrave = time.parse(attendance.getStartEngrave());
+				attendance.setStartEngrave(time.format(startEngrave));
+				finishEngrave = time.parse(attendance.getFinishEngrave());
+				attendance.setFinishEngrave(time.format(finishEngrave));
+			} catch (Exception e) {
+			}
+			mav.addObject("attendance", attendance);
+		}
+
 		if (cmd.equals("")) {
 //			エラーがあったらログインに戻る
-			
 
 		} else {
 //			OKになってたらメニューに行く
 			mav.addObject("user", user);
+
 			mav.setViewName("employeeMenu");
-			
+
 		}
 		return mav;
 
