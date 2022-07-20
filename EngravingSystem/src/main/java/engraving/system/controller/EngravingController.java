@@ -242,10 +242,12 @@ public class EngravingController {
 		} else {
 //			OKになってたらメニューに行く
 			mav.addObject("user", user);
+			if (user.getAuthorirty().equals("1")) {
 
-			mav.setViewName("employeeMenu");
-
-		}
+				mav.setViewName("employeeMenu");
+			} else {
+				mav.setViewName("adminMenu");
+			}
 		return mav;
 
 	}
