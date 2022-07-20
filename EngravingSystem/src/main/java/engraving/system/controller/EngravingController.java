@@ -228,12 +228,12 @@ public class EngravingController {
 			Date finishEngrave;
 			try {
 				startEngrave = time.parse(attendance.getStartEngrave());
-				attendance.setStartEngrave(time.format(startEngrave));
 				finishEngrave = time.parse(attendance.getFinishEngrave());
-				attendance.setFinishEngrave(time.format(finishEngrave));
+				mav.addObject("startTime", time.format(startEngrave));
+				mav.addObject("finishTime", time.format(finishEngrave));
 			} catch (Exception e) {
 			}
-			mav.addObject("attendance", attendance);
+
 		}
 
 		if (cmd.equals("")) {
