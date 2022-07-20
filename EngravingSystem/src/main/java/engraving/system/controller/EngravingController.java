@@ -247,7 +247,7 @@ public class EngravingController {
 				mav.setViewName("employeeMenu");
 			} else {
 				mav.setViewName("adminMenu");
-			}
+			}}
 		return mav;
 
 	}
