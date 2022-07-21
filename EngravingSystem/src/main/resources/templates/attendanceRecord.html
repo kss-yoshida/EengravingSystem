@@ -28,11 +28,11 @@
 					<form action="/adminAttendanceRecord" method="get">
 						<input type="text" name="year">年
 						<input type="text" name="month">月
-						<input type="hidden" name="employeeId" value="${employeeId}">
+						<input type="hidden" name="employeeId" th:value ="${employeeId}">
 						<input type="submit" value="検索">
 					</form>
 					<form action="/adminAttendanceRecord"  method ="get">
-					<input type="hidden" name="employeeId" value="${employeeId}">
+					<input type="hidden" name="employeeId"  th:value="${employeeId}">
 						<input type="submit" value="今月表示">
 					</form>
 				</div>
