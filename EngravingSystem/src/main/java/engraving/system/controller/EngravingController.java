@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -23,7 +24,6 @@ public class EngravingController {
 	public User setUpUser() {
 		return new User();
 	}
-
 
 	// Repositoryインターフェースを自動インスタンス化
 	@Autowired
@@ -43,17 +43,18 @@ public class EngravingController {
 	// 「/startEngraving」にアクセスがあった場合
 	@RequestMapping(value = "/startEngraving", method = RequestMethod.POST)
 	public ModelAndView engravingStart(@RequestParam("cmd") String cmd, ModelAndView mav) {
-		
+
 		// 勤怠情報を格納するAttendanceの作成
 		User user = (User) session.getAttribute("user");
 		Attendance attendance = new Attendance();
-	
+
 		// 日付の受け取りと格納
 		Date date = new Date();
 		SimpleDateFormat day = new SimpleDateFormat("yyyyMMdd");
-		
-		ArrayList<Attendance> attendanceList = (ArrayList<Attendance>)attendanceinfo.findByDayAndEmployeeId(day.format(date), user.getEmployeeId());
-		if(attendanceList.size() == 0) {
+
+		ArrayList<Attendance> attendanceList = (ArrayList<Attendance>) attendanceinfo
+				.findByDayAndEmployeeId(day.format(date), user.getEmployeeId());
+		if (attendanceList.size() == 0) {
 			attendance.setEmployeeId(user.getEmployeeId());
 			attendance.setDay(day.format(date));
 			// 出勤時間の受け取りと格納
@@ -64,7 +65,7 @@ public class EngravingController {
 			attendanceinfo.saveAndFlush(attendance);
 			String startTime = attendance.getStartTime();
 			mav.addObject("startTime", startTime);
-		}else {
+		} else {
 			SimpleDateFormat time = new SimpleDateFormat("kk:mm");
 			attendance = attendanceList.get(0);
 			Date startEngrave;
@@ -74,7 +75,7 @@ public class EngravingController {
 				mav.addObject("startTime", strStartTime);
 			} catch (Exception e) {
 			}
-			
+
 			Date finishEngrave;
 			try {
 				finishEngrave = time.parse(attendance.getFinishEngrave());
@@ -100,13 +101,14 @@ public class EngravingController {
 		SimpleDateFormat day = new SimpleDateFormat("yyyyMMdd");
 		Attendance attendance;
 		// ユーザーの当日の打刻情報を呼び出す
-		User user = (User)session.getAttribute("user");
+		User user = (User) session.getAttribute("user");
 		int employeeId = user.getEmployeeId();
-		ArrayList<Attendance> attendanceList = (ArrayList<Attendance>)attendanceinfo.findByDayAndEmployeeId(day.format(date), employeeId);
-		
+		ArrayList<Attendance> attendanceList = (ArrayList<Attendance>) attendanceinfo
+				.findByDayAndEmployeeId(day.format(date), employeeId);
+
 		if (attendanceList.get(0).getFinishEngrave() == null && attendanceList.size() != 0) {
 			attendance = attendanceList.get(0);
-			
+
 			// 退勤の打刻を行う
 			// 退勤時間をattendanceに格納
 			SimpleDateFormat time = new SimpleDateFormat("kk:mm");
@@ -138,7 +140,7 @@ public class EngravingController {
 				attendance.setOverTime(hour + ":" + minute);
 			}
 			attendanceinfo.saveAndFlush(attendance);
-			//打刻時間を送る処理
+			// 打刻時間を送る処理
 			Date startEngrave;
 			try {
 				startEngrave = time.parse(attendance.getStartEngrave());
@@ -146,7 +148,7 @@ public class EngravingController {
 				mav.addObject("startTime", strStartTime);
 			} catch (Exception e) {
 			}
-			
+
 			Date finishEngrave;
 			try {
 				finishEngrave = time.parse(attendance.getFinishEngrave());
@@ -154,7 +156,7 @@ public class EngravingController {
 				mav.addObject("finishTime", strFinishTime);
 			} catch (Exception e) {
 			}
-		}else {//すでに打刻している場合の打刻時間を送る処理
+		} else {// すでに打刻している場合の打刻時間を送る処理
 			SimpleDateFormat time = new SimpleDateFormat("kk:mm");
 			attendance = attendanceList.get(0);
 			Date startEngrave;
@@ -164,7 +166,7 @@ public class EngravingController {
 				mav.addObject("startTime", strStartTime);
 			} catch (Exception e) {
 			}
-			
+
 			Date finishEngrave;
 			try {
 				finishEngrave = time.parse(attendance.getFinishEngrave());
@@ -210,6 +212,7 @@ public class EngravingController {
 				logininfo.saveAndFlush(log);
 //				該当ユーザーがいたらcmdをOKにする
 				cmd = "ok";
+
 				if(cmd.equals("ok")) {
 					break;
 				}
@@ -250,9 +253,77 @@ public class EngravingController {
 				mav.setViewName("employeeMenu");
 			} else {
 				mav.setViewName("adminMenu");
-			}}
+			}
+		}
 		return mav;
+	}
 
+	/*
+	 * 社員一覧表示 管理者用機能
+	 */
+	@RequestMapping("/employeeList")
+	public ModelAndView employeeList(ModelAndView mav) {
+//		DBから社員リストを取得
+		ArrayList<User> userList = new ArrayList<User>();
+		userList = (ArrayList<User>) userinfo.findAll();
+//		リストが空でなければmavに登録
+		if (userList.size() != 0) {
+			mav.addObject("employeeList", userList);
+		}
+//		遷移先の指定
+		mav.setViewName("employeeList");
+		return mav;
+	}
+
+	/*
+	 * 社員一覧検索機能
+	 */
+	@RequestMapping("/searchEmployee")
+	public ModelAndView search(ModelAndView mav, @RequestParam(value = "employeeId", defaultValue = "0") int id,
+			@RequestParam(value = "name", defaultValue = "") String name) {
+//		DBから条件付きで社員リストを取得
+		ArrayList<User> userList = new ArrayList<User>();
+//		社員番号と名前が入力されている
+		if (!name.equals("") && id != 0) {
+			userList = (ArrayList<User>) userinfo.findByEmployeeIdAndName(id, name);
+		} else if (!name.equals("")) {
+//			名前のみ
+			userList = (ArrayList<User>) userinfo.findByName(name);
+		} else if (id != 0) {
+//			社員番号のみ
+			userList = (ArrayList<User>) userinfo.findByEmployeeId(id);
+		}
+
+//		リストが空でなければmavに登録
+		if (userList.size() != 0) {
+			mav.addObject("employeeList", userList);
+		}
+//		遷移先の指定
+		mav.setViewName("employeeList");
+		return mav;
+	}
+
+	/*
+	 * 管理者登録削除
+	 */
+	@RequestMapping("/changeAuthority")
+	public ModelAndView changeAdmin(ModelAndView mav, @RequestParam("authority") String authority,
+			@RequestParam("employeeId") int id) {
+		userinfo.findByEmployeeId(id);
+
+		return mav;
+	}
+
+	/*
+	 * ログアウト処理
+	 * 
+	 */
+	@RequestMapping("/logout")
+	public ModelAndView logout() {
+		ModelAndView mav = new ModelAndView();
+		session.removeAttribute("user");
+		mav.setViewName("login");
+		return mav;
 	}
 	
 	/*
@@ -455,7 +526,9 @@ public class EngravingController {
 	}
 	
 
+
 	//ログイン画面に遷移
+
 	@RequestMapping("/loginForm")
 	public ModelAndView loginForm(ModelAndView mav) {
 		mav.setViewName("login");
@@ -466,6 +539,7 @@ public class EngravingController {
 	//従業員メニュー画面に遷移
 	@RequestMapping("/employeeMenu")
 	public ModelAndView employeeMenu(ModelAndView mav) {
+		mav.setViewName("employeeMenu");
 		return mav;
 	}
 	//管理者メニューに遷移
