@@ -440,10 +440,13 @@ public class EngravingController {
 	@RequestMapping(value ="/adminAttendanceRecord",method = RequestMethod.GET)
 	public ModelAndView attendanceRecorde(@RequestParam(value = "year", defaultValue = "",required=false) String year ,
 			@RequestParam(value = "month",defaultValue = "",required=false) String month ,
-			@RequestParam("employeeId") int employeeId ,ModelAndView mav) {
+			@RequestParam("employeeId") String strEmployeeId ,ModelAndView mav) {
 		//ユーザー情報の受け取り
 		User user = (User)session.getAttribute("user");
 		String authority = user.getAuthority();
+		
+		//対象のユーザーIdの変更
+		int employeeId = Integer.parseInt(strEmployeeId); 
 		
 		//月が1桁で入力されt場合の処理
 				if(month.length() == 1 && month != "") {
