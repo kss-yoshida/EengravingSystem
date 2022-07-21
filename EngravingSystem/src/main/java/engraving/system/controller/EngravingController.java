@@ -213,6 +213,9 @@ public class EngravingController {
 //				該当ユーザーがいたらcmdをOKにする
 				cmd = "ok";
 
+				if(cmd.equals("ok")) {
+					break;
+				}
 			}
 		}
 
@@ -322,8 +325,210 @@ public class EngravingController {
 		mav.setViewName("login");
 		return mav;
 	}
+	
+	/*
+	 *勤怠情報確認機能 
+	 */
+	@RequestMapping(value ="/attendanceRecord"/*, method = RequestMethod.POST*/)
+	public ModelAndView attendanceRecorde(@RequestParam(value = "year", defaultValue = "",required=false) String year ,
+			@RequestParam(value = "month",defaultValue = "",required=false) String month ,ModelAndView mav) {
+		//ユーザー情報の受け取り
+		User user = (User)session.getAttribute("user");
+		int employeeId = user.getEmployeeId();
+		String authority = user.getAuthority();
+		
+		//月が1桁で入力されt場合の処理
+		if(month.length() == 1 && month != "") {
+			month = "0" + month;
+		}
+		
+		//検索する日付を格納する変数
+		String day;
+		Date date = new Date();
+		
+		//渡す年月の形を変換するフォーマット
+		SimpleDateFormat monthFormat = new SimpleDateFormat("yyyy年MM月");
+		
+		//検索条件での条件分岐
+		if(year.equals("") && month.equals("")) {//検索条件がない場合
+			SimpleDateFormat monthData = new SimpleDateFormat("yyyy-MM");
+			day = monthData.format(date) + "%";
+			mav.addObject("month",monthFormat.format(date));
+		}else if(!year.equals("") && !month.equals("")) {//年と月で検索された場合
+			day = year + "-" + month + "%";
+			mav.addObject("month",year + "年" + month + "月");
+		}else if(year.equals("") && !month.equals("")) {//月で検索した場合
+			SimpleDateFormat yearData = new SimpleDateFormat("yyyy");
+			day = yearData.format(date) + "-" + month + "%";
+			mav.addObject("month",yearData.format(date) + "年"  + month  + "月" );
+		}else  {//年で検索した場合
+			day = year + "%";
+			mav.addObject("month", year + "年");
+		}
+		//ユーザーの勤怠情報の受け取り
+		ArrayList<Attendance> attendanceList = attendanceinfo.findByEmployeeIdAndDayLike(employeeId,day);
+		
+		//形の変換のためのフォーマット
+		SimpleDateFormat time = new SimpleDateFormat("HH時mm分");
+		SimpleDateFormat timer = new SimpleDateFormat("HH時間mm分");
+		SimpleDateFormat days = new SimpleDateFormat("dd日");
+		SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+		SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd");
+		
+		//勤怠情報の形の変換
+		
+		for(int i = 0; attendanceList.size() > i; i++) {
+			Date startEngrave;
+			Date finishEngrave;
+			Date startTime;
+			Date finishTime;
+			Date breakTime;
+			Date overTime;
+			Date dayData;
+			try {
+				Attendance attendance = attendanceList.get(i);
+				//出勤打刻時間
+				startEngrave = timeFormat.parse(attendance.getStartEngrave());
+				attendance.setStartEngrave(time.format(startEngrave));
+				//退勤打刻時間
+				finishEngrave = timeFormat.parse(attendance.getFinishEngrave());
+				attendance.setFinishEngrave(time.format(finishEngrave));
+				//出勤時間
+				startTime = timeFormat.parse(attendance.getStartTime());
+				attendance.setStartTime(time.format(startTime));
+				//退勤時間
+				finishTime = timeFormat.parse(attendance.getFinishTime());
+				attendance.setFinishTime(time.format(finishTime));
+				//休憩時間
+				breakTime = timeFormat.parse(attendance.getBreakTime());
+				attendance.setBreakTime(timer.format(breakTime));
+				//残業時間
+				overTime = timeFormat.parse(attendance.getOverTime());
+				attendance.setOverTime(timer.format(overTime));
+				//日付
+				dayData = dayFormat.parse(attendance.getDay());
+				attendance.setDay(days.format(dayData));
+				
+				//データの格納 
+				attendanceList.set(i,attendance);
+			}catch(Exception e) {
+			}
+		}
+		
+		//情報の受け渡し
+		mav.addObject("attendanceList", attendanceList);
+		mav.addObject("authority",authority);
+		
+		//遷移先の指定
+		mav.setViewName("attendanceRecord");
+		
+		return mav;
+	}
+	
+	/*
+	 * ユーザー一覧から来た場合の勤怠情報確認機能 
+	 */
+	@RequestMapping(value ="/adminAttendanceRecord",method = RequestMethod.GET)
+	public ModelAndView attendanceRecorde(@RequestParam(value = "year", defaultValue = "",required=false) String year ,
+			@RequestParam(value = "month",defaultValue = "",required=false) String month ,
+			@RequestParam("enployeeId") int employeeId ,ModelAndView mav) {
+		//ユーザー情報の受け取り
+		User user = (User)session.getAttribute("user");
+		String authority = user.getAuthority();
+		
+		//月が1桁で入力されt場合の処理
+				if(month.length() == 1 && month != "") {
+					month = "0" + month;
+				}
+				
+				//検索する日付を格納する変数
+				String day;
+				Date date = new Date();
+				
+				//渡す年月の形を変換するフォーマット
+				SimpleDateFormat monthFormat = new SimpleDateFormat("yyyy年MM月");
+				
+				//検索条件での条件分岐
+				if(year.equals("") && month.equals("")) {//検索条件がない場合
+					SimpleDateFormat monthData = new SimpleDateFormat("yyyy-MM");
+					day = monthData.format(date) + "%";
+					mav.addObject("month",monthFormat.format(date));
+				}else if(!year.equals("") && !month.equals("")) {//年と月で検索された場合
+					day = year + "-" + month + "%";
+					mav.addObject("month",year + "年" + month + "月");
+				}else if(year.equals("") && !month.equals("")) {//月で検索した場合
+					SimpleDateFormat yearData = new SimpleDateFormat("yyyy");
+					day = yearData.format(date) + "-" + month + "%";
+					mav.addObject("month",yearData.format(date) + "年"  + month  + "月" );
+				}else  {//年で検索した場合
+					day = year + "%";
+					mav.addObject("month", year + "年");
+				}
+				//ユーザーの勤怠情報の受け取り
+				ArrayList<Attendance> attendanceList = attendanceinfo.findByEmployeeIdAndDayLike(employeeId,day);
+				
+				//形の変換のためのフォーマット
+				SimpleDateFormat time = new SimpleDateFormat("HH時mm分");
+				SimpleDateFormat timer = new SimpleDateFormat("HH時間mm分");
+				SimpleDateFormat days = new SimpleDateFormat("dd日");
+				SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+				SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd");
+				
+				//勤怠情報の形の変換
+				
+				for(int i = 0; attendanceList.size() > i; i++) {
+					Date startEngrave;
+					Date finishEngrave;
+					Date startTime;
+					Date finishTime;
+					Date breakTime;
+					Date overTime;
+					Date dayData;
+					try {
+						Attendance attendance = attendanceList.get(i);
+						//出勤打刻時間
+						startEngrave = timeFormat.parse(attendance.getStartEngrave());
+						attendance.setStartEngrave(time.format(startEngrave));
+						//退勤打刻時間
+						finishEngrave = timeFormat.parse(attendance.getFinishEngrave());
+						attendance.setFinishEngrave(time.format(finishEngrave));
+						//出勤時間
+						startTime = timeFormat.parse(attendance.getStartTime());
+						attendance.setStartTime(time.format(startTime));
+						//退勤時間
+						finishTime = timeFormat.parse(attendance.getFinishTime());
+						attendance.setFinishTime(time.format(finishTime));
+						//休憩時間
+						breakTime = timeFormat.parse(attendance.getBreakTime());
+						attendance.setBreakTime(timer.format(breakTime));
+						//残業時間
+						overTime = timeFormat.parse(attendance.getOverTime());
+						attendance.setOverTime(timer.format(overTime));
+						//日付
+						dayData = dayFormat.parse(attendance.getDay());
+						attendance.setDay(days.format(dayData));
+						
+						//データの格納 
+						attendanceList.set(i,attendance);
+					}catch(Exception e) {
+					}
+				}
+		
+		//情報の受け渡し
+		mav.addObject("attendanceList", attendanceList);
+		mav.addObject("authority",authority);
+		mav.addObject("employeeId", employeeId);
+		
+		//遷移先の指定
+		mav.setViewName("attendanceRecord");
+		
+		return mav;
+	}
+	
 
-//	画面遷移用リクエストマッピング
+
+	//ログイン画面に遷移
+
 	@RequestMapping("/loginForm")
 	public ModelAndView loginForm(ModelAndView mav) {
 		mav.setViewName("login");
@@ -331,12 +536,13 @@ public class EngravingController {
 		return mav;
 	}
 
+	//従業員メニュー画面に遷移
 	@RequestMapping("/employeeMenu")
 	public ModelAndView employeeMenu(ModelAndView mav) {
 		mav.setViewName("employeeMenu");
 		return mav;
 	}
-
+	//管理者メニューに遷移
 	@RequestMapping("/adminMenu")
 	public ModelAndView adminMenu(ModelAndView mav) {
 		mav.setViewName("adminMenu");
