@@ -1,60 +1,71 @@
 <!DOCTYPE html>
-<html lange="ja">
-	<head>
-		<meta charset="UTF-8">
-		<link rel="stylesheet" href="css/menu.css">
-		<link rel="stylesheet" href="css/style.css">
-		<link rel="stylesheet" href="css/adminMenu.css">
-		<link rel="stylesheet" href="css/employeeList.css">
-		<title>社員一覧</title>
-	</head>
-	<body>
-		<header>
-	        <nav class="nav-admin">
-	            <ul>
-	                <li>打刻プログラム</li>
-	                <li><a href="#">HOME</a></li>
-	                <li><a href="#">ログアウト</a></li>
-	            </ul>
-	        </nav>
-	    </header>
-		<div class="container">
-			<h3>社員一覧</h3><br>
-			<div class="engraving-flex">
-				<form action="#" method="post">
-					<input type="text" name="number">社員番号
-					<input type="text" name="name">名前
-					<input type="submit" value="検索">
-				</form>
-				<form action="#" method="post">
-					<input type="submit" value="全検索">
-				</form>
-			</div>
-			<table class="employee-list-table">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="css/menu.css">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/adminMenu.css">
+<link rel="stylesheet" href="css/employeeList.css">
+<title>社員一覧</title>
+</head>
+<body>
+	<header>
+		<nav class="nav-admin">
+			<ul>
+				<li>打刻プログラム</li>
+				<li><a href="/adminMenu">HOME</a></li>
+				<li><a href="/logout">ログアウト</a></li>
+			</ul>
+		</nav>
+	</header>
+	<div class="container">
+		<h3>社員一覧</h3>
+		<br>
+		<div class="engraving-flex">
+			<form action="/searchEmployee" method="post">
+				<input type="text" name="employeeId">社員番号 <input type="text"
+					name="name">名前 <input type="submit" value="検索">
+			</form>
+			<form action="/employeeList" method="post">
+				<input type="submit" value="全検索">
+			</form>
+		</div>
+		<table class="employee-list-table">
+			<tr>
+				<th>写真</th>
+				<th>社員番号</th>
+				<th>氏名</th>
+				<th>管理者登録・削除</th>
+				<th>変更/削除</th>
+			</tr>
+			<th:block th:each="user : ${employeeList}">
 				<tr>
-					<th>写真</th>
-					<th>社員番号</th>
-					<th>氏名</th>
-					<th>管理者登録・削除</th>
-					<th>変更/削除</th>
-				</tr>
-				<tr>
-					<td>写真</td>
-					<td>0000000</td>
-					<td>名前</td>
-					<td><input type="submit" value="登録"></td>
+					<td th:text="*{user.photo}"></td>
+					<td th:text="*{user.employeeId}"></td>
+					<td th:text="*{user.name}"></td>
+					<td th:switch="*{user.authority}">
+						<form action="/changeAuthority">
+							<input type="hidden" name="employeeID" value="*{user.employeeId}">
+							<input type="hidden" name="authority" value="1"
+								th:if="${authority == '1'}"> <input type="submit"
+								value="登録" th:case="1"> <input type="hidden"
+								name="authority" value="2" th:if="${authority == '0'}">
+							<input type="submit" value="削除" th:case="0">
+						</form>
+					</td>
 					<td>
 						<div class="engraving-flex">
-						<form action="#" method="post">
-							<input type="submit" value="変更">
-						</form>
-						<form action="#" method="post">
-							<input type="submit" value="削除">
-						</form>
-					</div>
+							<form action="#" method="post">
+								<input type="submit" value="変更">
+							</form>
+							<form action="#" method="post">
+								<input type="submit" value="削除">
+							</form>
+						</div>
 					</td>
 				</tr>
-			</table>
-		</div>
-	</body>
+			</th:block>
+		</table>
+	</div>
+</body>
 </html>
