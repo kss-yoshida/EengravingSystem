@@ -304,11 +304,20 @@ public class EngravingController {
 	 * 管理者登録削除
 	 */
 	@RequestMapping("/changeAuthority")
-	public ModelAndView changeAdmin(ModelAndView mav, @RequestParam("authority") String authority,
-			@RequestParam("employeeId") int id) {
-		userinfo.findByEmployeeId(id);
+	public String changeAdmin(ModelAndView mav, @RequestParam("authority") String authority,
+			@RequestParam("employeeId") String strid) {
+		int id = Integer.parseInt(strid);
+		ArrayList<User> list = userinfo.findByEmployeeId(id);
+		User user = list.get(0);
+		if (authority.equals("0")) {
+			user.setAuthority("1");
+		} else {
+			user.setAuthority("0");
+		}
 
-		return mav;
+		userinfo.saveAndFlush(user);
+
+		return "redirect:/employeeList";
 	}
 
 	/*
