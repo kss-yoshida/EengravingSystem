@@ -440,7 +440,7 @@ public class EngravingController {
 	@RequestMapping(value ="/adminAttendanceRecord",method = RequestMethod.GET)
 	public ModelAndView attendanceRecorde(@RequestParam(value = "year", defaultValue = "",required=false) String year ,
 			@RequestParam(value = "month",defaultValue = "",required=false) String month ,
-			@RequestParam("enployeeId") int employeeId ,ModelAndView mav) {
+			@RequestParam("employeeId") int employeeId ,ModelAndView mav) {
 		//ユーザー情報の受け取り
 		User user = (User)session.getAttribute("user");
 		String authority = user.getAuthority();
