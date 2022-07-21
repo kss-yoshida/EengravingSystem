@@ -42,7 +42,7 @@
 				<tr>
 					<td th:text="*{user.photo}"></td>
 					<td><a
-						th:href="@{/adminAttendanceRecord(id=${user.employeeId})}">[[*{user.employeeId}]]</a></td>
+						th:href="@{/adminAttendanceRecord(employeeId=${user.employeeId})}">[[*{user.employeeId}]]</a></td>
 					<td th:text="*{user.name}"></td>
 					<td>
 						<form action="/changeAuthority" th:switch="*{user.authority}">
