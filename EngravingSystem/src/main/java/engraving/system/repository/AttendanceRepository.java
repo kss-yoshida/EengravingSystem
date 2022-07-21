@@ -12,4 +12,7 @@ public interface AttendanceRepository extends JpaRepository<Attendance, String> 
 
   //退勤打刻時間とそれに付随するデータを更新する処理
 	public ArrayList<Attendance> findByDayAndEmployeeId(String day,int employeeId);
+	
+	//対象のユーザーの勤怠情報を受け取る処理
+	public ArrayList<Attendance> findByEmployeeIdAndDayLike(int employeeId,String day);
 }
