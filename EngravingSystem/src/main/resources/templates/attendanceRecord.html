@@ -1,53 +1,72 @@
 <!DOCTYPE html>
-<html lange="ja">
+<html xmlns:th="http://www.thymeleaf.org">
 	<head>
 		<meta charset="UTF-8">
-		<link rel="stylesheet" href="css/menu.css">
-		<link rel="stylesheet" href="css/style.css">
-		<link rel="stylesheet" href="css/adminMenu.css">
-		<link rel="stylesheet" href="css/attendanceRecord.css">
+		<link rel="stylesheet"  th:href="@{/css/menu.css}">
+		<link rel="stylesheet"  th:href="@{/css/style.css}">
+		<link rel="stylesheet"  th:href="@{/css/adminMenu.css}">
+		<link rel="stylesheet"  th:href="@{/css/attendanceRecord.css}">
 		<title>勤怠情報確認</title>
 	</head>
 	<body>
 		<header>
 	        <nav class="nav-normal">
-	            <ul>
+	            <ul >
 	                <li>打刻プログラム</li>
-	                <li><a href="#">HOME</a></li>
-	                <li><a href="#">ログアウト</a></li>
+		            <li th:switch="${authority}">
+			            <a th:case="0" href="/adminMenu" th:text="HOME"></a>
+			            <a th:case="1" href="/employeeMenu" th:text="HOME"></a>
+		            </li>
+	                <li><a href="/logout">ログアウト</a></li>
 	            </ul>
 	        </nav>
 	    </header>
 		<div class="container">
 			<h3>勤怠情報確認</h3><br>
-			<div class="engraving-flex">
-				<form action="#" method="post">
-					<input type="text" name="year">年
-					<input type="text" name="month">月
-					<input type="submit" value="検索">
-				</form>
-				<form action="#" method="post">
-					<input type="submit" value="全検索">
-				</form>
+			<div th:switch="${authority}">
+				<div class="engraving-flex"  th:case="0">
+					<form action="/adminAttendanceRecord" method="get">
+						<input type="text" name="year">年
+						<input type="text" name="month">月
+						<input type="hidden" name="employeeId" value="${employeeId}">
+						<input type="submit" value="検索">
+					</form>
+					<form action="/adminAttendanceRecord"  method ="get">
+					<input type="hidden" name="employeeId" value="${employeeId}">
+						<input type="submit" value="今月表示">
+					</form>
+				</div>
+				<div class="engraving-flex" th:case="1">
+					<form action="/attendanceRecord" method="post">
+						<input type="text" name="year">年
+						<input type="text" name="month">月
+						<input type="submit" value="検索">
+					</form>
+					<form action="/attendanceRecord" >
+						<input type="submit" value="今月表示">
+					</form>
+				</div>
 			</div>
 			<br>
-			<h4 class="text-left">0000年00月</h4>
+			<h4 class="text-left" th:text="${month}"></h4>
 			<table class="attendance-record-table">
 				<tr>
 					<th>日付</th>
 					<th>打刻出勤時間</th>
 					<th>打刻退勤時間</th>
-					<th>勤怠時間</th>
+					<th>出勤時間</th>
+					<th>退勤時間</th>
 					<th>休憩時間</th>
 					<th>残業時間</th>
 				</tr>
-				<tr>
-					<td>0日</td>
-					<td>00時00分</td>
-					<td>00時00分</td>
-					<td>0時間00分</td>
-					<td>0時間00分</td>
-					<td>0時間00分</td>
+				<tr th:each="attendanceList : ${attendanceList}"  th:object="${attendanceList}">
+					<td th:text="*{day}"></td>
+					<td th:text="*{startEngrave}"></td>
+					<td th:text="*{finishEngrave}"></td>
+					<td th:text="*{startTime}"></td>
+					<td th:text="*{finishTime}"></td>
+					<td th:text="*{breakTime}"></td>
+					<td th:text="*{overTime}"></td>
 				</tr>
 			</table>
 		</div>
