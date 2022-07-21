@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<link rel="stylesheet"  th:href="@{/css/menu.css}">
-<link rel="stylesheet"  th:href="@{/css/style.css}">
-<link rel="stylesheet"  th:href="@{/css/adminMenu.css}">
+<link rel="stylesheet" th:href="@{/css/menu.css}">
+<link rel="stylesheet" th:href="@{/css/style.css}">
+<link rel="stylesheet" th:href="@{/css/adminMenu.css}">
 <title>メニュー</title>
 
 </head>
@@ -13,8 +13,7 @@
 		<nav class="nav-normal">
 			<ul>
 				<li>打刻プログラム</li>
-				<li><a href="#">HOME</a></li>
-				<li><a href="#">ログアウト</a></li>
+				<li><a href="/logout">ログアウト</a></li>
 			</ul>
 		</nav>
 	</header>
@@ -29,21 +28,19 @@
 		</p>
 		<p>
 			<br>
-		<div class="engraving-flex">
-
-		</div>
+		<div class="engraving-flex"></div>
 		<div class="engraving-flex">
 			<form action="startEngraving" method="post">
-			<p th:if="${startTime != null}"  th:text="${startTime}"></p>
-			<p th:if="${startTime == null}" >&nbsp;</p>
-				<input type="hidden" name="cmd" value="employeeMenu">
-				<input type="submit" value="出勤">
+				<p th:if="${startTime != null}" th:text="${startTime}"></p>
+				<p th:if="${startTime == null}">&nbsp;</p>
+				<input type="hidden" name="cmd" value="employeeMenu"> <input
+					type="submit" value="出勤">
 			</form>
 			<form action="finishEngraving" method="post">
-				<p th:if="${finishTime != null}"  th:text="${finishTime}"></p>
-				<p th:if="${finishTime == null}" >&nbsp;</p>
-				<input type="hidden" name="cmd" value="employeeMenu">
-				<input type="submit" value="退勤">
+				<p th:if="${finishTime != null}" th:text="${finishTime}"></p>
+				<p th:if="${finishTime == null}">&nbsp;</p>
+				<input type="hidden" name="cmd" value="employeeMenu"> <input
+					type="submit" value="退勤">
 			</form>
 		</div>
 	</div>
