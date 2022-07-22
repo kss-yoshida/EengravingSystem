@@ -9,11 +9,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.util.*;
+import java.io.File;
 import java.text.*;
-import java.io.*;
 import javax.servlet.http.HttpSession;
 
 import engraving.system.entity.*;
@@ -36,6 +34,8 @@ public class EngravingController {
 	private UserRepository userinfo;
 	@Autowired
 	private LoginLogRepository logininfo;
+	@Autowired
+	private RequestRepository requestinfo;
 	@Autowired
 	HttpSession session;
 
@@ -104,7 +104,7 @@ public class EngravingController {
 		Attendance attendance;
 		// ユーザーの当日の打刻情報を呼び出す
 		User user = (User) session.getAttribute("user");
-		int employeeId = user.getEmployeeId();
+		String employeeId = user.getEmployeeId();
 		ArrayList<Attendance> attendanceList = (ArrayList<Attendance>) attendanceinfo
 				.findByDayAndEmployeeId(day.format(date), employeeId);
 
@@ -190,7 +190,7 @@ public class EngravingController {
 	 */
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public ModelAndView login(ModelAndView mav, @RequestParam("password") String pass,
-			@RequestParam("employee_id") int num) {
+			@RequestParam("employee_id") String id) {
 //		ユーザーリストの取得
 		ArrayList<User> list = (ArrayList<User>) userinfo.findAll();
 		User user = new User();
@@ -200,7 +200,7 @@ public class EngravingController {
 //		入力した社員番号とパスワードがあるか確認
 		for (int i = 0; i < list.size(); i++) {
 			user = list.get(i);
-			if (user.getEmployeeId() == num && user.getPassword().equals(pass)) {
+			if (user.getEmployeeId().equals(id) && user.getPassword().equals(pass)) {
 //				ログイン履歴の設定
 				log.setEmployeeId(user.getEmployeeId());
 				Date date = new Date();
@@ -223,7 +223,7 @@ public class EngravingController {
 //		ログインした社員の勤怠情報の取得
 		Date date = new Date();
 		SimpleDateFormat day = new SimpleDateFormat("yyyyMMdd");
-		int employeeId = user.getEmployeeId();
+		String employeeId = user.getEmployeeId();
 		ArrayList<Attendance> attendanceList = (ArrayList<Attendance>) attendanceinfo
 				.findByDayAndEmployeeId(day.format(date), employeeId);
 		Attendance attendance = new Attendance();
@@ -280,19 +280,19 @@ public class EngravingController {
 	 * 社員一覧検索機能
 	 */
 	@RequestMapping("/searchEmployee")
-	public ModelAndView search(ModelAndView mav, @RequestParam(value = "employeeId", defaultValue = "0") int id,
+	public ModelAndView search(ModelAndView mav, @RequestParam(value = "employeeId", defaultValue = "0") String id,
 			@RequestParam(value = "name", defaultValue = "") String name) {
 //		DBから条件付きで社員リストを取得
 		ArrayList<User> userList = new ArrayList<User>();
 //		社員番号と名前が入力されている
-		if (!name.equals("") && id != 0) {
-			userList = (ArrayList<User>) userinfo.findByEmployeeIdAndName(id, name);
+		if (!name.equals("") && id.equals("0")) {
+			userList = userinfo.findByEmployeeIdAndName(id, name);
 		} else if (!name.equals("")) {
 //			名前のみ
-			userList = (ArrayList<User>) userinfo.findByName(name);
-		} else if (id != 0) {
+			userList = userinfo.findByName(name);
+		} else if (id.equals("0")) {
 //			社員番号のみ
-			userList = (ArrayList<User>) userinfo.findByEmployeeId(id);
+			userList = userinfo.findByEmployeeIdStartingWith(id);
 		}
 
 //		リストが空でなければmavに登録
@@ -309,8 +309,7 @@ public class EngravingController {
 	 */
 	@RequestMapping("/changeAuthority")
 	public String changeAdmin(ModelAndView mav, @RequestParam("authority") String authority,
-			@RequestParam("employeeId") String strid) {
-		int id = Integer.parseInt(strid);
+			@RequestParam("employeeId") String id) {
 		ArrayList<User> list = userinfo.findByEmployeeId(id);
 		User user = list.get(0);
 		if (authority.equals("0")) {
@@ -345,7 +344,7 @@ public class EngravingController {
 			@RequestParam(value = "month", defaultValue = "", required = false) String month, ModelAndView mav) {
 		// ユーザー情報の受け取り
 		User user = (User) session.getAttribute("user");
-		int employeeId = user.getEmployeeId();
+		String employeeId = user.getEmployeeId();
 		String authority = user.getAuthority();
 
 		// 月が1桁で入力されt場合の処理
@@ -448,19 +447,16 @@ public class EngravingController {
 	public ModelAndView attendanceRecorde(
 			@RequestParam(value = "year", defaultValue = "", required = false) String year,
 			@RequestParam(value = "month", defaultValue = "", required = false) String month,
-			@RequestParam(value = "employeeId", defaultValue = "", required = false) String strEmployeeId,
-			ModelAndView mav) {
+			@RequestParam(value = "employeeId", defaultValue = "", required = false) String id, ModelAndView mav) {
 		// ユーザー情報の受け取り
 		User user = (User) session.getAttribute("user");
 		String authority = user.getAuthority();
 
-		// 対象のユーザーIdの変更
-		int employeeId = Integer.parseInt(strEmployeeId);
-
 		// 管理者メニューから来た場合の処理
-		if (strEmployeeId.equals("")) {
-			employeeId = user.getEmployeeId();
+		if (id.equals("")) {
+			id = user.getEmployeeId();
 		}
+
 		// 月が1桁で入力されt場合の処理
 		if (month.length() == 1 && month != "") {
 			month = "0" + month;
@@ -490,7 +486,7 @@ public class EngravingController {
 			mav.addObject("month", year + "年");
 		}
 		// ユーザーの勤怠情報の受け取り
-		ArrayList<Attendance> attendanceList = attendanceinfo.findByEmployeeIdAndDayLike(employeeId, day);
+		ArrayList<Attendance> attendanceList = attendanceinfo.findByEmployeeIdAndDayLike(id, day);
 
 		// 形の変換のためのフォーマット
 		SimpleDateFormat time = new SimpleDateFormat("HH時mm分");
@@ -542,7 +538,7 @@ public class EngravingController {
 		// 情報の受け渡し
 		mav.addObject("attendanceList", attendanceList);
 		mav.addObject("authority", authority);
-		mav.addObject("employeeId", employeeId);
+		mav.addObject("employeeId", id);
 
 		// 遷移先の指定
 		mav.setViewName("attendanceRecord");
@@ -567,7 +563,7 @@ public class EngravingController {
 		User user = new User();
 		
 		user.setName(name);
-		user.setEmployeeId(Integer.parseInt(employeeId));
+		user.setEmployeeId(employeeId);
 		user.setPassword(password);
 		user.setEmail(email);
 		user.setPhoto(photo);
@@ -583,7 +579,7 @@ public class EngravingController {
 // 		ModelとView情報を返す
 		return "redirect:/employeeList";
 	}
-	
+
 	/*
 	* リクエスト情報の受け取り
 	*/
@@ -620,4 +616,5 @@ public class EngravingController {
 		mav.setViewName("employeeRegistration");
 		return mav;
 	}
+
 }
