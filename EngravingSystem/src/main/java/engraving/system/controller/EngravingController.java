@@ -212,7 +212,7 @@ public class EngravingController {
 				logininfo.saveAndFlush(log);
 //				該当ユーザーがいたらcmdをOKにする
 				cmd = "ok";
-
+				break;
 			}
 		}
 
