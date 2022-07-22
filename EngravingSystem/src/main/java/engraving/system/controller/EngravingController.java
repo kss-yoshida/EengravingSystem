@@ -290,7 +290,7 @@ public class EngravingController {
 		} else if (!name.equals("")) {
 //			名前のみ
 			userList = userinfo.findByName(name);
-		} else if (id.equals("0")) {
+		} else if (!id.equals("0")) {
 //			社員番号のみ
 			userList = userinfo.findByEmployeeIdStartingWith(id);
 		}
