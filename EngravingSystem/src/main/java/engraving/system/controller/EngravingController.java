@@ -213,9 +213,8 @@ public class EngravingController {
 //				該当ユーザーがいたらcmdをOKにする
 				cmd = "ok";
 
-				if(cmd.equals("ok")) {
 					break;
-				}
+				
 			}
 		}
 
