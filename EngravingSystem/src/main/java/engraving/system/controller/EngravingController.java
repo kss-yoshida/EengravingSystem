@@ -9,8 +9,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.*;
 import java.text.*;
+import java.io.*;
 import javax.servlet.http.HttpSession;
 
 import engraving.system.entity.*;
@@ -570,12 +573,28 @@ public class EngravingController {
 		user.setPhoto(photo);
 		user.setAuthority(authority);
 		
+		//写真を保存する処理
+		File file = File("/src/main/resources/photo", employeeId + "_photo");
+		
 
 //		入力データをDBに保存
 		userinfo.saveAndFlush(user);
 
 // 		ModelとView情報を返す
 		return "redirect:/employeeList";
+	}
+	
+	/*
+	* リクエスト情報の受け取り
+	*/
+	@RequestMapping("/changeRequest")
+	public ModelAndView changeRequest(ModelAndView mav) {
+		//requestInfoの情報をすべて受け取る
+		Iterable<Request> requestList = requestinfo.findAll();
+		
+		mav.addObject("requestList",requestList);
+		
+		return mav;
 	}
 
 	@RequestMapping("/loginForm")
