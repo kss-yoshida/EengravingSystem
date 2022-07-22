@@ -35,6 +35,8 @@ public class EngravingController {
 	@Autowired
 	private LoginLogRepository logininfo;
 	@Autowired
+	private RequestRepository requestinfo;
+	@Autowired
 	HttpSession session;
 
 	/*
@@ -214,7 +216,6 @@ public class EngravingController {
 				cmd = "ok";
 
 					break;
-				
 			}
 		}
 
@@ -561,6 +562,16 @@ public class EngravingController {
 		mav = new ModelAndView("redirect:/employeeList");
 
 // 		ModelとView情報を返す
+		return mav;
+	}
+	
+	@RequestMapping("/changeRequest")
+	public ModelAndView changeRequest(ModelAndView mav) {
+		//requestInfoの情報をすべて受け取る
+		Iterable<Request> requestList = requestinfo.findAll();
+		
+		mav.addObject("requestList",requestList);
+		
 		return mav;
 	}
 
