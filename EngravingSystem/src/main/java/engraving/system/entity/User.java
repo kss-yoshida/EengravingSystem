@@ -13,13 +13,13 @@ public class User implements Serializable {
 	// employee
 	@Id
 	@Column(name = "employee_id")
-	private int employeeId;
+	private String employeeId;
 
-	public int getEmployeeId() {
+	public String getEmployeeId() {
 		return employeeId;
 	}
 
-	public void setEmployeeId(int employeeId) {
+	public void setEmployeeId(String employeeId) {
 		this.employeeId = employeeId;
 	}
 

@@ -20,14 +20,14 @@ public class Attendance {
 	
 	//社員番号
 	@Column(nullable = false)
-	private int employeeId;
+	private String employeeId;
 	
-	public int getEmployeeId() {
+	public String getEmployeeId() {
 		return employeeId;
 	}
 	
-	public void setEmployeeId(int employeeId) {
-		this.employeeId = employeeId;
+	public void setEmployeeId(String string) {
+		this.employeeId = string;
 	}
 	
 	//日付

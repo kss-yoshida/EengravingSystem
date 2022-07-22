@@ -22,13 +22,13 @@ public class LoginLog {
 
 	// 社員番号
 	@Column(name = "employeeId")
-	private int employeeId;
+	private String employeeId;
 
-	public void setEmployeeId(int id) {
-		this.employeeId = id;
+	public void setEmployeeId(String string) {
+		this.employeeId = string;
 	}
 
-	public int getEmployeeId() {
+	public String getEmployeeId() {
 		return this.employeeId;
 	}
 
