@@ -10,10 +10,14 @@ import engraving.system.entity.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, String> {
 
-	public ArrayList<User> findByEmployeeId(int id);
+	public ArrayList<User> findByEmployeeId(String id);
 
 	public ArrayList<User> findByName(String name);
 
-	public ArrayList<User> findByEmployeeIdAndName(int id, String name);
+	public ArrayList<User> findByEmployeeIdAndName(String id, String name);
+
+	public ArrayList<User> findByEmployeeIdLike(String id);
+
+	public ArrayList<User> findByEmployeeIdStartingWith(String id);
 
 }
