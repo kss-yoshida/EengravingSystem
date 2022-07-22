@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lange="ja">
+<html xmlns:th="http://www.thymeleaf.org">
 	<head>
 		<meta charset="UTF-8">
 		<link rel="stylesheet" href="css/menu.css">
@@ -13,8 +13,8 @@
 	        <nav class="nav-admin">
 	            <ul>
 	                <li>打刻プログラム</li>
-	                <li><a href="#">HOME</a></li>
-	                <li><a href="#">ログアウト</a></li>
+	                <li><a href="/adminMenu" th:text="HOME"></a></li>
+	                <li><a href="/logout">ログアウト</a></li>
 	            </ul>
 	        </nav>
 	    </header>
@@ -29,9 +29,9 @@
 					<th>変更後データ</th>
 					<th>認/否</th>
 				</tr>
-				<tr>
-					<td>0000/00/00</td>
-					<td>社員番号</td>
+				<tr th:each="requestList:${requestList}" th:object="${requestList}">
+					<td th:text="*{requestId}"></td>
+					<td></td>
 					<td>データ名</td>
 					<td>変更前</td>
 					<td>変更後</td>
