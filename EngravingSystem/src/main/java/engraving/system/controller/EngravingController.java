@@ -338,7 +338,7 @@ public class EngravingController {
 	/*
 	 * 勤怠情報確認機能
 	 */
-	@RequestMapping(value = "/attendanceRecord"/* , method = RequestMethod.POST */)
+	@RequestMapping(value = "/attendanceRecord")
 	public ModelAndView attendanceRecorde(
 			@RequestParam(value = "year", defaultValue = "", required = false) String year,
 			@RequestParam(value = "month", defaultValue = "", required = false) String month, ModelAndView mav) {
@@ -431,7 +431,7 @@ public class EngravingController {
 
 		// 管理者が見る場合
 		if (authority.equals("0")) {
-			mav.addObject("employeeId", employeeId);
+			mav.addObject("employeeId", user.getEmployeeId());
 		}
 
 		// 遷移先の指定
@@ -443,8 +443,8 @@ public class EngravingController {
 	/*
 	 * ユーザー一覧から来た場合の勤怠情報確認機能
 	 */
-	@RequestMapping(value = "/adminAttendanceRecord", method = RequestMethod.GET)
-	public ModelAndView attendanceRecorde(
+	@RequestMapping(value = "/adminAttendanceRecord")
+	public ModelAndView adminAttendanceRecorde(
 			@RequestParam(value = "year", defaultValue = "", required = false) String year,
 			@RequestParam(value = "month", defaultValue = "", required = false) String month,
 			@RequestParam(value = "employeeId", defaultValue = "", required = false) String id, ModelAndView mav) {
@@ -534,17 +534,6 @@ public class EngravingController {
 			} catch (Exception e) {
 			}
 		}
-
-		// 情報の受け渡し
-		mav.addObject("attendanceList", attendanceList);
-		mav.addObject("authority", authority);
-		mav.addObject("employeeId", id);
-
-		// 遷移先の指定
-		mav.setViewName("attendanceRecord");
-
-		return mav;
-	}
 
 	/*
 	 * 社員登録処理
