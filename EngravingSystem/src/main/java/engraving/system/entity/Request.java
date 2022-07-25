@@ -26,7 +26,7 @@ public class Request {
 	public void setEmployeeId(int id) {
 		this.employeeId=id;
 	}
-	public int getEmployee_id() {
+	public int getEmployeeId() {
 		return this.employeeId;
 	}
 	
@@ -77,7 +77,7 @@ public class Request {
 	public void setIsDeleted(Boolean flag) {
 		this.isDeleted=flag;
 	}
-	public Boolean getIs_deleted() {
+	public Boolean getIseleted() {
 		return this.isDeleted;
 	}
 
