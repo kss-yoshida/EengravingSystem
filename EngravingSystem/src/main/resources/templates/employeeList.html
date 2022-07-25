@@ -41,8 +41,13 @@
 			<th:block th:each="user : ${employeeList}">
 				<tr>
 					<td th:text="*{user.photo}"></td>
-					<td><a
-						th:href="@{/adminAttendanceRecord(employeeId=${user.employeeId})}">[[*{user.employeeId}]]</a></td>
+					<td>
+						<form action="/adminAttendanceRecord" method="post">
+							[[*{user.employeeId}]]
+							<input type="hidden" name="employeeId" th:value=*{employeeId}>
+							<input type="submit" value="勤怠確認">
+						</form>
+					</td>
 					<td th:text="*{user.name}"></td>
 					<td>
 						<form action="/changeAuthority" th:switch="*{user.authority}">
