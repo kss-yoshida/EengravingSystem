@@ -43,7 +43,7 @@ public class Change {
 	}
 	
 //	変更前のデータ
-	@Column(name="before_name" ,nullable=false)
+	@Column(name="before_data" ,nullable=false)
 	private String beforeData;
 	
 	public void setBeforeData(String data) {
