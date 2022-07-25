@@ -81,7 +81,7 @@ public class Change {
 	public void setIsUpdated(String date) {
 		this.isUpdated=date;
 	}
-	public String getIs_updated() {
+	public String getIsUpdated() {
 		return this.isUpdated;
 	}
 }
