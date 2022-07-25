@@ -57,7 +57,7 @@ public class Change {
 	@Column(name="after_data" ,nullable=false)
 	private String afterData;
 	
-	public void setafterData(String data) {
+	public void setAfterData(String data) {
 		this.afterData=data;
 	}
 	public String getAfterData() {
