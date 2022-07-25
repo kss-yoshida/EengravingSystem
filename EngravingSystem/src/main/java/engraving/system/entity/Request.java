@@ -21,12 +21,12 @@ public class Request {
 	
 //	社員番号
 	@Column(name="employee_id" ,nullable=false)
-	private int employeeId;
+	private String employeeId;
 	
-	public void setEmployeeId(int id) {
+	public void setEmployeeId(String id) {
 		this.employeeId=id;
 	}
-	public int getEmployeeId() {
+	public String getEmployeeId() {
 		return this.employeeId;
 	}
 	
@@ -46,7 +46,7 @@ public class Request {
 	public void setChangeStartEngrave(String time) {
 		this.changeStartEngrave=time;
 	}
-	public String getChange_start_engrave() {
+	public String getChangeStartEngrave() {
 		return this.changeStartEngrave;
 	}
 	
