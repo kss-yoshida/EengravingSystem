@@ -22,12 +22,12 @@ public class Change {
 	
 //	変更対応管理者番号
 	@Column(name="admin_id" ,nullable=false)
-	private int adminId;
+	private String adminId;
 	
-	public void setAdminId(int id) {
+	public void setAdminId(String id) {
 		this.adminId=id;
 	}
-	public int getAdminId() {
+	public String getAdminId() {
 		return this.adminId;
 	}
 	
@@ -65,12 +65,12 @@ public class Change {
 	}
 //	変更対象社員番号
 	@Column(name="employee_id" ,nullable=false)
-	private int employeeId;
+	private String employeeId;
 	
-	public void setEmployeeId(int id) {
+	public void setEmployeeId(String id) {
 		this.employeeId=id;
 	}
-	public int getEmployeeId() {
+	public String getEmployeeId() {
 		return this.employeeId;
 	}
 	
