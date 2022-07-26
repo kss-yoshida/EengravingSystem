@@ -10,9 +10,13 @@ import java.util.*;
 @Repository
 public interface AttendanceRepository extends JpaRepository<Attendance, String> {
 
+	//退勤情報IDから退勤情報を検索する
+	public Attendance findByAttendanceId(int attendanceId);
+	
 	// 退勤打刻時間とそれに付随するデータを更新する処理
 	public ArrayList<Attendance> findByDayAndEmployeeId(String day, String string);
 
 	// 対象のユーザーの勤怠情報を受け取る処理
 	public ArrayList<Attendance> findByEmployeeIdAndDayLike(String employeeId, String day);
+
 }
