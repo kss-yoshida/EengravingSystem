@@ -310,8 +310,7 @@ public class EngravingController {
 	@RequestMapping("/changeAuthority")
 	public String changeAdmin(ModelAndView mav, @RequestParam("authority") String authority,
 			@RequestParam("employeeId") String id) {
-		ArrayList<User> list = userinfo.findByEmployeeId(id);
-		User user = list.get(0);
+		User user= userinfo.findByEmployeeId(id);
 		if (authority.equals("0")) {
 			user.setAuthority("1");
 		} else {
@@ -534,17 +533,6 @@ public class EngravingController {
 			} catch (Exception e) {
 			}
 		}
-
-		// 情報の受け渡し
-		mav.addObject("attendanceList", attendanceList);
-		mav.addObject("authority", authority);
-		mav.addObject("employeeId", id);
-
-		// 遷移先の指定
-		mav.setViewName("attendanceRecord");
-
-		return mav;
-	}
 
 	/*
 	 * 社員登録処理
