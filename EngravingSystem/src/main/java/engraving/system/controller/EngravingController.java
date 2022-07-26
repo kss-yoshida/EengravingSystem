@@ -568,6 +568,86 @@ public class EngravingController {
 // 		ModelとView情報を返す
 		return "redirect:/employeeList";
 	}
+	/*
+	 * 勤怠情報変更機能
+	 */
+	@RequestMapping(value = "/changeAttendance", method = RequestMethod.POST)
+	public String changeAttendance(
+			@RequestParam(value = "attendanceId", defaultValue = "", required = false) String attendanceId,
+			@RequestParam(value = "startTime", defaultValue = "", required = false) String startTime,
+			@RequestParam(value = "finishTime", defaultValue = "", required = false) String finishTime,
+			@RequestParam(value = "overTime", defaultValue = "", required = false) String overTime,
+			@RequestParam(value = "breakTime", defaultValue = "", required = false) String breakTime,
+			@RequestParam(value = "startEngrave", defaultValue = "", required = false) String startEngrave,
+			@RequestParam(value = "finishEngrave", defaultValue = "", required = false) String finishEngrave,
+			@RequestParam(value = "employeeId", defaultValue = "", required = false) String employeeId,
+			@RequestParam(value = "day", defaultValue = "", required = false) String day, String mav) {
+		User user = (User) session.getAttribute("user");
+
+		Attendance before = attendanceinfo.findByAttendanceId(Integer.parseInt(attendanceId));
+
+		Attendance after = new Attendance();
+		after.setAttendanceId(Integer.parseInt(attendanceId));
+		after.setEmployeeId(before.getEmployeeId());
+		after.setDay(day);
+		after.setStartTime(startTime);
+		after.setFinishTime(finishTime);
+		after.setStartEngrave(startEngrave);
+		after.setFinishEngrave(finishEngrave);
+		after.setOverTime(overTime);
+		after.setBreakTime(breakTime);
+
+		Change change = new Change();
+		Date date = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
+		String time = sdf.format(date);
+
+		change.setAdminId(employeeId);
+		change.setIsUpdated(time);
+		change.setEmployeeId(before.getEmployeeId());
+//		それぞれの勤怠情報について変更履歴の登録
+//		出勤打刻時間
+		if (!before.getStartTime().equals(after.getStartTime())) {
+			change.setDataName("出勤時間");
+			change.setBeforeData(before.getStartTime());
+			change.setafterData(after.getStartTime());
+			changeinfo.saveAndFlush(change);
+		}
+//		休憩時間
+		if (!before.getBreakTime().equals(after.getBreakTime())) {
+			change.setDataName("休憩時間");
+			change.setBeforeData(before.getBreakTime());
+			change.setafterData(after.getBreakTime());
+			changeinfo.saveAndFlush(change);
+		}
+//		残業時間
+		if (!before.getOverTime().equals(after.getOverTime())) {
+			change.setDataName("残業時間");
+			change.setBeforeData(before.getOverTime());
+			change.setafterData(after.getOverTime());
+			changeinfo.saveAndFlush(change);
+		}
+//		退勤打刻時間
+		if (!before.getFinishTime().equals(after.getFinishTime())) {
+			change.setDataName("退勤時間");
+			change.setBeforeData(before.getFinishTime());
+			change.setafterData(after.getFinishTime());
+			changeinfo.saveAndFlush(change);
+		}
+
+//		勤怠情報変更の登録
+		attendanceinfo.saveAndFlush(after);
+
+//		遷移先コントローラーの選択
+		if (user.getEmployeeId().equals(employeeId)) {
+			mav = "redirect:/attendanceRecord";
+		} else {
+//			get送信
+			mav = "redirect:/adminAttendanceRecord" + after.getEmployeeId();
+		}
+
+		return mav;
+	}
 
 	/*
 	* リクエスト情報の受け取り
