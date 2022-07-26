@@ -12,7 +12,7 @@ public class Change {
 	@Id
 	private int changeId;
 	
-	private void setChangeId(int id){
+	public void setChangeId(int id){
 		this.changeId=id;
 	}
 	
