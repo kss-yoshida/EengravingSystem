@@ -62,8 +62,8 @@
 					</td>
 					<td>
 						<div class="engraving-flex">
-							<form action="#" method="post">
-								<input type="submit" value="変更">
+							<form action="/changeEmployee" method="post">
+								<input type="hidden" name="employeeId" th:value="*{user.employeeId}"> <input type="submit" value="変更">
 							</form>
 							<form action="#" method="post">
 								<input type="submit" value="削除">
