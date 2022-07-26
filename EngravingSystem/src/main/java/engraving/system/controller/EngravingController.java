@@ -804,12 +804,15 @@ public class EngravingController {
 		request.setIsDeleted(true);
 		requestinfo.saveAndFlush(request);
 		
-		ModelMap modelMap = new ModelMap();
-		modelMap.addAttribute("changeList",changeList);
-		redirectAttributes.addFlashAttribute("map1", modelMap);
-		redirectAttributes.addFlashAttribute("move","changeRequestList");
-		
-		return "redirect:/changeInsert";
+		if(cmd.equals("input")) {
+			ModelMap modelMap = new ModelMap();
+			modelMap.addAttribute("changeList",changeList);
+			redirectAttributes.addFlashAttribute("map1", modelMap);
+			redirectAttributes.addFlashAttribute("move","changeRequestList");
+
+			return "redirect:/changeInsert";
+		}else
+			return "changeRequestList";
 	}
 	
 	//変更履歴を登録する
