@@ -914,5 +914,15 @@ public class EngravingController {
 		mav.setViewName("userHistoricalCheck");
 		return mav;
 	}
+		@RequestMapping("/changeAttendanceinfo")
+	public ModelAndView changeAttendanceinfo(@RequestParam("employeeId") String employeeId,
+			@RequestParam("attendanceId") String attendanceId, ModelAndView mav) {
+		User user = userinfo.findByEmployeeId(employeeId);
+		Attendance attendance = attendanceinfo.findByAttendanceId(Integer.parseInt(attendanceId));
+		mav.addObject(user);
+		mav.addObject(attendance);
+		mav.setViewName("changeAttendance");
+		return mav;
+	}
 
 }
