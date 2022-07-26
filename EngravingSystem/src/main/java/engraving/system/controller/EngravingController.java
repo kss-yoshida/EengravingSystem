@@ -811,6 +811,50 @@ public class EngravingController {
 			return "redirect:/changeInsert";
 		}
 	}
+	
+		/*
+	 * 社員情報を送る処理
+	 */
+	@RequestMapping(value = "/changeEmployee",method = RequestMethod.POST)
+	public ModelAndView changeEmployeeInfo(ModelAndView mav, @RequestParam(value = "employeeId") String empid) {
+		
+		User user = userinfo.findByEmployeeId(empid);
+		
+		mav.addObject("user", user);
+		mav.setViewName("changeEmployeeInfo");
+		return mav;
+		
+	}
+	
+	/*
+	 * 社員情報変更処理
+	 */
+	@RequestMapping(value = "/changeEmployeeInfo",method = RequestMethod.POST)
+	public String changeEmployeeInfoPost(
+			@RequestParam(value = "name", defaultValue = "", required = false) String name,
+			@RequestParam(value = "employeeId", defaultValue = "", required = false) String employeeId,
+			@RequestParam(value = "password", defaultValue = "", required = false) String password,
+			@RequestParam(value = "email", defaultValue = "", required = false) String email,
+			@RequestParam(value = "photo", defaultValue = "", required = false) String photo,
+			@RequestParam(value = "authority", defaultValue = "", required = false) String authority)
+			 {
+		
+		User user = new User();
+		
+		user.setName(name);
+		user.setEmployeeId((employeeId));
+		user.setPassword(password);
+		user.setEmail(email);
+		user.setPhoto(photo);
+		user.setAuthority(authority);
+		
+
+//		入力データをDBに保存
+		userinfo.saveAndFlush(user);
+
+// 		ModelとView情報を返す
+		return "redirect:/employeeList";
+	}
 
 	@RequestMapping("/loginForm")
 	public ModelAndView loginForm(ModelAndView mav) {
@@ -833,6 +877,18 @@ public class EngravingController {
 	@RequestMapping("/employeeRegistration")
 	public ModelAndView employeeRegistration(ModelAndView mav) {
 		mav.setViewName("employeeRegistration");
+		return mav;
+	}
+	
+	@RequestMapping("/changeEmployeeInfo")
+	public ModelAndView changeEmployeeInfo(ModelAndView mav) {
+		mav.setViewName("changeEmployeeInfo");
+		return mav;
+	}
+	
+	@RequestMapping("/userHistoricalCheck")
+	public ModelAndView userHistoricalCheck(ModelAndView mav) {
+		mav.setViewName("userHistoricalCheck");
 		return mav;
 	}
 
