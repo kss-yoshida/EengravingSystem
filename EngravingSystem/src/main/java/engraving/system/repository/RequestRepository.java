@@ -8,4 +8,5 @@ import engraving.system.entity.Request;
 @Repository
 public interface RequestRepository extends JpaRepository<Request, String> {
 
+  public Request findByRequestId(int requestId);
 }
