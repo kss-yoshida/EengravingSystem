@@ -657,14 +657,156 @@ public class EngravingController {
 	/*
 	* リクエスト情報の受け取り
 	*/
-	@RequestMapping("/changeRequest")
-	public ModelAndView changeRequest(ModelAndView mav) {
+	@RequestMapping("/changeRequestList")
+	public ModelAndView changeRequestList(ModelAndView mav) {
 		//requestInfoの情報をすべて受け取る
-		Iterable<Request> requestList = requestinfo.findAll();
+		ArrayList<Request> requestList = (ArrayList<Request>)requestinfo.findAll();
 		
-		mav.addObject("requestList",requestList);
+		//日付を含めたリクエスト情報を格納する変数
+		ArrayList<RequestDay> requestDayList = new ArrayList<RequestDay>();
+		//日付の形を変更する処理
+		SimpleDateFormat dayType = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy年MM月dd日");
+		
+		for(int i = 0; i < requestList.size();i++) {
+			Request request = requestList.get(i);
+			if(request.getIsDeleted() == false) {
+			RequestDay requestDay = new RequestDay();
+			//勤怠情報IDから日付を検索する
+			Attendance attendance = attendanceinfo.findByAttendanceId(request.getAttendanceId());
+			
+			try {
+			//日付のフォーマットを変更する
+			Date day = dayType.parse(attendance.getDay());
+			requestDay.setDay(dayFormat.format(day));
+			}catch(Exception e){
+				
+			}
+			
+			requestDay.setRequestId(request.getRequestId());
+			requestDay.setEmployeeId(request.getEmployeeId());
+			requestDay.setAttendanceId(request.getAttendanceId());
+			requestDay.setBeforeStartEngrave(attendance.getStartTime());
+			requestDay.setBeforeFinishEngrave(attendance.getFinishTime());
+			requestDay.setChangeStartEngrave(request.getChangeStartEngrave());
+			requestDay.setChangeFinishEngrave(request.getChangeFinishEngrave());
+			requestDay.setComment(request.getComment());
+			requestDay.setIsDeleted(request.getIsDeleted());
+			
+			
+			requestDayList.add(requestDay);
+			}
+		}
+		
+		mav.addObject("requestDayList",requestDayList);
+		
+		mav.setViewName("changeRequestList");
 		
 		return mav;
+	}
+	
+	/*
+	 * リクエストされた情報を変更するかリクエストを削除する
+	 */
+	@RequestMapping(value="/changeRequest",  method = RequestMethod.POST)
+	public String changeRequest(RedirectAttributes redirectAttributes,@RequestParam(value = "requestId") String strRequestId,
+			@RequestParam(value="cmd") String cmd,ModelAndView mav) {
+		// ユーザー情報の受け取り
+		User user = (User) session.getAttribute("user");
+		
+		//対象のリクエスト情報を受け取る
+		int requestId = Integer.parseInt(strRequestId);
+		Request request = requestinfo.findByRequestId(requestId);
+		
+		//勤怠情報IDから対象の勤怠情報を検索する
+		Attendance attendance = attendanceinfo.findByAttendanceId(request.getAttendanceId());
+		
+		//対象のリクエスト情報を管理する変数の宣言と情報の登録
+		RequestDay requestDay = new RequestDay();
+		requestDay.setRequestId(request.getRequestId());
+		requestDay.setEmployeeId(request.getEmployeeId());
+		requestDay.setAttendanceId(request.getAttendanceId());
+		requestDay.setBeforeStartEngrave(attendance.getStartTime());
+		requestDay.setBeforeFinishEngrave(attendance.getFinishTime());
+		requestDay.setChangeStartEngrave(request.getChangeStartEngrave());
+		requestDay.setChangeFinishEngrave(request.getChangeFinishEngrave());
+		requestDay.setComment(request.getComment());
+		requestDay.setIsDeleted(request.getIsDeleted());
+		
+		//変更履歴を保存する変数の宣言
+		ArrayList<Change> changeList = new ArrayList<Change>();
+		
+		//日付の受け取り
+		SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy/MM/dd kk:mm:ss");
+		Date date = new Date();
+		
+		//認可した場合の処理	
+		if(cmd.equals("input")) {
+			
+			//情報を変更するかのif文
+			if(request.getChangeStartEngrave() != null && !requestDay.getBeforeStartEngrave().equals(request.getChangeStartEngrave())) {//出勤時間を変更する場合
+				attendance.setStartTime(request.getChangeStartEngrave());
+				
+				//変更履歴を追加
+				Change change = new Change();
+				change.setAdminId(user.getEmployeeId());
+				change.setDataName(attendance.getDay() + "出勤時間");
+				change.setBeforeData(requestDay.getBeforeStartEngrave());
+				change.setAfterData(requestDay.getChangeStartEngrave());
+				change.setEmployeeId(requestDay.getEmployeeId());
+				change.setIsUpdated(dayFormat.format(date));
+				
+				changeList.add(change);
+				//changeinfo.saveAndFlush(change);
+			}
+			if(request.getChangeFinishEngrave() != null && !requestDay.getBeforeFinishEngrave().equals(request.getChangeFinishEngrave())){//退勤時間を変更する場合
+				attendance.setFinishTime(request.getChangeFinishEngrave());
+				
+				//変更履歴を追加
+				Change change = new Change();
+				change.setAdminId(user.getEmployeeId());
+				change.setDataName(attendance.getDay() + "退勤時間");
+				change.setBeforeData(requestDay.getBeforeFinishEngrave());
+				change.setAfterData(requestDay.getChangeFinishEngrave());
+				change.setEmployeeId(requestDay.getEmployeeId());
+				change.setIsUpdated(dayFormat.format(date));
+				
+				changeList.add(change);
+				//changeinfo.saveAndFlush(change);
+			}
+			
+		}
+		
+		//処理を行った変更リクエストを削除する
+		request.setIsDeleted(true);
+		requestinfo.saveAndFlush(request);
+		
+		ModelMap modelMap = new ModelMap();
+		modelMap.addAttribute("changeList",changeList);
+		redirectAttributes.addFlashAttribute("map1", modelMap);
+		redirectAttributes.addFlashAttribute("move","changeRequestList");
+		
+		return "redirect:/changeInsert";
+	}
+	
+	//変更履歴を登録する
+	@RequestMapping("/changeInsert")
+	public String changeinsert(RedirectAttributes redirectAttributes,@ModelAttribute("map1") ModelMap map1,
+			@ModelAttribute("move") String move) {
+		ArrayList<Change> changeList = (ArrayList<Change>)map1.get("changeList");
+		changeinfo.saveAndFlush(changeList.get(0));
+		changeList.remove(0);
+		
+		ModelMap modelMap = new ModelMap();
+		modelMap.addAttribute("changeList",changeList);
+		redirectAttributes.addFlashAttribute("map1", modelMap);
+		redirectAttributes.addFlashAttribute("move",move);
+		
+		if(changeList.size() == 0) {
+			return move;
+		}else {
+			return "redirect:/changeInsert";
+		}
 	}
 
 	@RequestMapping("/loginForm")
