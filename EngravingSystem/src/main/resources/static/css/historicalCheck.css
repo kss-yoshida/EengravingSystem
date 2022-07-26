@@ -1,9 +1,16 @@
 .historical-check-table {
 	width: 100%;
+	border: 2px solid dimgray;
+	brder-spacing: 0px;
 }
 
 .historical-check-table th{
 	width: 16%;
 	background-color: dimgray;
 	color: white;
+}
+
+.historical-check-table td{
+	border: 2px solid dimgray;
+	border-spacing: 0px;
 }
