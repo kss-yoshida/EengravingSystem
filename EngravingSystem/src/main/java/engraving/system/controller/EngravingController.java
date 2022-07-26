@@ -577,7 +577,7 @@ public class EngravingController {
 		return "redirect:/employeeList";
 	}
 	/*
-	 * 勤怠情報変更機能
+	 * 勤怠情報変更
 	 */
 	@RequestMapping(value = "/changeAttendance", method = RequestMethod.POST)
 	public String changeAttendance(
@@ -589,7 +589,8 @@ public class EngravingController {
 			@RequestParam(value = "startEngrave", defaultValue = "", required = false) String startEngrave,
 			@RequestParam(value = "finishEngrave", defaultValue = "", required = false) String finishEngrave,
 			@RequestParam(value = "employeeId", defaultValue = "", required = false) String employeeId,
-			@RequestParam(value = "day", defaultValue = "", required = false) String day, String mav) {
+			@RequestParam(value = "day", defaultValue = "", required = false) String day, String mav,
+			RedirectAttributes redirectAttributes) {
 		User user = (User) session.getAttribute("user");
 
 		Attendance before = attendanceinfo.findByAttendanceId(Integer.parseInt(attendanceId));
@@ -605,56 +606,75 @@ public class EngravingController {
 		after.setOverTime(overTime);
 		after.setBreakTime(breakTime);
 
-		Change change = new Change();
+		ArrayList<Change> list = new ArrayList<Change>();
+
 		Date date = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
 		String time = sdf.format(date);
 
-		change.setAdminId(employeeId);
-		change.setIsUpdated(time);
-		change.setEmployeeId(before.getEmployeeId());
 //		それぞれの勤怠情報について変更履歴の登録
-//		出勤打刻時間
+//		出勤時間
 		if (!before.getStartTime().equals(after.getStartTime())) {
+			Change change = new Change();
+			change.setAdminId(employeeId);
+			change.setIsUpdated(time);
+			change.setEmployeeId(before.getEmployeeId());
 			change.setDataName("出勤時間");
 			change.setBeforeData(before.getStartTime());
 			change.setafterData(after.getStartTime());
-			changeinfo.saveAndFlush(change);
+			list.add(change);
 		}
 //		休憩時間
 		if (!before.getBreakTime().equals(after.getBreakTime())) {
+			Change change = new Change();
+			change.setAdminId(employeeId);
+			change.setIsUpdated(time);
+			change.setEmployeeId(before.getEmployeeId());
 			change.setDataName("休憩時間");
 			change.setBeforeData(before.getBreakTime());
 			change.setafterData(after.getBreakTime());
-			changeinfo.saveAndFlush(change);
+			list.add(change);
 		}
 //		残業時間
 		if (!before.getOverTime().equals(after.getOverTime())) {
+			Change change = new Change();
+			change.setAdminId(employeeId);
+			change.setIsUpdated(time);
+			change.setEmployeeId(before.getEmployeeId());
 			change.setDataName("残業時間");
 			change.setBeforeData(before.getOverTime());
 			change.setafterData(after.getOverTime());
-			changeinfo.saveAndFlush(change);
+			list.add(change);
 		}
-//		退勤打刻時間
+//		退勤時間
 		if (!before.getFinishTime().equals(after.getFinishTime())) {
+			Change change = new Change();
+			change.setAdminId(employeeId);
+			change.setIsUpdated(time);
+			change.setEmployeeId(before.getEmployeeId());
 			change.setDataName("退勤時間");
 			change.setBeforeData(before.getFinishTime());
 			change.setafterData(after.getFinishTime());
-			changeinfo.saveAndFlush(change);
+			list.add(change);
 		}
 
 //		勤怠情報変更の登録
 		attendanceinfo.saveAndFlush(after);
-
 //		遷移先コントローラーの選択
 		if (user.getEmployeeId().equals(employeeId)) {
 			mav = "redirect:/attendanceRecord";
 		} else {
 //			get送信
-			mav = "redirect:/adminAttendanceRecord" + after.getEmployeeId();
+			mav = "redirect:/adminAttendanceRecord";
 		}
 
-		return mav;
+//		変更情報をMapに登録
+		ModelMap md = new ModelMap();
+		md.addAttribute("changeList", list);
+		redirectAttributes.addFlashAttribute("map1", md);
+		redirectAttributes.addFlashAttribute("move", mav);
+
+		return "redirect:/changeInsert";
 	}
 
 	/*
