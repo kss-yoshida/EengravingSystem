@@ -66,7 +66,7 @@ public class Request {
 	public void setComment(String comment) {
 		this.comment=comment;
 	}
-	public String getCommetn() {
+	public String getComment() {
 		return this.comment;
 	}
 
@@ -77,7 +77,7 @@ public class Request {
 	public void setIsDeleted(Boolean flag) {
 		this.isDeleted=flag;
 	}
-	public Boolean getIseleted() {
+	public Boolean getIsDeleted() {
 		return this.isDeleted;
 	}
 
