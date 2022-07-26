@@ -535,6 +535,17 @@ public class EngravingController {
 			}
 		}
 
+		// 情報の受け渡し
+		mav.addObject("attendanceList", attendanceList);
+		mav.addObject("authority", authority);
+		mav.addObject("employeeId", id);
+
+		// 遷移先の指定
+		mav.setViewName("attendanceRecord");
+
+		return mav;
+	}
+
 	/*
 	 * 社員登録処理
 	 */
