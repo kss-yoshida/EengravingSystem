@@ -10,7 +10,7 @@ import engraving.system.entity.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, String> {
 
-	public ArrayList<User> findByEmployeeId(String id);
+	public User findByEmployeeId(String id);
 
 	public ArrayList<User> findByName(String name);
 
