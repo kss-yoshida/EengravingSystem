@@ -567,7 +567,7 @@ public class EngravingController {
 		user.setAuthority(authority);
 		
 		//写真を保存する処理
-		File file = File("/src/main/resources/photo", employeeId + "_photo");
+		//File file = File("/src/main/resources/photo", employeeId + "_photo");
 		
 
 //		入力データをDBに保存
@@ -621,7 +621,7 @@ public class EngravingController {
 			change.setEmployeeId(before.getEmployeeId());
 			change.setDataName("出勤時間");
 			change.setBeforeData(before.getStartTime());
-			change.setafterData(after.getStartTime());
+			change.setAfterData(after.getStartTime());
 			list.add(change);
 		}
 //		休憩時間
@@ -632,7 +632,7 @@ public class EngravingController {
 			change.setEmployeeId(before.getEmployeeId());
 			change.setDataName("休憩時間");
 			change.setBeforeData(before.getBreakTime());
-			change.setafterData(after.getBreakTime());
+			change.setAfterData(after.getBreakTime());
 			list.add(change);
 		}
 //		残業時間
@@ -643,7 +643,7 @@ public class EngravingController {
 			change.setEmployeeId(before.getEmployeeId());
 			change.setDataName("残業時間");
 			change.setBeforeData(before.getOverTime());
-			change.setafterData(after.getOverTime());
+			change.setAfterData(after.getOverTime());
 			list.add(change);
 		}
 //		退勤時間
@@ -654,7 +654,7 @@ public class EngravingController {
 			change.setEmployeeId(before.getEmployeeId());
 			change.setDataName("退勤時間");
 			change.setBeforeData(before.getFinishTime());
-			change.setafterData(after.getFinishTime());
+			change.setAfterData(after.getFinishTime());
 			list.add(change);
 		}
 
