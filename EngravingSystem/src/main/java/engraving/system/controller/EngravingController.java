@@ -451,11 +451,6 @@ public class EngravingController {
 		User user = (User) session.getAttribute("user");
 		String authority = user.getAuthority();
 
-		// 管理者メニューから来た場合の処理
-		if (id.equals("")) {
-			id = user.getEmployeeId();
-		}
-
 		// 月が1桁で入力されt場合の処理
 		if (month.length() == 1 && month != "") {
 			month = "0" + month;
