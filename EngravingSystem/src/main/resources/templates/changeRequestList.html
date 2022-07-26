@@ -24,23 +24,29 @@
 				<tr>
 					<th>日時</th>
 					<th>変更対象者番号</th>
-					<th>変更対象データ</th>
-					<th>変更前データ</th>
-					<th>変更後データ</th>
+					<th>変更前データ<br>
+					(出勤/退勤)</th>
+					<th>変更後データ<br>
+					(出勤/退勤)</th>
+					<th>コメント</th>
 					<th>認/否</th>
 				</tr>
-				<tr th:each="requestList:${requestList}" th:object="${requestList}">
-					<td th:text="*{requestId}"></td>
-					<td></td>
-					<td>データ名</td>
-					<td>変更前</td>
-					<td>変更後</td>
+				<tr th:each="requestDayList:${requestDayList}" th:object="${requestDayList}">
+					<td th:text="*{day}"></td>
+					<td th:text="*{employeeId}"></td>
+					<td th:text="|*{beforeStartEngrave} / *{beforeFinishEngrave}|"></td>
+					<td th:text="|*{changeStartEngrave}/*{changeFinishEngrave}|"></td>
+					<td th:text="*{comment}"></td>
 					<td>
 					<div class="engraving-flex">
-						<form action="#" method="post">
+						<form action="changeRequest" method="post">
+							<input type="hidden" name="requestId" th:value="*{requestId}">
+							<input type="hidden" name = "cmd" value="input">
 							<input type="submit" value="認">
 						</form>
-						<form action="#" method="post">
+						<form action="changeRequest" method="post">
+							<input type="hidden" name="requestId" th:value="*{requestId}">
+							<input type="hidden" name = "cmd" value="delete">
 							<input type="submit" value="否">
 						</form>
 					</div>
