@@ -50,7 +50,7 @@
 			<br>
 			<h4 class="text-left" th:text="${month}"></h4>
 			<table class="attendance-record-table">
-				<tr>
+				<tr><td></td>
 					<th>日付</th>
 					<th>打刻出勤時間</th>
 					<th>打刻退勤時間</th>
@@ -60,6 +60,12 @@
 					<th>残業時間</th>
 				</tr>
 				<tr th:each="attendanceList : ${attendanceList}"  th:object="${attendanceList}">
+					<td><form action="/changeAttendanceinfo" method="post">
+						<input type="hidden" name="attendanceId"
+							th:value="*{attendanceId}"><input type="hidden"
+							name="employeeId" th:value="*{employeeId}"> <input
+							type="submit" value="変更">
+					</form></td>
 					<td th:text="*{day}"></td>
 					<td th:text="*{startEngrave}"></td>
 					<td th:text="*{finishEngrave}"></td>
