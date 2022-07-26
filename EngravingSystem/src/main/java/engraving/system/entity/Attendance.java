@@ -10,7 +10,7 @@ public class Attendance {
 	@Id
 	private int attendanceId;
 	
-	public int getAttendanseId() {
+	public int getAttendanceId() {
 		return attendanceId;
 	}
 	
