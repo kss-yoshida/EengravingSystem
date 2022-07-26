@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lange="ja">
+<html xmlns:th="http://www.thymeleaf.org">
 	<head>
 		<meta charset="UTF-8">
 		<link rel="stylesheet" href="css/menu.css">
@@ -13,27 +13,42 @@
 	        <nav class="nav-admin">
 	            <ul>
 	                <li>打刻プログラム</li>
-	                <li><a href="#">HOME</a></li>
-	                <li><a href="#">ログアウト</a></li>
-	            </ul>
+					<li><a href="/adminMenu">HOME</a></li>
+					<li><a href="/logout">ログアウト</a></li>
+        	    </ul>
 	        </nav>
 	    </header>
 		<div class="container">
 			<h3>社員情報変更</h3><br>
-			<form action="#" method="post">
+			<form action="/changeEmployeeInfo" method="post">
 				<table class="change-employee-table">
 						<tr>
-							<th>氏名</th>
-							<td><input type="text" name="name"></td>
-						</tr>
-						<tr>
-							<th>パスワード</th>
-							<td><input type="text" name="password"></td>
-						</tr>
-						<tr>
-							<th>写真</th>
-							<td><input type="file" name="image" id=""></td>
-						</tr>
+					<th>氏名</th>
+					<td><input th:value="${user.getName}" type="text" name="name"></td>
+				</tr>
+				<tr>
+					<th>社員番号</th>
+					<td><input th:value="${user.getEmployeeId}"  type="text" name="employeeId"></td>
+				</tr>
+				<tr>
+					<th>パスワード</th>
+					<td><input th:value="${user.getPassword}"  type="text" name="password"></td>
+				</tr>
+				<tr>
+					<th>E-Mail</th>
+					<td><input th:value="${user.getEmail}" type="text" name="email"></td>
+				</tr>
+				<tr>
+					<th>写真</th>
+					<td><input th:value="${user.getPhoto}" type="file" name="photo" id=""></td>
+				</tr>
+				<tr>
+					<th>管理者権限</th>
+					<td><select name="authority" th:value="${user.getAuthority}">
+							<option value="1">---管理者権限を付与しない---</option>
+							<option value="0">---管理者権限を付与する---</option>
+					</select></td>
+				</tr>
 				</table>
 				<br>
 				<input type="submit" value="変更">
