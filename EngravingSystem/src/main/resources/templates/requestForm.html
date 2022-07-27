@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="css/menu.css">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/changeForm.css">
+<title>勤怠情報変更フォーム</title>
+</head>
+<body>
+	<header>
+		<nav class="nav-normal">
+			<ul>
+				<li>打刻プログラム</li>
+				<li><a href="/employeeMenu">HOME</a></li>
+				<li><a href="/logout">ログアウト</a></li>
+			</ul>
+		</nav>
+	</header>
+	<div class="container">
+		<h3>勤怠情報変更フォーム</h3>
+		<br>
+		<p>日付：[[${attendance.day}]]</p>
+		<form action="/requestForm" method="post">
+			<table class="change-form-table" th:object="${attendance}">
+				<tr>
+					<th>内容</th>
+					<th>変更前</th>
+					<th>変更後</th>
+				</tr>
+				<tr>
+					<th>出勤時間</th>
+					<td>[[*{startTime}]]</td>
+					<td><input type="text" name="changeStartTime"
+						th:value="*{startTime}"></td>
+				</tr>
+				<tr>
+					<th>退勤時間</th>
+					<td>[[*{finishTime}]]</td>
+					<td><input type="text" name="changeFinishTime"
+						th:value="*{finishTime}"></td>
+				</tr>
+				<tr>
+					<th>変更理由</th>
+					<td></td>
+					<td><textarea name="comment" rows="5" cols="20"></textarea></td>
+				</tr>
+			</table>
+			<br> <input type="hidden" name="attendanceId"
+				th:value="${attendance.attendanceId}"> <input type="hidden"
+				name="employeeId" th:value="${user.employeeId}"> <input
+				type="submit" value="リクエスト送信">
+		</form>
+	</div>
+</body>
+</html>
