@@ -899,12 +899,49 @@ public class EngravingController {
 			@RequestParam(value = "authority", defaultValue = "", required = false) String authority) {
 
 		User user = new User();
+		
+		if(!photo.isEmpty()) {
+			try {
+				//ファイル名を社員番号に変更
+				File oldFileName = new File(photo.getOriginalFilename());
+				File newFileName = new File(employeeId + ".jpg");
+				oldFileName.renameTo(newFileName);
+				
+				//保存先を定義
+				String uploadPath = "photo/";
+				byte[] buytes = photo.getBytes();
+				
+				//指定ファイルへ読み込みファイルを書き込む
+				BufferedOutputStream stream = new BufferedOutputStream(
+						new FileOutputStream(new File(uploadPath + newFileName)));
+				stream.write(buytes);
+				stream.close();
+				
+				//圧縮
+				File input = new File(uploadPath + newFileName);
+				BufferedImage image = ImageIO.read(input);
+				OutputStream os = new FileOutputStream(input);
+				Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("jpg");
+				ImageWriter writer = (ImageWriter)writers.next();
+				ImageOutputStream ios = ImageIO.createImageOutputStream(os);
+				writer.setOutput(ios);
+				ImageWriteParam param = new JPEGImageWriteParam(null);
+				param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+				param.setCompressionQuality(0.30f);
+				writer.write(null, new IIOImage(image, null, null),param);
+				os.close();
+				ios.close();
+				writer.dispose();
+				
+			}catch (Exception e) {
+				System.out.println(e);
+			}
 
 		user.setName(name);
 		user.setEmployeeId((employeeId));
 		user.setPassword(password);
 		user.setEmail(email);
-		user.setPhoto(photo);
+		user.setPhoto(employeeId + ".jpg");
 		user.setAuthority(authority);
 
 //		入力データをDBに保存
