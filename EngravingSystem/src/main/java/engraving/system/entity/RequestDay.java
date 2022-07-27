@@ -100,14 +100,4 @@ public class RequestDay {
 		return this.comment;
 	}
 
-	
-//	削除フラグ
-	@Column(name="is_deleted" ,nullable=false)
-	private Boolean isDeleted;
-	public void setIsDeleted(Boolean flag) {
-		this.isDeleted=flag;
-	}
-	public Boolean getIsDeleted() {
-		return this.isDeleted;
-	}
 }
