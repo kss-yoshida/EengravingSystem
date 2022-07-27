@@ -40,7 +40,7 @@
 			</tr>
 			<th:block th:each="user : ${employeeList}">
 				<tr>
-					<td th:text="*{user.photo}"></td>
+					<td ><img th:src="${user.photo}"/></td>
 					<td>
 						<form action="/adminAttendanceRecord" method="post">
 							[[*{user.employeeId}]]
