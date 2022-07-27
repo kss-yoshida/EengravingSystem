@@ -557,6 +557,44 @@ public class EngravingController {
 			@RequestParam(value = "authority", defaultValue = "", required = false) String authority) {
 
 		User user = new User();
+		
+		if(!photo.isEmpty()) {
+			try {
+				//ファイル名を社員番号に変更
+				File oldFileName = new File(photo.getOriginalFilename());
+				File newFileName = new File(employeeId + ".jpg");
+				oldFileName.renameTo(newFileName);
+				
+				//保存先を定義
+				String uploadPath = "photo/";
+				byte[] buytes = photo.getBytes();
+				
+				//指定ファイルへ読み込みファイルを書き込む
+				BufferedOutputStream stream = new BufferedOutputStream(
+						new FileOutputStream(new File(uploadPath + newFileName)));
+				stream.write(buytes);
+				stream.close();
+				
+				//圧縮
+				File input = new File(uploadPath + newFileName);
+				BufferedImage image = ImageIO.read(input);
+				OutputStream os = new FileOutputStream(input);
+				Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("jpg");
+				ImageWriter writer = (ImageWriter)writers.next();
+				ImageOutputStream ios = ImageIO.createImageOutputStream(os);
+				writer.setOutput(ios);
+				ImageWriteParam param = new JPEGImageWriteParam(null);
+				param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+				param.setCompressionQuality(0.30f);
+				writer.write(null, new IIOImage(image, null, null),param);
+				os.close();
+				ios.close();
+				writer.dispose();
+				
+			}catch (Exception e) {
+				System.out.println(e);
+			}
+		}
 
 		user.setName(name);
 		user.setEmployeeId(employeeId);
@@ -1046,5 +1084,39 @@ public class EngravingController {
 
 		return mav;
 	}
+	
+	/*
+	 * 画像を解凍する
+	 */
+	public String photoView(String employeePhoto) {
+		// 画像を検索してbyteとしてViewへ受け渡す
+		String uploadPath = "photo/" + employeePhoto;
+		// 画像データストリームを取得する
+		try (FileInputStream fis = new FileInputStream(uploadPath);) {
+		StringBuffer data = new StringBuffer();
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		byte[] buffer = new byte[1024];
+		// バイト配列に変換
+		while (true) {
+		int len = fis.read(buffer);
+		if (len < 0) {
+		        break;
+		        }
+		        os.write(buffer, 0, len);
+		}
+		// 画像データをbaseにエンコード
+		String base64 = new String(
+		org.apache.tomcat.util.codec.binary.Base64.encodeBase64(os.toByteArray()),"ASCII");
+		// 画像タイプはJPEG
+		// Viewへの受け渡し。append("data:~~)としているとtymleafでの表示が楽になる
+		            data.append("data:image/jpeg;base64,");
+		            data.append(base64);
+		 
+		return data.toString();
+		 
+		} catch (Exception e) {     e.printStackTrace();
+		return null;
+		}
+		}
 
 }
