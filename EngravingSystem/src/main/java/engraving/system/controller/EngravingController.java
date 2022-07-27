@@ -13,8 +13,13 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.*;
-//import java.io.File;
+import java.io.*;
 import java.text.*;
+import java.awt.image.*;
+
+import javax.imageio.*;
+import javax.imageio.stream.*;
+import javax.imageio.plugins.jpeg.*;
 import javax.servlet.http.HttpSession;
 
 import engraving.system.entity.*;
