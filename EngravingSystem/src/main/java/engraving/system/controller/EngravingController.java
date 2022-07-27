@@ -713,7 +713,6 @@ public class EngravingController {
 				requestDay.setChangeStartTime(request.getChangeStartTime());
 				requestDay.setChangeFinishTime(request.getChangeFinishTime());
 				requestDay.setComment(request.getComment());
-				requestDay.setIsDeleted(request.getIsDeleted());
 
 				requestDayList.add(requestDay);
 			}
@@ -753,7 +752,6 @@ public class EngravingController {
 		requestDay.setChangeStartTime(request.getChangeStartTime());
 		requestDay.setChangeFinishTime(request.getChangeFinishTime());
 		requestDay.setComment(request.getComment());
-		requestDay.setIsDeleted(request.getIsDeleted());
 
 		// 変更履歴を保存する変数の宣言
 		ArrayList<Change> changeList = new ArrayList<Change>();
