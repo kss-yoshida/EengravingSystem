@@ -41,23 +41,23 @@ public class Request {
 	}
 	
 //	変更希望出勤時間
-	@Column(name="change_start_engrave" ,nullable=true)
-	private String changeStartEngrave;
-	public void setChangeStartEngrave(String time) {
-		this.changeStartEngrave=time;
+	@Column(name="change_start_time" ,nullable=true)
+	private String changeStartTime;
+	public void setChangeStartTime(String time) {
+		this.changeStartTime=time;
 	}
-	public String getChangeStartEngrave() {
-		return this.changeStartEngrave;
+	public String getChangeStartTime() {
+		return this.changeStartTime;
 	}
 	
 //	変更希望退勤時間
-	@Column(name="change_finish_engrave" ,nullable=true)
-	private String changeFinishEngrave;
-	public void setChangeFinishEngrave(String time) {
-		this.changeFinishEngrave=time;
+	@Column(name="change_finish_time" ,nullable=true)
+	private String changeFinishTime;
+	public void setChangeFinishTime(String time) {
+		this.changeFinishTime=time;
 	}
-	public String getChangeFinishEngrave() {
-		return this.changeFinishEngrave;
+	public String getChangeFinishTime() {
+		return this.changeFinishTime;
 	}
 	
 //	変更希望理由
