@@ -876,19 +876,34 @@ public class EngravingController {
 		return "redirect:/employeeList";
 	}
 	
-	/*リクエスト登録*/
+	/* 社員削除機能 */
+	@RequestMapping(value = "/deleteEmployee", method = RequestMethod.POST)
+	public String deleteEmployee(@RequestParam("employeeId") String id) {
+		User user = userinfo.findByEmployeeId(id);
+		userinfo.delete(user);
+		return "redirect:/employeeList";
+	}
+
+	/* リクエスト登録 */
 	@PostMapping("/requestForm")
-	public String requestForm(@RequestParam("employeeId")String employeeId,@RequestParam("attendanceId")String attendanceId,@RequestParam("changeStartTime")String changeStartTime) {
-		return"";
-	}
+	public String requestForm(@RequestParam(value = "changeStartTime", defaultValue = "") String changeStartTime,
+			@RequestParam(value = "changeFinishTime", defaultValue = "") String changeFinishTime,
+			@RequestParam(value = "comment", defaultValue = "記述なし") String comment,
+			@RequestParam("attendanceId") String attendanceId, @RequestParam("employeeId") String employeeId) {
+//		入力内容をセット
+		Request request = new Request();
+		request.setChangeFinishTime(changeFinishTime);
+		request.setChangeStartTime(changeStartTime);
+		request.setComment(comment);
+		request.setAttendanceId(Integer.parseInt(attendanceId));
+		request.setEmployeeId(employeeId);
+		request.setIsDeleted(false);
 
-	@RequestMapping("/loginForm")
-	public ModelAndView loginForm(ModelAndView mav) {
-		mav.setViewName("login");
+//		DBに登録
+		requestinfo.saveAndFlush(request);
 
-		return mav;
+		return "redirect:/employeeMenu";
 	}
-	
 	/*
 	 * 変更履歴確認
 	 */
@@ -917,16 +932,68 @@ public class EngravingController {
 		return mav;
 	}
 
+//以下画面遷移用リクエストマッピング
+	@RequestMapping("/loginForm")
+	public ModelAndView loginForm(ModelAndView mav) {
+		mav.setViewName("login");
+
+		return mav;
+	}
+	
 	@RequestMapping("/employeeMenu")
 	public ModelAndView employeeMenu(ModelAndView mav) {
+		User user = (User) session.getAttribute("user");
+//		ログインした社員の勤怠情報の取得
+		Date date = new Date();
+		SimpleDateFormat day = new SimpleDateFormat("yyyyMMdd");
+		String employeeId = user.getEmployeeId();
+		ArrayList<Attendance> attendanceList = (ArrayList<Attendance>) attendanceinfo
+				.findByDayAndEmployeeId(day.format(date), employeeId);
+		Attendance attendance = new Attendance();
+		if (attendanceList.size() != 0) {
+//		ログイン日の出勤情報があった場合
+			attendance = attendanceList.get(0);
+			SimpleDateFormat time = new SimpleDateFormat("kk:mm");
+			Date startEngrave;
+			Date finishEngrave;
+			try {
+				startEngrave = time.parse(attendance.getStartEngrave());
+				finishEngrave = time.parse(attendance.getFinishEngrave());
+				mav.addObject("startTime", time.format(startEngrave));
+				mav.addObject("finishTime", time.format(finishEngrave));
+			} catch (Exception e) {
+			}
+		}
 		return mav;
 	}
 
 	@RequestMapping("/adminMenu")
 	public ModelAndView adminMenu(ModelAndView mav) {
-		mav.setViewName("adminMenu");
+		User user = (User) session.getAttribute("user");
+//		ログインした社員の勤怠情報の取得
+		Date date = new Date();
+		SimpleDateFormat day = new SimpleDateFormat("yyyyMMdd");
+		String employeeId = user.getEmployeeId();
+		ArrayList<Attendance> attendanceList = (ArrayList<Attendance>) attendanceinfo
+				.findByDayAndEmployeeId(day.format(date), employeeId);
+		Attendance attendance = new Attendance();
+		if (attendanceList.size() != 0) {
+//		ログイン日の出勤情報があった場合
+			attendance = attendanceList.get(0);
+			SimpleDateFormat time = new SimpleDateFormat("kk:mm");
+			Date startEngrave;
+			Date finishEngrave;
+			try {
+				startEngrave = time.parse(attendance.getStartEngrave());
+				finishEngrave = time.parse(attendance.getFinishEngrave());
+				mav.addObject("startTime", time.format(startEngrave));
+				mav.addObject("finishTime", time.format(finishEngrave));
+			} catch (Exception e) {
+			}
+		}
 		return mav;
 	}
+
 
 	@RequestMapping("/employeeRegistration")
 	public ModelAndView employeeRegistration(ModelAndView mav) {
@@ -954,6 +1021,28 @@ public class EngravingController {
 		mav.addObject(user);
 		mav.addObject(attendance);
 		mav.setViewName("changeAttendance");
+		return mav;
+	}
+	
+//	変更リクエストForm
+	@RequestMapping("/requestForminfo")
+	public ModelAndView requestForminfo(ModelAndView mav) {
+		User user = (User) session.getAttribute("user");
+		Date date = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		String day = sdf.format(date);
+		ArrayList<Attendance> list = attendanceinfo.findByDayAndEmployeeId(day, user.getEmployeeId());
+		Attendance attendance;
+		if (list.size() > 0) {
+			attendance = list.get(0);
+			mav.addObject(user);
+			mav.addObject(attendance);
+			mav.setViewName("requestForm");
+		} else {
+//			当日の勤怠登録前には何も起きない
+			mav.setViewName("employeeMenu");
+		}
+
 		return mav;
 	}
 
