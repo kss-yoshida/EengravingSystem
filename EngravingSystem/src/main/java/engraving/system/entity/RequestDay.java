@@ -52,42 +52,42 @@ public class RequestDay {
 	
 //	変更前出勤時間
 	@Column(nullable=true)
-	private String beforeStartEngrave;
-	public void setBeforeStartEngrave(String time) {
-		this.beforeStartEngrave=time;
+	private String beforeStartTime;
+	public void setBeforeStartTime(String time) {
+		this.beforeStartTime=time;
 	}
-	public String getBeforeStartEngrave() {
-		return this.beforeStartEngrave;
+	public String getBeforeStartTime() {
+		return this.beforeStartTime;
 	}
 	
 //	変更前退勤時間
 	@Column(nullable=true)
-	private String beforeFinishEngrave;
-	public void setBeforeFinishEngrave(String time) {
-		this.beforeFinishEngrave=time;
+	private String beforeFinishTime;
+	public void setBeforeFinishTime(String time) {
+		this.beforeFinishTime=time;
 	}
-	public String getBeforeFinishEngrave() {
-		return this.beforeFinishEngrave;
+	public String getBeforeFinishTime() {
+		return this.beforeFinishTime;
 	}
 	
 //	変更希望出勤時間
-	@Column(name="change_start_engrave" ,nullable=true)
-	private String changeStartEngrave;
-	public void setChangeStartEngrave(String time) {
-		this.changeStartEngrave=time;
+	@Column(name="change_start_time" ,nullable=true)
+	private String changeStartTime;
+	public void setChangeStarttime(String time) {
+		this.changeStartTime=time;
 	}
-	public String getChangeStartEngrave() {
-		return this.changeStartEngrave;
+	public String getChangeStartTime() {
+		return this.changeStartTime;
 	}
 	
 //	変更希望退勤時間
-	@Column(name="change_finish_engrave" ,nullable=true)
-	private String changeFinishEngrave;
-	public void setChangeFinishEngrave(String time) {
-		this.changeFinishEngrave=time;
+	@Column(name="change_finish_time" ,nullable=true)
+	private String changeFinishTime;
+	public void setChangeFinishTime(String time) {
+		this.changeFinishTime=time;
 	}
-	public String getChangeFinishEngrave() {
-		return this.changeFinishEngrave;
+	public String getChangeFinishTime() {
+		return this.changeFinishTime;
 	}
 	
 //	変更希望理由
