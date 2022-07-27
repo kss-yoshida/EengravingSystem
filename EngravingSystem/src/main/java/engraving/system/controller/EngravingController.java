@@ -248,7 +248,7 @@ public class EngravingController {
 
 		if (cmd.equals("")) {
 //			エラーがあったらログインに戻る
-
+			mav.setViewName("loginForm");
 		} else {
 //			OKになってたらメニューに行く
 			mav.addObject("user", user);
