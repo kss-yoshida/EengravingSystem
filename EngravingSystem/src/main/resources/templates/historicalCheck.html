@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lange="ja">
+<html xmlns:th="http://www.thymeleaf.org">
 	<head>
 		<meta charset="UTF-8">
 		<link rel="stylesheet" href="css/menu.css">
@@ -19,7 +19,18 @@
 	        </nav>
 	    </header>
 		<div class="container">
+		
 			<h3>変更履歴</h3><br>
+			<div class="engraving-flex" >
+					<form action="/historicalCheck" method="post">
+						<input type="text" name="employeeId">変更対象者番号
+						<input type="text" name="adminId">担当者番号
+						<input type="submit" value="検索">
+					</form>
+					<form action="/historicalCheck"  method ="post">
+						<input type="submit" value="今月表示">
+					</form>
+			</div>
 			<table class="historical-check-table">
 				<tr>
 					<th>日時</th>
@@ -27,15 +38,15 @@
 					<th>変更対象データ</th>
 					<th>変更前データ</th>
 					<th>変更後データ</th>
-					<th>担当者</th>
+					<th>担当者番号</th>
 				</tr>
-				<tr>
-					<td>0000/00/00</td>
-					<td>社員番号</td>
-					<td>データ名</td>
-					<td>変更前</td>
-					<td>変更後</td>
-					<td>担当者名</td>
+				<tr th:each="changeList: ${changeList}" th:object="${changeList}">
+					<td th:text="*{isUpdated}"></td>
+					<td th:text="*{employeeId}"></td>
+					<td th:text="*{dataName}"></td>
+					<td th:text="*{beforeData}"></td>
+					<td th:text="*{afterData}"></td>
+					<td th:text="*{adminId}"></td>
 				</tr>
 			</table>
 		</div>
