@@ -25,13 +25,13 @@
 			<h3>勤怠情報確認</h3><br>
 			<div th:switch="${authority}">
 				<div class="engraving-flex"  th:case="0">
-					<form action="/adminAttendanceRecord" method="get">
+					<form action="/adminAttendanceRecord" method="post">
 						<input type="text" name="year">年
 						<input type="text" name="month">月
 						<input type="hidden" name="employeeId" th:value ="${employeeId}">
 						<input type="submit" value="検索">
 					</form>
-					<form action="/adminAttendanceRecord"  method ="get">
+					<form action="/adminAttendanceRecord"  method ="post">
 					<input type="hidden" name="employeeId"  th:value="${employeeId}">
 						<input type="submit" value="今月表示">
 					</form>
