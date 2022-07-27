@@ -880,7 +880,8 @@ public class EngravingController {
 	@RequestMapping(value = "/deleteEmployee", method = RequestMethod.POST)
 	public String deleteEmployee(@RequestParam("employeeId") String id) {
 		User user = userinfo.findByEmployeeId(id);
-		userinfo.delete(user);
+		user.setIsDeleted(true);
+		userinfo.saveAndFlush(user);
 		return "redirect:/employeeList";
 	}
 
