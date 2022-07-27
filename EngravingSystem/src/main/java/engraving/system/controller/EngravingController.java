@@ -708,10 +708,10 @@ public class EngravingController {
 				requestDay.setRequestId(request.getRequestId());
 				requestDay.setEmployeeId(request.getEmployeeId());
 				requestDay.setAttendanceId(request.getAttendanceId());
-				requestDay.setBeforeStartEngrave(attendance.getStartTime());
-				requestDay.setBeforeFinishEngrave(attendance.getFinishTime());
-				requestDay.setChangeStartEngrave(request.getChangeStartTime());
-				requestDay.setChangeFinishEngrave(request.getChangeFinishTime());
+				requestDay.setBeforeStartTime(attendance.getStartTime());
+				requestDay.setBeforeFinishTime(attendance.getFinishTime());
+				requestDay.setChangeStartTime(request.getChangeStartTime());
+				requestDay.setChangeFinishTime(request.getChangeFinishTime());
 				requestDay.setComment(request.getComment());
 				requestDay.setIsDeleted(request.getIsDeleted());
 
@@ -748,10 +748,10 @@ public class EngravingController {
 		requestDay.setRequestId(request.getRequestId());
 		requestDay.setEmployeeId(request.getEmployeeId());
 		requestDay.setAttendanceId(request.getAttendanceId());
-		requestDay.setBeforeStartEngrave(attendance.getStartTime());
-		requestDay.setBeforeFinishEngrave(attendance.getFinishTime());
-		requestDay.setChangeStartEngrave(request.getChangeStartTime());
-		requestDay.setChangeFinishEngrave(request.getChangeFinishTime());
+		requestDay.setBeforeStartTime(attendance.getStartTime());
+		requestDay.setBeforeFinishTime(attendance.getFinishTime());
+		requestDay.setChangeStartTime(request.getChangeStartTime());
+		requestDay.setChangeFinishTime(request.getChangeFinishTime());
 		requestDay.setComment(request.getComment());
 		requestDay.setIsDeleted(request.getIsDeleted());
 
@@ -774,8 +774,8 @@ public class EngravingController {
 				Change change = new Change();
 				change.setAdminId(user.getEmployeeId());
 				change.setDataName(attendance.getDay() + "出勤時間");
-				change.setBeforeData(requestDay.getBeforeStartEngrave());
-				change.setAfterData(requestDay.getChangeStartEngrave());
+				change.setBeforeData(requestDay.getBeforeStartTime());
+				change.setAfterData(requestDay.getChangeStartTime());
 				change.setEmployeeId(requestDay.getEmployeeId());
 				change.setIsUpdated(dayFormat.format(date));
 
@@ -790,8 +790,8 @@ public class EngravingController {
 				Change change = new Change();
 				change.setAdminId(user.getEmployeeId());
 				change.setDataName(attendance.getDay() + "退勤時間");
-				change.setBeforeData(requestDay.getBeforeFinishEngrave());
-				change.setAfterData(requestDay.getChangeFinishEngrave());
+				change.setBeforeData(requestDay.getBeforeFinishTime());
+				change.setAfterData(requestDay.getChangeFinishTime());
 				change.setEmployeeId(requestDay.getEmployeeId());
 				change.setIsUpdated(dayFormat.format(date));
 
@@ -805,12 +805,16 @@ public class EngravingController {
 		request.setIsDeleted(true);
 		requestinfo.saveAndFlush(request);
 
-		ModelMap modelMap = new ModelMap();
-		modelMap.addAttribute("changeList", changeList);
-		redirectAttributes.addFlashAttribute("map1", modelMap);
-		redirectAttributes.addFlashAttribute("move", "changeRequestList");
-
-		return "redirect:/changeInsert";
+		if(cmd.equals("input")) {
+			ModelMap modelMap = new ModelMap();
+			modelMap.addAttribute("changeList",changeList);
+			redirectAttributes.addFlashAttribute("map1", modelMap);
+			redirectAttributes.addFlashAttribute("move","changeRequestList");
+			
+			return "redirect:/changeInsert";
+		}else{
+			return "changeRequestList";
+		}
 	}
 
 	// 変更履歴を登録する
