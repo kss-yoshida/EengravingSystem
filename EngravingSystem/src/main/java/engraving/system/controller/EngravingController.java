@@ -11,6 +11,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 import java.io.*;
@@ -558,7 +559,7 @@ public class EngravingController {
 			@RequestParam(value = "employeeId", defaultValue = "", required = false) String employeeId,
 			@RequestParam(value = "password", defaultValue = "", required = false) String password,
 			@RequestParam(value = "email", defaultValue = "", required = false) String email,
-			@RequestParam(value = "photo", defaultValue = "", required = false) String photo,
+			MultipartFile photo,
 			@RequestParam(value = "authority", defaultValue = "", required = false) String authority) {
 
 		User user = new User();
@@ -605,7 +606,7 @@ public class EngravingController {
 		user.setEmployeeId(employeeId);
 		user.setPassword(password);
 		user.setEmail(email);
-		user.setPhoto(photo);
+		user.setPhoto(employeeId + ".jpg");
 		user.setAuthority(authority);
 
 		// 写真を保存する処理
@@ -900,7 +901,7 @@ public class EngravingController {
 			@RequestParam(value = "employeeId", defaultValue = "", required = false) String employeeId,
 			@RequestParam(value = "password", defaultValue = "", required = false) String password,
 			@RequestParam(value = "email", defaultValue = "", required = false) String email,
-			@RequestParam(value = "photo", defaultValue = "", required = false) String photo,
+			MultipartFile photo,
 			@RequestParam(value = "authority", defaultValue = "", required = false) String authority) {
 
 		User user = new User();
