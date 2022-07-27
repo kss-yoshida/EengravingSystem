@@ -888,6 +888,34 @@ public class EngravingController {
 
 		return mav;
 	}
+	
+	/*
+	 * 変更履歴確認
+	 */
+	@RequestMapping("/historicalCheck")
+	public ModelAndView historicalCheck(
+			@RequestParam(value = "adminId", defaultValue = "", required = false) String adminId,
+			@RequestParam(value = "employeeId", defaultValue = "", required = false) String employeeId,
+			ModelAndView mav) {
+		// 結果を受け取る変数
+		ArrayList<Change> changeList = new ArrayList<Change>();
+
+		// 検索による受け取る情報の分岐
+		if (adminId.equals("") && employeeId.equals("")) {// 検索情報がない場合
+			changeList = (ArrayList<Change>) changeinfo.findAll();
+		} else if (adminId.equals("") && !employeeId.equals("")) {// ユーザーIDでの検索の場合
+			changeList = changeinfo.findByEmployeeIdLike(employeeId + "%");
+		} else if (!adminId.equals("") && employeeId.equals("")) {// 管理者IDでの検索の場合
+			changeList = changeinfo.findByAdminIdLike(adminId + "%");
+		} else {// ユーザーIDと管理者IDでの検索
+			changeList = changeinfo.findByEmployeeIdAndAdminIdLike(employeeId, adminId);
+		}
+		// 結果の受け渡し
+		mav.addObject("changeList", changeList);
+		mav.setViewName("historicalCheck");
+
+		return mav;
+	}
 
 	@RequestMapping("/employeeMenu")
 	public ModelAndView employeeMenu(ModelAndView mav) {
