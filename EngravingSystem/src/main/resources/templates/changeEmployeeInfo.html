@@ -20,7 +20,7 @@
 	    </header>
 		<div class="container">
 			<h3>社員情報変更</h3><br>
-			<form action="/changeEmployeeInfo" method="post">
+			<form action="/changeEmployeeInfo" method="post" enctype="multipart/form-data">
 				<table class="change-employee-table">
 						<tr>
 					<th>氏名</th>
@@ -40,7 +40,7 @@
 				</tr>
 				<tr>
 					<th>写真</th>
-					<td><input th:value="${user.getPhoto}" type="file" name="photo" id=""></td>
+					<td><input th:value="${user.getPhoto}" type="file" name="photo"></td>
 				</tr>
 				<tr>
 					<th>管理者権限</th>
