@@ -816,7 +816,7 @@ public class EngravingController {
 
 			// 情報を変更するかのif文
 			if (request.getChangeStartTime() != null
-					&& !requestDay.getBeforeStartEngrave().equals(request.getChangeStartTime())) {// 出勤時間を変更する場合
+					&& !requestDay.getBeforeStartTime().equals(request.getChangeStartTime())) {// 出勤時間を変更する場合
 				attendance.setStartTime(request.getChangeStartTime());
 
 				// 変更履歴を追加
@@ -832,7 +832,7 @@ public class EngravingController {
 				// changeinfo.saveAndFlush(change);
 			}
 			if (request.getChangeFinishTime() != null
-					&& !requestDay.getBeforeFinishEngrave().equals(request.getChangeFinishTime())) {// 退勤時間を変更する場合
+					&& !requestDay.getBeforeFinishTime().equals(request.getChangeFinishTime())) {// 退勤時間を変更する場合
 				attendance.setFinishTime(request.getChangeFinishTime());
 
 				// 変更履歴を追加
