@@ -564,7 +564,7 @@ public class EngravingController {
 
 		User user = new User();
 		
-		if(!photo.isEmpty()) {
+		if(!(photo == null)) {
 			try {
 				//ファイル名を社員番号に変更
 				File oldFileName = new File(photo.getOriginalFilename());
@@ -906,7 +906,7 @@ public class EngravingController {
 
 		User user = new User();
 		
-		if(!photo.isEmpty()) {
+		if(!(photo == null)) {
 			try {
 				//ファイル名を社員番号に変更
 				File oldFileName = new File(photo.getOriginalFilename());
