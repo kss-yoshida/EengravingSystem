@@ -5,7 +5,7 @@
 		<link rel="stylesheet" href="css/menu.css">
 		<link rel="stylesheet" href="css/style.css">
 		<link rel="stylesheet" href="css/adminMenu.css">
-		<link rel="stylesheet" href="css/historicalCheck.css">
+		<link rel="stylesheet" href="css/changeRequestList.css">
 		<title>変更申請一覧</title>
 	</head>
 	<body>
@@ -20,36 +20,36 @@
 	    </header>
 		<div class="container">
 			<h3>変更申請一覧</h3><br>
-			<table class="historical-check-table">
+			<table class="change-request-table">
 				<tr>
-					<th>日時</th>
-					<th>変更対象者番号</th>
-					<th>変更前データ<br>
+					<th id="change-request-normal">日時</th>
+					<th id="change-request-normal">変更対象者番号</th>
+					<th id="change-request-normal">変更前データ<br>
 					(出勤/退勤)</th>
-					<th>変更後データ<br>
+					<th id="change-request-normal">変更後データ<br>
 					(出勤/退勤)</th>
-					<th>コメント</th>
-					<th>認/否</th>
+					<th id="change-request-other">コメント</th>
+					<th id="change-request-normal">認/否</th>
 				</tr>
 				<tr th:each="requestDayList:${requestDayList}" th:object="${requestDayList}">
-					<td th:text="*{day}"></td>
-					<td th:text="*{employeeId}"></td>
-					<td th:text="|*{beforeStartTime} / *{beforeFinishTime}|"></td>
-					<td th:text="|*{changeStartTime}/*{changeFinishTime}|"></td>
-					<td th:text="*{comment}"></td>
-					<td>
-					<div class="engraving-flex">
-						<form action="changeRequest" method="post">
-							<input type="hidden" name="requestId" th:value="*{requestId}">
-							<input type="hidden" name = "cmd" value="input">
-							<input type="submit" value="認">
-						</form>
-						<form action="changeRequest" method="post">
-							<input type="hidden" name="requestId" th:value="*{requestId}">
-							<input type="hidden" name = "cmd" value="delete">
-							<input type="submit" value="否">
-						</form>
-					</div>
+					<td id="change-request-normal" th:text="*{day}"></td>
+					<td id="change-request-normal" th:text="*{employeeId}"></td>
+					<td id="change-request-normal" th:text="|*{beforeStartTime} / *{beforeFinishTime}|"></td>
+					<td id="change-request-normal" th:text="|*{changeStartTime}/*{changeFinishTime}|"></td>
+					<td id="change-request-other" th:text="*{comment}"></td>
+					<td id="change-request-normal">
+						<div class="engraving-flex">
+							<form action="changeRequest" method="post">
+								<input type="hidden" name="requestId" th:value="*{requestId}">
+								<input type="hidden" name = "cmd" value="input">
+								<input type="submit" value="認">
+							</form>
+							<form action="changeRequest" method="post">
+								<input type="hidden" name="requestId" th:value="*{requestId}">
+								<input type="hidden" name = "cmd" value="delete">
+								<input type="submit" value="否">
+							</form>
+						</div>
 					</td>
 				</tr>
 			</table>
