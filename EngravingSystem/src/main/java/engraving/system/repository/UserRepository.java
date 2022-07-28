@@ -20,4 +20,6 @@ public interface UserRepository extends JpaRepository<User, String> {
 
 	public ArrayList<User> findByEmployeeIdStartingWith(String id);
 
+	public ArrayList<User> findByNameLike(String name);
+
 }
