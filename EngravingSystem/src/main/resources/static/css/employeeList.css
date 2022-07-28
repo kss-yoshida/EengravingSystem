@@ -7,3 +7,8 @@
 	background-color: dimgray;
 	color: white;
 }
+
+.employee-list-table img{
+	width: 150px;
+	height: 200px;
+}
