@@ -1106,6 +1106,124 @@ public class EngravingController {
 
 		return mav;
 	}
+	
+	/*
+	 * ログイン履歴
+	 */
+	@RequestMapping("/userHistoricalCheck")
+	public ModelAndView userHistoricalCheck(
+			@RequestParam(value = "employeeId", defaultValue = "", required = false) String employeeId,
+			@RequestParam(value = "name", defaultValue = "", required = false) String name,
+			@RequestParam(value = "year", defaultValue = "", required = false) String year,
+			@RequestParam(value = "month", defaultValue = "", required = false) String month, ModelAndView mav) {
+//		ユーザーのログイン履歴の受け取り
+
+// 		月が1桁で入力されt場合の処理
+		if (month.length() == 1 && month != "") {
+			month = "0" + month;
+		}
+
+// 		検索する日付を格納する変数
+		String day;
+		Date date = new Date();
+
+//		渡す年月の形を変換するフォーマット
+		SimpleDateFormat monthFormat = new SimpleDateFormat("yyyy年MM月");
+
+		ArrayList<User> userList = new ArrayList<User>();
+
+// 		検索条件での条件分岐
+		if (year.equals("") && month.equals("")) {// 検索条件がない場合
+			SimpleDateFormat monthData = new SimpleDateFormat("yyyy-MM");
+			day = monthData.format(date) + "%";
+			mav.addObject("month", monthFormat.format(date));
+		} else if (!year.equals("") && !month.equals("")) {// 年と月で検索された場合
+			day = year + "-" + month + "%";
+			mav.addObject("month", year + "年" + month + "月");
+		} else if (year.equals("") && !month.equals("")) {// 月で検索した場合
+			SimpleDateFormat yearData = new SimpleDateFormat("yyyy");
+			day = yearData.format(date) + "-" + month + "%";
+			mav.addObject("month", yearData.format(date) + "年" + month + "月");
+		} else {// 年で検索した場合
+			day = year + "%";
+			mav.addObject("month", year + "年");
+		}
+
+		String cmd = "";
+
+		if (!name.equals("") && !employeeId.equals("")) {// 社員番号と名前が入力されている
+			userList = userinfo.findByNameLike("%" + name + "%");
+			String testEmployeeId = "";
+			for (int i = 0; i < userList.size(); i++) {
+				if (employeeId.equals(userList.get(i).getEmployeeId())) {
+					testEmployeeId = employeeId;
+					userList = new ArrayList<User>();
+					break;
+				}
+			}
+			employeeId = testEmployeeId;
+			userList = new ArrayList<User>();
+			if (employeeId.equals("")) {
+				cmd = "n";
+			}
+		} else if (!name.equals("") && employeeId.equals("")) {// 名前のみ
+			userList = userinfo.findByNameLike("%" + name + "%");
+			if (userList.isEmpty()) {
+				cmd = "n";
+			}
+		}
+
+		ArrayList<LoginLog> loginLogList = new ArrayList<LoginLog>();
+		if (userList.isEmpty() && cmd.equals("")) {
+			loginLogList = logininfo.findByEmployeeIdLikeAndLoginTimeLike("%" + employeeId + "%", day);
+		} else if (!userList.isEmpty() && cmd.equals("")) {
+			for (int i = 0; i < userList.size(); i++) {
+				ArrayList<LoginLog> testLoginLog = new ArrayList<LoginLog>();
+				testLoginLog = logininfo.findByEmployeeIdLikeAndLoginTimeLike(userList.get(i).getEmployeeId(), day);
+				for (int j = 0; j < testLoginLog.size(); j++) {
+					loginLogList.add(testLoginLog.get(j));
+				}
+			}
+		}
+
+		ArrayList<LoginLogName> nameList = new ArrayList<LoginLogName>();
+
+		String strFormat = "dd日 HH時mm分ss秒";
+		if (month.equals("") && !year.equals("")) {
+			strFormat = "MM月dd日 HH時mm分ss秒";
+		}
+
+		SimpleDateFormat sdf = new SimpleDateFormat(strFormat);
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+		Date dayData;
+
+		for (int i = 0; i < loginLogList.size(); i++) {
+			LoginLogName loginLogName = new LoginLogName();
+			User user = userinfo.findByEmployeeId(loginLogList.get(i).getEmployeeId());
+
+			try {
+				dayData = format.parse(loginLogList.get(i).getLoginTime());
+
+//		 送る値を格納する
+				loginLogName.setEmployeeId(loginLogList.get(i).getEmployeeId());
+				loginLogName.setLoginTime(sdf.format(dayData));
+				loginLogName.setName(user.getName());
+				nameList.add(loginLogName);
+			} catch (ParseException e) {
+			}
+
+		}
+
+//		リストが空でなければmavに登録
+		if (loginLogList.size() != 0) {
+			mav.addObject("loginLogList", nameList);
+		}
+
+//		遷移先の指定
+		mav.setViewName("userHistoricalCheck");
+		return mav;
+	}
 
 //以下画面遷移用リクエストマッピング
 	@RequestMapping("/loginForm")
@@ -1255,122 +1373,6 @@ public class EngravingController {
 		}
 		}
 
-	/*
-	 * ログイン履歴
-	 */
-	@RequestMapping("/userHistoricalCheck")
-	public ModelAndView userHistoricalCheck(
-			@RequestParam(value = "employeeId", defaultValue = "", required = false) String employeeId,
-			@RequestParam(value = "name", defaultValue = "", required = false) String name,
-			@RequestParam(value = "year", defaultValue = "", required = false) String year,
-			@RequestParam(value = "month", defaultValue = "", required = false) String month, ModelAndView mav) {
-//		ユーザーのログイン履歴の受け取り
-
-// 		月が1桁で入力されt場合の処理
-		if (month.length() == 1 && month != "") {
-			month = "0" + month;
-		}
-
-// 		検索する日付を格納する変数
-		String day;
-		Date date = new Date();
-
-//		渡す年月の形を変換するフォーマット
-		SimpleDateFormat monthFormat = new SimpleDateFormat("yyyy年MM月");
-
-		ArrayList<User> userList = new ArrayList<User>();
-
-// 		検索条件での条件分岐
-		if (year.equals("") && month.equals("")) {// 検索条件がない場合
-			SimpleDateFormat monthData = new SimpleDateFormat("yyyy-MM");
-			day = monthData.format(date) + "%";
-			mav.addObject("month", monthFormat.format(date));
-		} else if (!year.equals("") && !month.equals("")) {// 年と月で検索された場合
-			day = year + "-" + month + "%";
-			mav.addObject("month", year + "年" + month + "月");
-		} else if (year.equals("") && !month.equals("")) {// 月で検索した場合
-			SimpleDateFormat yearData = new SimpleDateFormat("yyyy");
-			day = yearData.format(date) + "-" + month + "%";
-			mav.addObject("month", yearData.format(date) + "年" + month + "月");
-		} else {// 年で検索した場合
-			day = year + "%";
-			mav.addObject("month", year + "年");
-		}
-
-		String cmd = "";
-
-		if (!name.equals("") && !employeeId.equals("")) {// 社員番号と名前が入力されている
-			userList = userinfo.findByNameLike("%" + name + "%");
-			String testEmployeeId = "";
-			for (int i = 0; i < userList.size(); i++) {
-				if (employeeId.equals(userList.get(i).getEmployeeId())) {
-					testEmployeeId = employeeId;
-					userList = new ArrayList<User>();
-					break;
-				}
-			}
-			employeeId = testEmployeeId;
-			userList = new ArrayList<User>();
-			if (employeeId.equals("")) {
-				cmd = "n";
-			}
-		} else if (!name.equals("") && employeeId.equals("")) {// 名前のみ
-			userList = userinfo.findByNameLike("%" + name + "%");
-			if (userList.isEmpty()) {
-				cmd = "n";
-			}
-		}
-
-		ArrayList<LoginLog> loginLogList = new ArrayList<LoginLog>();
-		if (userList.isEmpty() && cmd.equals("")) {
-			loginLogList = logininfo.findByEmployeeIdLikeAndLoginTimeLike("%" + employeeId + "%", day);
-		} else if (!userList.isEmpty() && cmd.equals("")) {
-			for (int i = 0; i < userList.size(); i++) {
-				ArrayList<LoginLog> testLoginLog = new ArrayList<LoginLog>();
-				testLoginLog = logininfo.findByEmployeeIdLikeAndLoginTimeLike(userList.get(i).getEmployeeId(), day);
-				for (int j = 0; j < testLoginLog.size(); j++) {
-					loginLogList.add(testLoginLog.get(j));
-				}
-			}
-		}
-
-		ArrayList<LoginLogName> nameList = new ArrayList<LoginLogName>();
-
-		String strFormat = "dd日 HH時mm分ss秒";
-		if (month.equals("") && !year.equals("")) {
-			strFormat = "MM月dd日 HH時mm分ss秒";
-		}
-
-		SimpleDateFormat sdf = new SimpleDateFormat(strFormat);
-		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-		Date dayData;
-
-		for (int i = 0; i < loginLogList.size(); i++) {
-			LoginLogName loginLogName = new LoginLogName();
-			User user = userinfo.findByEmployeeId(loginLogList.get(i).getEmployeeId());
-
-			try {
-				dayData = format.parse(loginLogList.get(i).getLoginTime());
-
-//		 送る値を格納する
-				loginLogName.setEmployeeId(loginLogList.get(i).getEmployeeId());
-				loginLogName.setLoginTime(sdf.format(dayData));
-				loginLogName.setName(user.getName());
-				nameList.add(loginLogName);
-			} catch (ParseException e) {
-			}
-
-		}
-
-//		リストが空でなければmavに登録
-		if (loginLogList.size() != 0) {
-			mav.addObject("loginLogList", nameList);
-		}
-
-//		遷移先の指定
-		mav.setViewName("userHistoricalCheck");
-		return mav;
-	}
+	
 
 }
