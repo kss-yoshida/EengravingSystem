@@ -73,7 +73,7 @@ public class RequestDay {
 //	変更希望出勤時間
 	@Column(name="change_start_time" ,nullable=true)
 	private String changeStartTime;
-	public void setChangeStartime(String time) {
+	public void setChangeStarTime(String time) {
 		this.changeStartTime=time;
 	}
 	public String getChangeStartTime() {
