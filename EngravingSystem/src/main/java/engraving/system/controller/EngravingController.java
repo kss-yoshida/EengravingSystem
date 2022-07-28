@@ -1255,8 +1255,6 @@ public class EngravingController {
 		}
 		}
 
-}
-
 	/*
 	 * ログイン履歴
 	 */
@@ -1375,3 +1373,4 @@ public class EngravingController {
 		return mav;
 	}
 
+}
