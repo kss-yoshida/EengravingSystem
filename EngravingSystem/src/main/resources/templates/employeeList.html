@@ -39,7 +39,7 @@
 				<th>変更/削除</th>
 			</tr>
 			<th:block th:each="user : ${employeeList}">
-				<tr>
+				<tr th:if="*{user.isDeleted==false}">
 					<td ><img th:src="${user.photo}"/></td>
 					<td>
 						<form action="/adminAttendanceRecord" method="post">
