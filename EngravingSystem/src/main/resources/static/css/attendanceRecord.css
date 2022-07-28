@@ -3,6 +3,13 @@
 }
 
 .attendance-record-table th{
-	width: 14%;
 	background-color: #99CCFF;
+}
+
+#attendance-record-other {
+	width: 10%;
+}
+
+#attendance-record-normal{
+	width: 13%;
 }
