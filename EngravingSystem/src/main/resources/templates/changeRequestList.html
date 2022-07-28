@@ -34,8 +34,8 @@
 				<tr th:each="requestDayList:${requestDayList}" th:object="${requestDayList}">
 					<td th:text="*{day}"></td>
 					<td th:text="*{employeeId}"></td>
-					<td th:text="|*{beforeStartEngrave} / *{beforeFinishEngrave}|"></td>
-					<td th:text="|*{changeStartEngrave}/*{changeFinishEngrave}|"></td>
+					<td th:text="|*{beforeStartTime} / *{beforeFinishTime}|"></td>
+					<td th:text="|*{changeStartTime}/*{changeFinishTime}|"></td>
 					<td th:text="*{comment}"></td>
 					<td>
 					<div class="engraving-flex">
