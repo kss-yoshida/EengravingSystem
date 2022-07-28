@@ -606,7 +606,9 @@ public class EngravingController {
 		user.setEmployeeId(employeeId);
 		user.setPassword(password);
 		user.setEmail(email);
+		if(!(photo==null)){
 		user.setPhoto(employeeId + ".jpg");
+		}
 		user.setAuthority(authority);
 
 		// 写真を保存する処理
