@@ -900,61 +900,147 @@ public class EngravingController {
 	public String changeEmployeeInfoPost(@RequestParam(value = "name", defaultValue = "", required = false) String name,
 			@RequestParam(value = "employeeId", defaultValue = "", required = false) String employeeId,
 			@RequestParam(value = "password", defaultValue = "", required = false) String password,
-			@RequestParam(value = "email", defaultValue = "", required = false) String email,
-			MultipartFile photo,
-			@RequestParam(value = "authority", defaultValue = "", required = false) String authority) {
+			@RequestParam(value = "email", defaultValue = "", required = false) String email, MultipartFile photo,
+			@RequestParam(value = "authority", defaultValue = "", required = false) String authority,
+			RedirectAttributes redirectAttributes) {
 
 		User user = new User();
-		
-		if(!(photo == null)) {
+		User before = userinfo.findByEmployeeId(employeeId);
+
+		if (!(photo == null)) {
 			try {
-				//ファイル名を社員番号に変更
+				// ファイル名を社員番号に変更
 				File oldFileName = new File(photo.getOriginalFilename());
 				File newFileName = new File(employeeId + ".jpg");
 				oldFileName.renameTo(newFileName);
-				
-				//保存先を定義
+
+				// 保存先を定義
 				String uploadPath = "photo/";
 				byte[] buytes = photo.getBytes();
-				
-				//指定ファイルへ読み込みファイルを書き込む
+
+				// 指定ファイルへ読み込みファイルを書き込む
 				BufferedOutputStream stream = new BufferedOutputStream(
 						new FileOutputStream(new File(uploadPath + newFileName)));
 				stream.write(buytes);
 				stream.close();
-				
-				//圧縮
+
+				// 圧縮
 				File input = new File(uploadPath + newFileName);
 				BufferedImage image = ImageIO.read(input);
 				OutputStream os = new FileOutputStream(input);
 				Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("jpg");
-				ImageWriter writer = (ImageWriter)writers.next();
+				ImageWriter writer = (ImageWriter) writers.next();
 				ImageOutputStream ios = ImageIO.createImageOutputStream(os);
 				writer.setOutput(ios);
 				ImageWriteParam param = new JPEGImageWriteParam(null);
 				param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
 				param.setCompressionQuality(0.30f);
-				writer.write(null, new IIOImage(image, null, null),param);
+				writer.write(null, new IIOImage(image, null, null), param);
 				os.close();
 				ios.close();
 				writer.dispose();
-				
-			}catch (Exception e) {
+
+			} catch (Exception e) {
 				System.out.println(e);
 			}
-
+		}
 		user.setName(name);
-		user.setEmployeeId((employeeId));
+		user.setEmployeeId(employeeId);
 		user.setPassword(password);
 		user.setEmail(email);
-		user.setPhoto(employeeId + ".jpg");
 		user.setAuthority(authority);
+		if (!(photo == null)) {
+			user.setPhoto(employeeId + ".jpg");
+		}
+
+//		変更履歴の登録
+		ArrayList<Change> list = new ArrayList<Change>();
+
+		Date date = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
+		String time = sdf.format(date);
+//		社員番号
+		if (!before.getEmployeeId().equals(user.getEmployeeId())) {
+			Change change = new Change();
+			change.setAdminId(employeeId);
+			change.setIsUpdated(time);
+			change.setEmployeeId(before.getEmployeeId());
+			change.setDataName("社員番号");
+			change.setBeforeData(before.getEmployeeId());
+			change.setAfterData(user.getEmployeeId());
+			list.add(change);
+		}
+//		社員名
+		if (!before.getName().equals(user.getName())) {
+			Change change = new Change();
+			change.setAdminId(employeeId);
+			change.setIsUpdated(time);
+			change.setEmployeeId(before.getEmployeeId());
+			change.setDataName("社員名");
+			change.setBeforeData(before.getName());
+			change.setAfterData(user.getName());
+			list.add(change);
+		}
+//		パスワード
+		if (!before.getPassword().equals(user.getPassword())) {
+			Change change = new Change();
+			change.setAdminId(employeeId);
+			change.setIsUpdated(time);
+			change.setEmployeeId(before.getEmployeeId());
+			change.setDataName("パスワード");
+			change.setBeforeData(before.getPassword());
+			change.setAfterData(user.getPassword());
+			list.add(change);
+		}
+//		Email
+		if (!before.getEmail().equals(user.getEmail())) {
+			Change change = new Change();
+			change.setAdminId(employeeId);
+			change.setIsUpdated(time);
+			change.setEmployeeId(before.getEmployeeId());
+			change.setDataName("Emailアドレス");
+			change.setBeforeData(before.getEmail());
+			change.setAfterData(user.getEmail());
+			list.add(change);
+		}
+//		写真
+		if (!(photo == null) && !before.getPhoto().equals(user.getPhoto())) {
+			Change change = new Change();
+			change.setAdminId(employeeId);
+			change.setIsUpdated(time);
+			change.setEmployeeId(before.getEmployeeId());
+			change.setDataName("写真");
+			change.setBeforeData(before.getPhoto());
+			change.setAfterData(user.getPhoto());
+			list.add(change);
+		}
+//		権限
+		if (!before.getAuthority().equals(user.getAuthority())) {
+			Change change = new Change();
+			change.setAdminId(employeeId);
+			change.setIsUpdated(time);
+			change.setEmployeeId(before.getEmployeeId());
+			change.setDataName("権限");
+			if (before.getAuthority().equals("0")) {
+				change.setBeforeData("管理者");
+				change.setAfterData("一般社員");
+			} else {
+				change.setBeforeData("一般社員");
+				change.setAfterData("管理者");
+			}
+			list.add(change);
+		}
 
 //		入力データをDBに保存
 		userinfo.saveAndFlush(user);
 
-// 		ModelとView情報を返す
-		return "redirect:/employeeList";
+//		変更情報をMapに登録
+		ModelMap md = new ModelMap();
+		md.addAttribute("changeList", list);
+		redirectAttributes.addFlashAttribute("map1", md);
+		redirectAttributes.addFlashAttribute("move", "redirect:/employeeList");
+
+		return "redirect:/changeInsert";
 	}
 	
 	/* 社員削除機能 */
