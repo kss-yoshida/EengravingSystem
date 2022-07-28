@@ -1,0 +1,16 @@
+.change-request-table {
+	width: 100%;
+}
+
+.change-request-table th{
+	background-color: dimgray;
+	color: white;
+}
+
+#change-request-normal {
+	width: 15%;
+}
+
+#change-request-other {
+	width: 24%;
+}

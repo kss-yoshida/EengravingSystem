@@ -1,5 +1,7 @@
 .change-attendance-table {
-	width: 100%;
+	margin: auto;
+    width: 60%;
+    text-align: center;
 }
 
 .change-attendance-table th{
