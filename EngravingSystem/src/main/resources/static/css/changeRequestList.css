@@ -1,5 +1,6 @@
 .change-request-table {
 	width: 100%;
+	table-layout: fixed;
 }
 
 .change-request-table th{
@@ -10,7 +11,15 @@
 #change-request-normal {
 	width: 15%;
 }
+#change-request-other  {
+	width: 29%;
+}
 
-#change-request-other {
-	width: 24%;
+#change-request-other-td {
+	width: 29%;
+	text-align: left;
+}
+
+#change-request {
+	width: 10%;
 }
