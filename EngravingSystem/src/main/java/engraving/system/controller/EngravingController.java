@@ -299,6 +299,16 @@ public class EngravingController {
 		userList = (ArrayList<User>) userinfo.findAll();
 //		リストが空でなければmavに登録
 		if (userList.size() != 0) {
+			
+			//写真を表示できる形に変換する処理
+			for(int i = 0; i <userList.size(); i++) {
+				User userPhoto = userList.get(i);
+				if(userPhoto.getPhoto() != null) {
+					userPhoto.setPhoto(photoView(userPhoto.getPhoto()));
+					userList.set(i, userPhoto);
+				}
+			}
+				
 			mav.addObject("employeeList", userList);
 		}
 //		遷移先の指定
@@ -328,6 +338,16 @@ public class EngravingController {
 
 //		リストが空でなければmavに登録
 		if (userList.size() != 0) {
+			
+			//写真を表示できる形に変換する処理
+			for(int i = 0; i <userList.size(); i++) {
+				User userPhoto = userList.get(i);
+				if(userPhoto.getPhoto() != null) {
+					userPhoto.setPhoto(photoView(userPhoto.getPhoto()));
+					userList.set(i, userPhoto);
+				}
+			}
+			
 			mav.addObject("employeeList", userList);
 		} else {
 //			検索結果が空の場合
@@ -957,11 +977,11 @@ public class EngravingController {
 			ModelMap modelMap = new ModelMap();
 			modelMap.addAttribute("changeList", changeList);
 			redirectAttributes.addFlashAttribute("map1", modelMap);
-			redirectAttributes.addFlashAttribute("move", "changeRequestList");
+			redirectAttributes.addFlashAttribute("move", "redirect:/changeRequestList");
 			mav.setViewName("redirect:/changeInsert");
 			return mav;
 		} else {
-			mav.setViewName("changeRequestList");
+			mav.setViewName("redirect:/changeRequestList");
 			return mav;
 		}
 	}
@@ -993,6 +1013,11 @@ public class EngravingController {
 	public ModelAndView changeEmployeeInfo(ModelAndView mav, @RequestParam(value = "employeeId") String empid) {
 
 		User user = userinfo.findByEmployeeId(empid);
+		
+		//写真を表示できる形に変換する処理
+		if(user.getPhoto() != null) {
+			user.setPhoto(photoView(user.getPhoto()));
+		}
 
 		mav.addObject("user", user);
 		mav.setViewName("changeEmployeeInfo");
