@@ -36,7 +36,7 @@
 				<th>社員番号</th>
 				<th>氏名</th>
 				<th>管理者登録・削除</th>
-				<th>変更/削除</th>
+				<th>社員詳細・変更/削除</th>
 			</tr>
 			<th:block th:each="user : ${employeeList}">
 				<tr th:if="*{user.isDeleted==false}">
@@ -63,7 +63,7 @@
 					<td>
 						<div class="engraving-flex">
 							<form action="/changeEmployee" method="post">
-								<input type="hidden" name="employeeId" th:value="*{user.employeeId}"> <input type="submit" value="変更">
+								<input type="hidden" name="employeeId" th:value="*{user.employeeId}"> <input type="submit" value="詳細・変更">
 							</form>
 							<form action="/deleteEmployee" method="post">
 								<input type="hidden"name="employeeId"th:value="*{user.employeeId}">

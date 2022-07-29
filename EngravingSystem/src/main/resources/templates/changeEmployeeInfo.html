@@ -19,31 +19,43 @@
 	        </nav>
 	    </header>
 		<div class="container">
-			<h3>社員情報変更</h3><br>
+			<h3>社員情報詳細・変更</h3><br>
 			<form action="/changeEmployeeInfo" method="post" enctype="multipart/form-data">
 				<table class="change-employee-table">
-						<tr>
-					<th>氏名</th>
-					<td><input th:value="${user.getName}" type="text" name="name"></td>
+					<tr>
+						<th>内容</th>
+						<th>詳細</th>
+						<th>変更</th>
+					</tr>
+					<tr>
+						<th>氏名</th>
+						<td th:text="${user.getName}"></td>
+						<td><input th:value="${user.getName}" type="text" name="name"></td>
 				</tr>
 				<tr>
 					<th>社員番号</th>
+					<td th:text="${user.getEmployeeId}"></td>
 					<td><input th:value="${user.getEmployeeId}"  type="text" name="employeeId"></td>
 				</tr>
 				<tr>
 					<th>パスワード</th>
+					<td th:text="${user.getPassword}"></td>
 					<td><input th:value="${user.getPassword}"  type="text" name="password"></td>
 				</tr>
 				<tr>
 					<th>E-Mail</th>
+					<td th:text="${user.getEmail}"></td>
 					<td><input th:value="${user.getEmail}" type="text" name="email"></td>
 				</tr>
 				<tr>
 					<th>写真</th>
+					<td ><img th:src="${user.photo}"/></td>
 					<td><input th:value="${user.getPhoto}" type="file" name="photo"></td>
 				</tr>
 				<tr>
 					<th>管理者権限</th>
+					<td th:if="${user.authority}==0" th:text="管理者"></td>
+					<td th:if="${user.authority}==1" th:text="社員"></td>
 					<td><select name="authority" th:value="${user.getAuthority}">
 							<option value="1">---管理者権限を付与しない---</option>
 							<option value="0">---管理者権限を付与する---</option>
