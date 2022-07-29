@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.ModelMap;
@@ -27,12 +26,8 @@ import engraving.system.entity.*;
 import engraving.system.repository.*;
 
 @Controller
-@SessionAttributes(value = "user")
+
 public class EngravingController {
-	@ModelAttribute(value = "user")
-	public User setUpUser() {
-		return new User();
-	}
 
 	// Repositoryインターフェースを自動インスタンス化
 	@Autowired
@@ -55,8 +50,16 @@ public class EngravingController {
 	@RequestMapping(value = "/startEngraving", method = RequestMethod.POST)
 	public ModelAndView engravingStart(@RequestParam("cmd") String cmd, ModelAndView mav) {
 
+		String error = "";
 		// 勤怠情報を格納するAttendanceの作成
 		User user = (User) session.getAttribute("user");
+		if (user == null) {
+			error = "セッションが切れました。再度ログインしてください。";
+			cmd = "login";
+			mav.addObject("error", error);
+			mav.setViewName(cmd);
+			return mav;
+		}
 		Attendance attendance = new Attendance();
 
 		// 日付の受け取りと格納
@@ -76,7 +79,11 @@ public class EngravingController {
 			attendanceinfo.saveAndFlush(attendance);
 			String startTime = attendance.getStartTime();
 			mav.addObject("startTime", startTime);
+
+//			すでに打刻時間があった場合
 		} else {
+			error = "すでに本日の出勤打刻は完了しています。";
+			mav.addObject("error", error);
 			SimpleDateFormat time = new SimpleDateFormat("kk:mm");
 			attendance = attendanceList.get(0);
 			Date startEngrave;
@@ -113,6 +120,14 @@ public class EngravingController {
 		Attendance attendance;
 		// ユーザーの当日の打刻情報を呼び出す
 		User user = (User) session.getAttribute("user");
+		String error;
+		if (user == null) {
+			error = "セッションが切れました。再度ログインしてください。";
+			cmd = "login";
+			mav.addObject("error", error);
+			mav.setViewName(cmd);
+			return mav;
+		}
 		String employeeId = user.getEmployeeId();
 		ArrayList<Attendance> attendanceList = (ArrayList<Attendance>) attendanceinfo
 				.findByDayAndEmployeeId(day.format(date), employeeId);
@@ -168,6 +183,12 @@ public class EngravingController {
 			} catch (Exception e) {
 			}
 		} else {// すでに打刻している場合の打刻時間を送る処理
+			if (attendanceList.size() != 0) {
+				error = "まずは出勤打刻を行ってください。";
+			} else {
+				error = "本日の退勤打刻は完了しています。";
+			}
+			mav.addObject("error", error);
 			SimpleDateFormat time = new SimpleDateFormat("kk:mm");
 			attendance = attendanceList.get(0);
 			Date startEngrave;
@@ -229,34 +250,34 @@ public class EngravingController {
 			}
 		}
 
-//		ログインした社員の勤怠情報の取得
-		Date date = new Date();
-		SimpleDateFormat day = new SimpleDateFormat("yyyyMMdd");
-		String employeeId = user.getEmployeeId();
-		ArrayList<Attendance> attendanceList = (ArrayList<Attendance>) attendanceinfo
-				.findByDayAndEmployeeId(day.format(date), employeeId);
-		Attendance attendance = new Attendance();
-		if (attendanceList.size() != 0) {
-//		ログイン日の出勤情報があった場合
-			attendance = attendanceList.get(0);
-			SimpleDateFormat time = new SimpleDateFormat("kk:mm");
-			Date startEngrave;
-			Date finishEngrave;
-			try {
-				startEngrave = time.parse(attendance.getStartEngrave());
-				finishEngrave = time.parse(attendance.getFinishEngrave());
-				mav.addObject("startTime", time.format(startEngrave));
-				mav.addObject("finishTime", time.format(finishEngrave));
-			} catch (Exception e) {
-			}
-
-		}
-
 		if (cmd.equals("")) {
 //			エラーがあったらログインに戻る
+			mav.addObject("error", "社員番号またはパスワードが間違っています。");
 			mav.setViewName("loginForm");
 		} else {
-//			OKになってたらメニューに行く
+//			OKになってたら当日の勤怠情報を検索してメニューに行く
+//			ログインした社員の勤怠情報の取得
+			Date date = new Date();
+			SimpleDateFormat day = new SimpleDateFormat("yyyyMMdd");
+			String employeeId = user.getEmployeeId();
+			ArrayList<Attendance> attendanceList = (ArrayList<Attendance>) attendanceinfo
+					.findByDayAndEmployeeId(day.format(date), employeeId);
+			Attendance attendance = new Attendance();
+			if (attendanceList.size() != 0) {
+//			ログイン日の出勤情報があった場合
+				attendance = attendanceList.get(0);
+				SimpleDateFormat time = new SimpleDateFormat("kk:mm");
+				Date startEngrave;
+				Date finishEngrave;
+				try {
+					startEngrave = time.parse(attendance.getStartEngrave());
+					finishEngrave = time.parse(attendance.getFinishEngrave());
+					mav.addObject("startTime", time.format(startEngrave));
+					mav.addObject("finishTime", time.format(finishEngrave));
+				} catch (Exception e) {
+				}
+
+			}
 			mav.addObject("user", user);
 			if (user.getAuthority().equals("1")) {
 
@@ -291,6 +312,7 @@ public class EngravingController {
 	@RequestMapping("/searchEmployee")
 	public ModelAndView search(ModelAndView mav, @RequestParam(value = "employeeId", defaultValue = "0") String id,
 			@RequestParam(value = "name", defaultValue = "") String name) {
+		String error;
 //		DBから条件付きで社員リストを取得
 		ArrayList<User> userList = new ArrayList<User>();
 //		社員番号と名前が入力されている
@@ -307,6 +329,10 @@ public class EngravingController {
 //		リストが空でなければmavに登録
 		if (userList.size() != 0) {
 			mav.addObject("employeeList", userList);
+		} else {
+//			検索結果が空の場合
+			error = "検索内容に該当する社員はいませんでした。";
+			mav.addObject("error", error);
 		}
 //		遷移先の指定
 		mav.setViewName("employeeList");
@@ -336,11 +362,9 @@ public class EngravingController {
 	 * 
 	 */
 	@RequestMapping("/logout")
-	public ModelAndView logout() {
-		ModelAndView mav = new ModelAndView();
+	public String logout() {
 		session.removeAttribute("user");
-		mav.setViewName("login");
-		return mav;
+		return "login";
 	}
 
 	/*
@@ -352,10 +376,35 @@ public class EngravingController {
 			@RequestParam(value = "month", defaultValue = "", required = false) String month, ModelAndView mav) {
 		// ユーザー情報の受け取り
 		User user = (User) session.getAttribute("user");
+		if (user == null) {
+			String error = "セッションが切れました。再度ログインしてください。";
+
+			mav.addObject("error", error);
+			mav.setViewName("login");
+			return mav;
+		}
 		String employeeId = user.getEmployeeId();
 		String authority = user.getAuthority();
 
-		// 月が1桁で入力されt場合の処理
+//		検索の際に年月が半角の数列で検索されているかの判定
+		try {
+			if (!year.equals("") || !month.equals("")) {
+				int check = Integer.parseInt(year);
+				check = Integer.parseInt(month);
+			}
+		} catch (NumberFormatException e) {
+			mav.addObject("error", "検索の年月は半角数字で入力してください。");
+			mav.setViewName("attendanceRecord");
+			return mav;
+		}
+//		桁数チェック
+		if (year.length() != 4 || month.length() > 2) {
+			mav.addObject("error", "年は４桁、月は２桁以内で入力してください。");
+			mav.setViewName("attendanceRecord");
+			return mav;
+		}
+
+		// 月が1桁で入力された場合の処理
 		if (month.length() == 1 && month != "") {
 			month = "0" + month;
 		}
@@ -458,11 +507,34 @@ public class EngravingController {
 			@RequestParam(value = "employeeId", defaultValue = "", required = false) String id, ModelAndView mav) {
 		// ユーザー情報の受け取り
 		User user = (User) session.getAttribute("user");
+		if (user == null) {
+			String error = "セッションが切れました。再度ログインしてください。";
+
+			mav.addObject("error", error);
+			mav.setViewName("login");
+			return mav;
+		}
 		String authority = user.getAuthority();
 
 		// 月が1桁で入力されt場合の処理
 		if (month.length() == 1 && month != "") {
 			month = "0" + month;
+		}
+
+//		検索の際に年月が半角の数列で検索されているかの判定
+		try {
+			int check = Integer.parseInt(year);
+			check = Integer.parseInt(month);
+		} catch (NumberFormatException e) {
+			mav.addObject("error", "検索の年月は半角数字で入力してください。");
+			mav.setViewName("attendanceRecord");
+			return mav;
+		}
+//		桁数チェック
+		if (year.length() != 4 || month.length() > 2) {
+			mav.addObject("error", "年は４桁、月は２桁以内で入力してください。");
+			mav.setViewName("attendanceRecord");
+			return mav;
 		}
 
 		// 検索する日付を格納する変数
@@ -492,10 +564,10 @@ public class EngravingController {
 		ArrayList<Attendance> attendanceList = attendanceinfo.findByEmployeeIdAndDayLike(id, day);
 
 		String strFormat = ("dd日");
-		if(!year.equals("") && month.equals("")){
-			strFormat ="MM月dd日";
+		if (!year.equals("") && month.equals("")) {
+			strFormat = "MM月dd日";
 		}
-		
+
 		// 形の変換のためのフォーマット
 		SimpleDateFormat time = new SimpleDateFormat("HH時mm分");
 		SimpleDateFormat timer = new SimpleDateFormat("HH時間mm分");
@@ -558,51 +630,63 @@ public class EngravingController {
 	 * 社員登録処理
 	 */
 	@RequestMapping(value = "/employeeRegistration", method = RequestMethod.POST)
-
-	public String employeeRegistrationPost(
+	public ModelAndView employeeRegistrationPost(
 			@RequestParam(value = "name", defaultValue = "", required = false) String name,
 			@RequestParam(value = "employeeId", defaultValue = "", required = false) String employeeId,
 			@RequestParam(value = "password", defaultValue = "", required = false) String password,
-			@RequestParam(value = "email", defaultValue = "", required = false) String email,
-			MultipartFile photo,
-			@RequestParam(value = "authority", defaultValue = "", required = false) String authority) {
+			@RequestParam(value = "email", defaultValue = "", required = false) String email, MultipartFile photo,
+			@RequestParam(value = "authority", defaultValue = "", required = false) String authority,
+			ModelAndView mav) {
 
 		User user = new User();
-		
-		if(!(photo == null)) {
+
+//		入力データの確認
+		if (name.equals("") || password.equals("") || employeeId.equals("") || email.equals("")) {
+			mav.addObject("error", "名前、パスワード、社員番号、Emailアドレスが入力されていません。");
+			mav.setViewName("employeeRegistration");
+			return mav;
+		}
+		if (password.length() < 8) {
+			mav.addObject("error", "パスワードは最低でも８桁設定してください");
+			mav.setViewName("employeeRegistration");
+			return mav;
+		}
+
+//		写真の取り込み処理
+		if (!(photo.getOriginalFilename().equals(""))) {
 			try {
-				//ファイル名を社員番号に変更
+				// ファイル名を社員番号に変更
 				File oldFileName = new File(photo.getOriginalFilename());
 				File newFileName = new File(employeeId + ".jpg");
 				oldFileName.renameTo(newFileName);
-				
-				//保存先を定義
+
+				// 保存先を定義
 				String uploadPath = "photo/";
 				byte[] buytes = photo.getBytes();
-				
-				//指定ファイルへ読み込みファイルを書き込む
+
+				// 指定ファイルへ読み込みファイルを書き込む
 				BufferedOutputStream stream = new BufferedOutputStream(
 						new FileOutputStream(new File(uploadPath + newFileName)));
 				stream.write(buytes);
 				stream.close();
-				
-				//圧縮
+
+				// 圧縮
 				File input = new File(uploadPath + newFileName);
 				BufferedImage image = ImageIO.read(input);
 				OutputStream os = new FileOutputStream(input);
 				Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("jpg");
-				ImageWriter writer = (ImageWriter)writers.next();
+				ImageWriter writer = (ImageWriter) writers.next();
 				ImageOutputStream ios = ImageIO.createImageOutputStream(os);
 				writer.setOutput(ios);
 				ImageWriteParam param = new JPEGImageWriteParam(null);
 				param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
 				param.setCompressionQuality(0.30f);
-				writer.write(null, new IIOImage(image, null, null),param);
+				writer.write(null, new IIOImage(image, null, null), param);
 				os.close();
 				ios.close();
 				writer.dispose();
-				
-			}catch (Exception e) {
+
+			} catch (Exception e) {
 				System.out.println(e);
 			}
 		}
@@ -611,8 +695,8 @@ public class EngravingController {
 		user.setEmployeeId(employeeId);
 		user.setPassword(password);
 		user.setEmail(email);
-		if(!(photo==null)){
-		user.setPhoto(employeeId + ".jpg");
+		if (!(photo.getOriginalFilename().equals(""))) {
+			user.setPhoto(employeeId + ".jpg");
 		}
 		user.setAuthority(authority);
 
@@ -622,15 +706,16 @@ public class EngravingController {
 //		入力データをDBに保存
 		userinfo.saveAndFlush(user);
 
+		mav.setViewName("redirect:/employeeList");
 // 		ModelとView情報を返す
-		return "redirect:/employeeList";
+		return mav;
 	}
 
 	/*
 	 * 勤怠情報変更
 	 */
 	@RequestMapping(value = "/changeAttendance", method = RequestMethod.POST)
-	public String changeAttendance(
+	public ModelAndView changeAttendance(
 			@RequestParam(value = "attendanceId", defaultValue = "", required = false) String attendanceId,
 			@RequestParam(value = "startTime", defaultValue = "", required = false) String startTime,
 			@RequestParam(value = "finishTime", defaultValue = "", required = false) String finishTime,
@@ -639,9 +724,15 @@ public class EngravingController {
 			@RequestParam(value = "startEngrave", defaultValue = "", required = false) String startEngrave,
 			@RequestParam(value = "finishEngrave", defaultValue = "", required = false) String finishEngrave,
 			@RequestParam(value = "employeeId", defaultValue = "", required = false) String employeeId,
-			@RequestParam(value = "day", defaultValue = "", required = false) String day, String mav,
+			@RequestParam(value = "day", defaultValue = "", required = false) String day, ModelAndView mav,
 			RedirectAttributes redirectAttributes) {
 		User user = (User) session.getAttribute("user");
+		if (user == null) {
+			String error = "セッションが切れました。再度ログインしてください。";
+			mav.addObject("error", error);
+			mav.setViewName("login");
+			return mav;
+		}
 
 		Attendance before = attendanceinfo.findByAttendanceId(Integer.parseInt(attendanceId));
 
@@ -711,20 +802,22 @@ public class EngravingController {
 //		勤怠情報変更の登録
 		attendanceinfo.saveAndFlush(after);
 //		遷移先コントローラーの選択
+		String cmd;
 		if (user.getEmployeeId().equals(employeeId)) {
-			mav = "redirect:/attendanceRecord";
+			cmd = "redirect:/attendanceRecord";
 		} else {
 //			get送信
-			mav = "redirect:/adminAttendanceRecord";
+			cmd = "redirect:/adminAttendanceRecord";
 		}
 
 //		変更情報をMapに登録
 		ModelMap md = new ModelMap();
 		md.addAttribute("changeList", list);
 		redirectAttributes.addFlashAttribute("map1", md);
-		redirectAttributes.addFlashAttribute("move", mav);
+		redirectAttributes.addFlashAttribute("move", cmd);
 
-		return "redirect:/changeInsert";
+		mav.setViewName("redirect:/changeInsert");
+		return mav;
 	}
 
 	/*
@@ -780,11 +873,17 @@ public class EngravingController {
 	 * リクエストされた情報を変更するかリクエストを削除する
 	 */
 	@RequestMapping(value = "/changeRequest", method = RequestMethod.POST)
-	public String changeRequest(RedirectAttributes redirectAttributes,
+	public ModelAndView changeRequest(RedirectAttributes redirectAttributes,
 			@RequestParam(value = "requestId") String strRequestId, @RequestParam(value = "cmd") String cmd,
 			ModelAndView mav) {
 		// ユーザー情報の受け取り
 		User user = (User) session.getAttribute("user");
+		if (user == null) {
+			String error = "セッションが切れました。再度ログインしてください。";
+			mav.addObject("error", error);
+			mav.setViewName("login");
+			return mav;
+		}
 
 		// 対象のリクエスト情報を受け取る
 		int requestId = Integer.parseInt(strRequestId);
@@ -854,15 +953,16 @@ public class EngravingController {
 		request.setIsDeleted(true);
 		requestinfo.saveAndFlush(request);
 
-		if(cmd.equals("input")) {
+		if (cmd.equals("input")) {
 			ModelMap modelMap = new ModelMap();
-			modelMap.addAttribute("changeList",changeList);
+			modelMap.addAttribute("changeList", changeList);
 			redirectAttributes.addFlashAttribute("map1", modelMap);
-			redirectAttributes.addFlashAttribute("move","changeRequestList");
-			
-			return "redirect:/changeInsert";
-		}else{
-			return "changeRequestList";
+			redirectAttributes.addFlashAttribute("move", "changeRequestList");
+			mav.setViewName("redirect:/changeInsert");
+			return mav;
+		} else {
+			mav.setViewName("changeRequestList");
+			return mav;
 		}
 	}
 
@@ -904,17 +1004,39 @@ public class EngravingController {
 	 * 社員情報変更処理
 	 */
 	@RequestMapping(value = "/changeEmployeeInfo", method = RequestMethod.POST)
-	public String changeEmployeeInfoPost(@RequestParam(value = "name", defaultValue = "", required = false) String name,
+	public ModelAndView changeEmployeeInfoPost(
+			@RequestParam(value = "name", defaultValue = "", required = false) String name,
 			@RequestParam(value = "employeeId", defaultValue = "", required = false) String employeeId,
+			@RequestParam(value = "employeeId", defaultValue = "", required = false) String oldEmployeeId,
 			@RequestParam(value = "password", defaultValue = "", required = false) String password,
 			@RequestParam(value = "email", defaultValue = "", required = false) String email, MultipartFile photo,
 			@RequestParam(value = "authority", defaultValue = "", required = false) String authority,
-			RedirectAttributes redirectAttributes) {
+			RedirectAttributes redirectAttributes, ModelAndView mav) {
 
 		User user = new User();
-		User before = userinfo.findByEmployeeId(employeeId);
+		User before = userinfo.findByEmployeeId(oldEmployeeId);
 
-		if (!(photo == null)) {
+//		入力内容の判定
+		if (name.equals("") || employeeId.equals("") || password.equals("") || email.equals("")) {
+			mav.addObject("error", "社員番号、名前、パスワード、Emailは必ず入力してください。");
+			mav.addObject("user", before);
+			mav.setViewName("changeEmployeeInfo");
+			return mav;
+		}
+		User check = userinfo.findByEmployeeId(employeeId);
+		if (!check.getEmployeeId().equals(before.getEmployeeId())) {
+			mav.addObject("error", "社員番号が重複しています。");
+			mav.addObject("user", before);
+			mav.setViewName("changeEmployeeInfo");
+			return mav;
+		}
+		if (password.length() < 8) {
+			mav.addObject("error", "パスワードは最低でも８桁設定してください");
+			mav.setViewName("employeeRegistration");
+			return mav;
+		}
+
+		if (!(photo.getOriginalFilename().equals(""))) {
 			try {
 				// ファイル名を社員番号に変更
 				File oldFileName = new File(photo.getOriginalFilename());
@@ -956,7 +1078,7 @@ public class EngravingController {
 		user.setPassword(password);
 		user.setEmail(email);
 		user.setAuthority(authority);
-		if (!(photo == null)) {
+		if (!(photo.getOriginalFilename().equals(""))) {
 			user.setPhoto(employeeId + ".jpg");
 		}
 
@@ -1047,24 +1169,41 @@ public class EngravingController {
 		redirectAttributes.addFlashAttribute("map1", md);
 		redirectAttributes.addFlashAttribute("move", "redirect:/employeeList");
 
-		return "redirect:/changeInsert";
+		mav.setViewName("redirect:/changeInsert");
+		return mav;
 	}
-	
+
 	/* 社員削除機能 */
 	@RequestMapping(value = "/deleteEmployee", method = RequestMethod.POST)
-	public String deleteEmployee(@RequestParam("employeeId") String id) {
+	public ModelAndView deleteEmployee(@RequestParam("employeeId") String id, ModelAndView mav) {
 		User user = userinfo.findByEmployeeId(id);
+		if (user == null || user.getIsDeleted()) {
+			mav.addObject("error", "削除しようとした社員はすでにDBに存在しません。");
+
+			return mav;
+		}
 		user.setIsDeleted(true);
 		userinfo.saveAndFlush(user);
-		return "redirect:/employeeList";
+		mav.setViewName("redirect:/employeeList");
+		return mav;
 	}
 
 	/* リクエスト登録 */
 	@PostMapping("/requestForm")
-	public String requestForm(@RequestParam(value = "changeStartTime", defaultValue = "") String changeStartTime,
+	public ModelAndView requestForm(@RequestParam(value = "changeStartTime", defaultValue = "") String changeStartTime,
 			@RequestParam(value = "changeFinishTime", defaultValue = "") String changeFinishTime,
 			@RequestParam(value = "comment", defaultValue = "記述なし") String comment,
-			@RequestParam("attendanceId") String attendanceId, @RequestParam("employeeId") String employeeId) {
+			@RequestParam("attendanceId") String attendanceId, @RequestParam("employeeId") String employeeId,
+			ModelAndView mav) {
+//		入力内容の確認
+		int start = Integer.parseInt(changeStartTime.replace(":", ""));
+		int fin = Integer.parseInt(changeFinishTime.replace(":", ""));
+		if (start >= fin) {
+			mav.addObject("error", "退勤時間が出勤時間よりも早くなっています。");
+			mav.setViewName("redirect:/requestForminfo");
+			return mav;
+		}
+
 //		入力内容をセット
 		Request request = new Request();
 		request.setChangeFinishTime(changeFinishTime);
@@ -1076,9 +1215,10 @@ public class EngravingController {
 
 //		DBに登録
 		requestinfo.saveAndFlush(request);
-
-		return "redirect:/employeeMenu";
+		mav.setViewName("redirect:/employeeMenu");
+		return mav;
 	}
+
 	/*
 	 * 変更履歴確認
 	 */
@@ -1100,13 +1240,19 @@ public class EngravingController {
 		} else {// ユーザーIDと管理者IDでの検索
 			changeList = changeinfo.findByEmployeeIdAndAdminIdLike(employeeId, adminId);
 		}
+
+//		検索結果がなかった時
+		if (changeList.size() == 0) {
+			mav.addObject("error", "検索結果はありません。");
+		}
+
 		// 結果の受け渡し
 		mav.addObject("changeList", changeList);
 		mav.setViewName("historicalCheck");
 
 		return mav;
 	}
-	
+
 	/*
 	 * ログイン履歴
 	 */
@@ -1116,7 +1262,24 @@ public class EngravingController {
 			@RequestParam(value = "name", defaultValue = "", required = false) String name,
 			@RequestParam(value = "year", defaultValue = "", required = false) String year,
 			@RequestParam(value = "month", defaultValue = "", required = false) String month, ModelAndView mav) {
-//		ユーザーのログイン履歴の受け取り
+//		検索時の入力内容の確認
+//		検索の際に年月が半角の数列で検索されているかの判定
+		try {
+			if (!year.equals("") || !month.equals("")) {
+				int check = Integer.parseInt(year);
+				check = Integer.parseInt(month);
+			}
+		} catch (NumberFormatException e) {
+			mav.addObject("error", "検索の年月は半角数字でお願いします。");
+			mav.setViewName("attendanceRecord");
+			return mav;
+		}
+//		桁数チェック
+		if (year.length() != 4 || month.length() > 2) {
+			mav.addObject("error", "年は４桁、月は２桁以内でお願いします。");
+			mav.setViewName("attendanceRecord");
+			return mav;
+		}
 
 // 		月が1桁で入力されt場合の処理
 		if (month.length() == 1 && month != "") {
@@ -1218,6 +1381,8 @@ public class EngravingController {
 //		リストが空でなければmavに登録
 		if (loginLogList.size() != 0) {
 			mav.addObject("loginLogList", nameList);
+		} else {
+			mav.addObject("error", "検索結果はありません。");
 		}
 
 //		遷移先の指定
@@ -1232,10 +1397,16 @@ public class EngravingController {
 
 		return mav;
 	}
-	
+
 	@RequestMapping("/employeeMenu")
 	public ModelAndView employeeMenu(ModelAndView mav) {
 		User user = (User) session.getAttribute("user");
+		String error = "";
+		if (user == null) {
+			error = "セッションが切れました。再度ログインしてください。";
+			mav.addObject("error", error);
+			return mav;
+		}
 //		ログインした社員の勤怠情報の取得
 		Date date = new Date();
 		SimpleDateFormat day = new SimpleDateFormat("yyyyMMdd");
@@ -1257,12 +1428,19 @@ public class EngravingController {
 			} catch (Exception e) {
 			}
 		}
+		mav.setViewName("employeeMenu");
 		return mav;
 	}
 
 	@RequestMapping("/adminMenu")
 	public ModelAndView adminMenu(ModelAndView mav) {
 		User user = (User) session.getAttribute("user");
+		String error = "";
+		if (user == null) {
+			error = "セッションが切れました。再度ログインしてください。";
+			mav.addObject("error", error);
+			return mav;
+		}
 //		ログインした社員の勤怠情報の取得
 		Date date = new Date();
 		SimpleDateFormat day = new SimpleDateFormat("yyyyMMdd");
@@ -1284,9 +1462,9 @@ public class EngravingController {
 			} catch (Exception e) {
 			}
 		}
+		mav.setViewName("adminMenu");
 		return mav;
 	}
-
 
 	@RequestMapping("/employeeRegistration")
 	public ModelAndView employeeRegistration(ModelAndView mav) {
@@ -1300,12 +1478,6 @@ public class EngravingController {
 		return mav;
 	}
 
-	@RequestMapping("/userHistoricalCheck")
-	public ModelAndView userHistoricalCheck(ModelAndView mav) {
-		mav.setViewName("userHistoricalCheck");
-		return mav;
-	}
-
 	@RequestMapping("/changeAttendanceinfo")
 	public ModelAndView changeAttendanceinfo(@RequestParam("employeeId") String employeeId,
 			@RequestParam("attendanceId") String attendanceId, ModelAndView mav) {
@@ -1316,11 +1488,18 @@ public class EngravingController {
 		mav.setViewName("changeAttendance");
 		return mav;
 	}
-	
+
 //	変更リクエストForm
 	@RequestMapping("/requestForminfo")
 	public ModelAndView requestForminfo(ModelAndView mav) {
 		User user = (User) session.getAttribute("user");
+		String error = "";
+		if (user == null) {
+			error = "セッションが切れました。再度ログインしてください。";
+			mav.addObject("error", error);
+			mav.setViewName("login");
+			return mav;
+		}
 		Date date = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		String day = sdf.format(date);
@@ -1333,12 +1512,13 @@ public class EngravingController {
 			mav.setViewName("requestForm");
 		} else {
 //			当日の勤怠登録前には何も起きない
+			mav.addObject("error", "本日の打刻を行ってください‼");
 			mav.setViewName("employeeMenu");
 		}
 
 		return mav;
 	}
-	
+
 	/*
 	 * 画像を解凍する
 	 */
@@ -1347,32 +1527,31 @@ public class EngravingController {
 		String uploadPath = "photo/" + employeePhoto;
 		// 画像データストリームを取得する
 		try (FileInputStream fis = new FileInputStream(uploadPath);) {
-		StringBuffer data = new StringBuffer();
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		byte[] buffer = new byte[1024];
-		// バイト配列に変換
-		while (true) {
-		int len = fis.read(buffer);
-		if (len < 0) {
-		        break;
-		        }
-		        os.write(buffer, 0, len);
-		}
-		// 画像データをbaseにエンコード
-		String base64 = new String(
-		org.apache.tomcat.util.codec.binary.Base64.encodeBase64(os.toByteArray()),"ASCII");
-		// 画像タイプはJPEG
-		// Viewへの受け渡し。append("data:~~)としているとtymleafでの表示が楽になる
-		            data.append("data:image/jpeg;base64,");
-		            data.append(base64);
-		 
-		return data.toString();
-		 
-		} catch (Exception e) {     e.printStackTrace();
-		return null;
-		}
-		}
+			StringBuffer data = new StringBuffer();
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			byte[] buffer = new byte[1024];
+			// バイト配列に変換
+			while (true) {
+				int len = fis.read(buffer);
+				if (len < 0) {
+					break;
+				}
+				os.write(buffer, 0, len);
+			}
+			// 画像データをbaseにエンコード
+			String base64 = new String(org.apache.tomcat.util.codec.binary.Base64.encodeBase64(os.toByteArray()),
+					"ASCII");
+			// 画像タイプはJPEG
+			// Viewへの受け渡し。append("data:~~)としているとtymleafでの表示が楽になる
+			data.append("data:image/jpeg;base64,");
+			data.append(base64);
 
-	
+			return data.toString();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 
 }
