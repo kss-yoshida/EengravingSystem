@@ -28,19 +28,19 @@
 		</p>
 		<p>
 			<br>
-		<div class="engraving-flex"></div>
 		<div class="engraving-flex">
 			<form action="startEngraving" method="post">
 				<p th:if="${startTime != null}" th:text="${startTime}"></p>
 				<p th:if="${startTime == null}">&nbsp;</p>
 				<input type="hidden" name="cmd" value="employeeMenu"> <input
-					type="submit" value="出勤">
+					type="submit" value="出勤" th:if="${startTime==null}">
 			</form>
 			<form action="finishEngraving" method="post">
-				<p th:if="${finishTime != null}" th:text="${finishTime}"></p>
+				<p th:if="${finishTime != null}" th:text="${startTime}"></p>
 				<p th:if="${finishTime == null}">&nbsp;</p>
 				<input type="hidden" name="cmd" value="employeeMenu"> <input
-					type="submit" value="退勤">
+					type="submit" value="退勤"
+					th:if="${startTime!=null&&finishTime==null}">
 			</form>
 		</div>
 	</div>
