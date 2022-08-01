@@ -23,6 +23,8 @@
 	    </header>
 		<div class="container">
 			<h3>勤怠情報確認</h3><br>
+			<p class="error" th:if="${error!=null}">[[${error}]]</p>
+			<p class="message" th:if="${message!=null}">[[${message}]]</p>
 			<div th:switch="${authority}">
 				<div class="engraving-flex"  th:case="0">
 					<form action="/adminAttendanceRecord" method="post">
