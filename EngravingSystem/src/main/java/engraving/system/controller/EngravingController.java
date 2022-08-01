@@ -310,7 +310,7 @@ public class EngravingController {
 	 * 社員一覧表示 管理者用機能
 	 */
 	@RequestMapping("/employeeList")
-	public ModelAndView employeeList(ModelAndView mav) {
+	public ModelAndView employeeList(@RequestParam(value="message", defaultValue = "", required = false) String message, ModelAndView mav) {
 		try {
 //		DBから社員リストを取得
 			ArrayList<User> userList = new ArrayList<User>();
@@ -328,6 +328,9 @@ public class EngravingController {
 				}
 
 				mav.addObject("employeeList", userList);
+			}
+			if(!message.equals("")) {
+				mav.addObject("message",message);
 			}
 //		遷移先の指定
 			mav.setViewName("employeeList");
