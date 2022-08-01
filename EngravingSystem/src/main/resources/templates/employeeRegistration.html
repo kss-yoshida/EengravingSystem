@@ -21,6 +21,7 @@
 	<div class="container">
 		<h3>社員登録</h3>
 		<br>
+		<p class="error" th:if="${error!=null}">[[${error}]]</p>
 		<form action="/employeeRegistration" method="post" enctype="multipart/form-data">
 			<table class="change-employee-table">
 				<tr>
