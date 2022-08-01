@@ -22,6 +22,7 @@
 		<br>
 		<p>社員番号 :[[${user.employeeId}]] 名前 : [[${user.name}]]
 			日付：[[${attendance.day}]]</p>
+		<p class="error" th:if="${error!=null}">[[${error}]]</p>
 		<form action="/changeAttendance" method="post">
 			<table class="change-attendance-table" th:object="${attendance}">
 				<tr>
