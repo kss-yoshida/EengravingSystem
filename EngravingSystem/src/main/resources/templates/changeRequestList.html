@@ -26,18 +26,18 @@
 				<tr>
 					<th id="change-request-normal">日時</th>
 					<th id="change-request-normal">変更対象者番号</th>
-					<th id="change-request-normal">変更前データ<br>
-					(出勤/退勤)</th>
-					<th id="change-request-normal">変更後データ<br>
-					(出勤/退勤)</th>
+					<th id="change-request-normal">出勤時間<br>
+					(変更前/変更後)</th>
+					<th id="change-request-normal">退勤時間<br>
+					(変更前/変更後)</th>
 					<th id="change-request-other">コメント</th>
 					<th id="change-request">認/否</th>
 				</tr>
 				<tr th:each="requestDayList:${requestDayList}" th:object="${requestDayList}">
 					<td id="change-request-normal" th:text="*{day}"></td>
 					<td id="change-request-normal" th:text="*{employeeId}"></td>
-					<td id="change-request-normal" th:text="|*{beforeStartTime}/*{beforeFinishTime}|"></td>
-					<td id="change-request-normal" th:text="|*{changeStartTime}/*{changeFinishTime}|"></td>
+					<td id="change-request-normal" th:text="|*{beforeStartTime}/*{changeStartTime}|"></td>
+					<td id="change-request-normal" th:text="|*{beforeFinishTime}/*{changeFinishTime}|"></td>
 					<td id="change-request-other-td" th:text="*{comment}"></td>
 					<td id="change-request">
 						<div class="engraving-flex">
