@@ -21,6 +21,8 @@
 	<div class="container">
 		<h3>社員一覧</h3>
 		<br>
+		<p class="error" th:if="${error!=null}">[[${error}]]</p>
+		<p class="message" th:if="${message!=null}">[[${message}]]</p>
 		<div class="engraving-flex">
 			<form action="/searchEmployee" method="post">
 				<input type="text" name="employeeId">社員番号 <input type="text"
