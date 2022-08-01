@@ -2,8 +2,12 @@
 	width: 100%;
 }
 
-.attendance-record-table th{
+.attendance-record-employee th{
 	background-color: #99CCFF;
+}
+
+.attendance-record-admin th{
+	background-color: dimgray;
 }
 
 #attendance-record-other {
