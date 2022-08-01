@@ -409,6 +409,8 @@ public class EngravingController {
 			//	メッセージを格納する変数
 			String message = "";
 			
+			User user = userinfo.findByEmployeeId(id);
+			
 			if (authority.equals("0")) {
 				user.setAuthority("1");
 				message = user.getEmployeeId() +"の権限を一般社員にしました";
