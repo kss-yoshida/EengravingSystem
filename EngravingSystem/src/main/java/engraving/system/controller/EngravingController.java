@@ -239,6 +239,12 @@ public class EngravingController {
 			LoginLog log = new LoginLog();
 			String cmd = "";
 
+			if (pass.equals("") || id.equals("")) {
+				mav.addObject("error", "社員番号またはパスワードが入力されていません。");
+				mav.setViewName("login");
+				return mav;
+			}
+
 //		入力した社員番号とパスワードがあるか確認
 			for (int i = 0; i < list.size(); i++) {
 				user = list.get(i);
@@ -265,7 +271,7 @@ public class EngravingController {
 			if (cmd.equals("")) {
 //			エラーがあったらログインに戻る
 				mav.addObject("error", "社員番号またはパスワードが間違っています。");
-				mav.setViewName("loginForm");
+				mav.setViewName("login");
 			} else {
 //			OKになってたら当日の勤怠情報を検索してメニューに行く
 //			ログインした社員の勤怠情報の取得
@@ -282,10 +288,14 @@ public class EngravingController {
 					Date startEngrave;
 					Date finishEngrave;
 					try {
-						startEngrave = time.parse(attendance.getStartEngrave());
-						finishEngrave = time.parse(attendance.getFinishEngrave());
-						mav.addObject("startTime", time.format(startEngrave));
-						mav.addObject("finishTime", time.format(finishEngrave));
+						if (attendance.getStartEngrave() != null) {
+							startEngrave = time.parse(attendance.getStartEngrave());
+							mav.addObject("startTime", time.format(startEngrave));
+						}
+						if (attendance.getFinishEngrave() != null) {
+							finishEngrave = time.parse(attendance.getFinishEngrave());
+							mav.addObject("finishTime", time.format(finishEngrave));
+						}
 					} catch (ParseException e) {
 					}
 
@@ -310,7 +320,8 @@ public class EngravingController {
 	 * 社員一覧表示 管理者用機能
 	 */
 	@RequestMapping("/employeeList")
-	public ModelAndView employeeList(@RequestParam(value="message", defaultValue = "", required = false) String message, ModelAndView mav) {
+	public ModelAndView employeeList(
+			@RequestParam(value = "message", defaultValue = "", required = false) String message, ModelAndView mav) {
 		try {
 //		DBから社員リストを取得
 			ArrayList<User> userList = new ArrayList<User>();
@@ -329,9 +340,9 @@ public class EngravingController {
 
 				mav.addObject("employeeList", userList);
 			}
-			//変更履歴登録画面から来た場合の処理
-			if(!message.equals("")) {
-				mav.addObject("message",message);
+			// 変更履歴登録画面から来た場合の処理
+			if (!message.equals("")) {
+				mav.addObject("message", message);
 			}
 //		遷移先の指定
 			mav.setViewName("employeeList");
@@ -350,22 +361,22 @@ public class EngravingController {
 	public ModelAndView search(ModelAndView mav, @RequestParam(value = "employeeId", defaultValue = "") String id,
 			@RequestParam(value = "name", defaultValue = "") String name) {
 		try {
-			//メッセージを格納する変数
+			// メッセージを格納する変数
 			String message = "";
-			
+
 			String error;
 //			DBから条件付きで社員リストを取得
 			ArrayList<User> userList = new ArrayList<User>();
-	//		社員番号と名前が入力されている
+			// 社員番号と名前が入力されている
 			if (!name.equals("") && !id.equals("")) {
 				userList = userinfo.findByEmployeeIdAndName(id, name);
 				message = "社員番号 : " + id + " 名前 : " + name + "の検索結果";
 			} else if (!name.equals("")) {
-	//			名前のみ
+				// 名前のみ
 				userList = userinfo.findByName(name);
 				message = "名前 : " + name + "の検索結果";
 			} else if (!id.equals("")) {
-	//			社員番号のみ
+				// 社員番号のみ
 				userList = userinfo.findByEmployeeIdStartingWith(id);
 				message = "社員番号 : " + id + "の検索結果";
 			}
@@ -389,7 +400,7 @@ public class EngravingController {
 				mav.addObject("error", error);
 			}
 //		遷移先の指定
-			mav.addObject("message" , message);
+			mav.addObject("message", message);
 			mav.setViewName("employeeList");
 			return mav;
 		} catch (Exception e) {
@@ -406,14 +417,14 @@ public class EngravingController {
 	public ModelAndView changeAdmin(ModelAndView mav, @RequestParam("authority") String authority,
 			@RequestParam("employeeId") String id) {
 		try {
-			//	メッセージを格納する変数
+			// メッセージを格納する変数
 			String message = "";
-			
+
 			User user = userinfo.findByEmployeeId(id);
-			
+
 			if (authority.equals("0")) {
 				user.setAuthority("1");
-				message = user.getEmployeeId() +"の権限を一般社員にしました";
+				message = user.getEmployeeId() + "の権限を一般社員にしました";
 			} else {
 				user.setAuthority("0");
 				message = user.getEmployeeId() + "の権限を管理者にしました";
@@ -421,7 +432,7 @@ public class EngravingController {
 
 			userinfo.saveAndFlush(user);
 
-			mav.addObject("message",message);
+			mav.addObject("message", message);
 			mav.setViewName("redirect:/employeeList");
 			return mav;
 		} catch (Exception e) {
@@ -437,7 +448,7 @@ public class EngravingController {
 	 */
 	@RequestMapping("/logout")
 	public ModelAndView logout(ModelAndView mav, @ModelAttribute("error") String error) {
-		if (error == null) {
+		if (error.equals("")) {
 			mav.addObject("message", "ログアウトしました");
 		} else {
 			mav.addObject("error", error);
@@ -454,11 +465,11 @@ public class EngravingController {
 	public ModelAndView attendanceRecorde(
 			@RequestParam(value = "year", defaultValue = "", required = false) String year,
 			@RequestParam(value = "month", defaultValue = "", required = false) String month,
-			@RequestParam(value="message", defaultValue = "", required = false) String forMessage,ModelAndView mav) {
+			@RequestParam(value = "message", defaultValue = "", required = false) String forMessage, ModelAndView mav) {
 		try {
-			//メッセージを格納する変数
+			// メッセージを格納する変数
 			String message = "";
-			
+
 			// ユーザー情報の受け取り
 			User user = (User) session.getAttribute("user");
 			if (user == null) {
@@ -473,34 +484,39 @@ public class EngravingController {
 
 //		検索の際に年月が半角の数列で検索されているかの判定
 			try {
-				if (!year.equals("") || !month.equals("")) {
+				if (!year.equals("")) {
 					int check = Integer.parseInt(year);
-					check = Integer.parseInt(month);
-					mav.addObject("authority", authority);
-
-			// 管理者が見る場合
-			if (authority.equals("0")) {
-				mav.addObject("employeeId", user.getEmployeeId());
-			}
+				}
+				if (!month.equals("")) {
+					int check = Integer.parseInt(month);
 				}
 			} catch (NumberFormatException e) {
 				mav.addObject("error", "検索の年月は半角数字で入力してください。");
 				mav.setViewName("attendanceRecord");
+				mav.addObject("authority", authority);
+
+				// 管理者が見る場合
+				if (authority.equals("0")) {
+					mav.addObject("employeeId", user.getEmployeeId());
+				}
 				return mav;
 			}
 //		桁数チェック
-			if(!year.equals("") || !month.equals("")){
-			if (year.length() != 4 || month.length() > 2) {
-				mav.addObject("error", "年は４桁、月は２桁以内で入力してください。");
-				mav.setViewName("attendanceRecord");
-				mav.addObject("authority", authority);
+			if (!year.equals("") || !month.equals("")) {
+				if (year.length() != 4 || month.length() > 2) {
+					mav.addObject("error", "年は４桁、月は２桁以内で入力してください。");
+					mav.setViewName("attendanceRecord");
+					mav.addObject("authority", authority);
 
-			// 管理者が見る場合
-			if (authority.equals("0")) {
-				mav.addObject("employeeId", user.getEmployeeId());
+					mav.addObject("authority", authority);
+
+					// 管理者が見る場合
+					if (authority.equals("0")) {
+						mav.addObject("employeeId", user.getEmployeeId());
+					}
+					return mav;
+				}
 			}
-				return mav;
-			}}
 
 			// 月が1桁で入力された場合の処理
 			if (month.length() == 1 && month != "") {
@@ -519,7 +535,7 @@ public class EngravingController {
 				SimpleDateFormat monthData = new SimpleDateFormat("yyyy-MM");
 				day = monthData.format(date) + "%";
 				mav.addObject("month", monthFormat.format(date));
-				if(!forMessage.equals("")) {
+				if (!forMessage.equals("")) {
 					message = forMessage;
 				}
 			} else if (!year.equals("") && !month.equals("")) {// 年と月で検索された場合
@@ -567,15 +583,14 @@ public class EngravingController {
 					// 出勤時間
 					startTime = timeFormat.parse(attendance.getStartTime());
 					attendance.setStartTime(time.format(startTime));
-					
-					//退勤を押している場合
-					if(attendance.getFinishEngrave() != null) {
-						// 退勤時間
-						finishTime = timeFormat.parse(attendance.getFinishTime());
-						attendance.setFinishTime(time.format(finishTime));
+					if (attendance.getFinishEngrave() != null) {
 						// 退勤打刻時間
 						finishEngrave = timeFormat.parse(attendance.getFinishEngrave());
 						attendance.setFinishEngrave(time.format(finishEngrave));
+
+						// 退勤時間
+						finishTime = timeFormat.parse(attendance.getFinishTime());
+						attendance.setFinishTime(time.format(finishTime));
 						// 休憩時間
 						breakTime = timeFormat.parse(attendance.getBreakTime());
 						attendance.setBreakTime(timer.format(breakTime));
@@ -595,8 +610,8 @@ public class EngravingController {
 
 			// 情報の受け渡し
 			mav.addObject("attendanceList", attendanceList);
-			if(!message.equals("")) {
-				mav.addObject("message",message);
+			if (!message.equals("")) {
+				mav.addObject("message", message);
 			}
 			mav.addObject("authority", authority);
 
@@ -624,11 +639,11 @@ public class EngravingController {
 			@RequestParam(value = "year", defaultValue = "", required = false) String year,
 			@RequestParam(value = "month", defaultValue = "", required = false) String month,
 			@RequestParam(value = "employeeId", defaultValue = "", required = false) String id,
-			@RequestParam(value="message", defaultValue = "", required = false)String forMessage,ModelAndView mav) {
+			@RequestParam(value = "message", defaultValue = "", required = false) String forMessage, ModelAndView mav) {
 		try {
-			//メッセージを格納する変数
+			// メッセージを格納する変数
 			String message = "";
-			
+
 			// ユーザー情報の受け取り
 			User user = (User) session.getAttribute("user");
 			if (user == null) {
@@ -645,20 +660,53 @@ public class EngravingController {
 				month = "0" + month;
 			}
 
-//		検索の際に年月が半角の数列で検索されているかの判定
+//			検索の際に年月が半角の数列で検索されているかの判定
 			try {
-				int check = Integer.parseInt(year);
-				check = Integer.parseInt(month);
+				if (!year.equals("")) {
+					int check = Integer.parseInt(year);
+				}
+				if (!month.equals("")) {
+					int check = Integer.parseInt(month);
+				}
 			} catch (NumberFormatException e) {
 				mav.addObject("error", "検索の年月は半角数字で入力してください。");
 				mav.setViewName("attendanceRecord");
+				mav.addObject("authority", authority);
+
+				// 管理者が見る場合
+				if (authority.equals("0")) {
+					mav.addObject("employeeId", user.getEmployeeId());
+				}
 				return mav;
 			}
-//		桁数チェック
-			if (year.length() != 4 || month.length() > 2) {
-				mav.addObject("error", "年は４桁、月は２桁以内で入力してください。");
-				mav.setViewName("attendanceRecord");
-				return mav;
+//			桁数チェック
+			if (!year.equals("") || !month.equals("")) {
+				if (year.length() != 0 && year.length() > 4 ||month.length() > 2) {
+					mav.addObject("error", "年は４桁、月は２桁以内で入力してください。");
+					mav.setViewName("attendanceRecord");
+					mav.addObject("authority", authority);
+
+					mav.addObject("authority", authority);
+
+					// 管理者が見る場合
+					if (authority.equals("0")) {
+						mav.addObject("employeeId", user.getEmployeeId());
+					}
+					return mav;
+				}
+				if (year.length() != 0 && year.length() > 4) {
+					mav.addObject("error", "年は４桁、月は２桁以内で入力してください。");
+					mav.setViewName("attendanceRecord");
+					mav.addObject("authority", authority);
+
+					mav.addObject("authority", authority);
+
+					// 管理者が見る場合
+					if (authority.equals("0")) {
+						mav.addObject("employeeId", user.getEmployeeId());
+					}
+					return mav;
+				}
 			}
 
 			// 検索する日付を格納する変数
@@ -673,7 +721,7 @@ public class EngravingController {
 				SimpleDateFormat monthData = new SimpleDateFormat("yyyy-MM");
 				day = monthData.format(date) + "%";
 				mav.addObject("month", monthFormat.format(date));
-				if(!forMessage.equals("")) {
+				if (!forMessage.equals("")) {
 					message = forMessage;
 				}
 			} else if (!year.equals("") && !month.equals("")) {// 年と月で検索された場合
@@ -723,21 +771,23 @@ public class EngravingController {
 					// 出勤打刻時間
 					startEngrave = timeFormat.parse(attendance.getStartEngrave());
 					attendance.setStartEngrave(time.format(startEngrave));
-					// 退勤打刻時間
-					finishEngrave = timeFormat.parse(attendance.getFinishEngrave());
-					attendance.setFinishEngrave(time.format(finishEngrave));
 					// 出勤時間
 					startTime = timeFormat.parse(attendance.getStartTime());
 					attendance.setStartTime(time.format(startTime));
-					// 退勤時間
-					finishTime = timeFormat.parse(attendance.getFinishTime());
-					attendance.setFinishTime(time.format(finishTime));
-					// 休憩時間
-					breakTime = timeFormat.parse(attendance.getBreakTime());
-					attendance.setBreakTime(timer.format(breakTime));
-					// 残業時間
-					overTime = timeFormat.parse(attendance.getOverTime());
-					attendance.setOverTime(timer.format(overTime));
+					if (attendance.getFinishEngrave() != null) {
+						// 退勤打刻時間
+						finishEngrave = timeFormat.parse(attendance.getFinishEngrave());
+						attendance.setFinishEngrave(time.format(finishEngrave));
+						// 退勤時間
+						finishTime = timeFormat.parse(attendance.getFinishTime());
+						attendance.setFinishTime(time.format(finishTime));
+						// 休憩時間
+						breakTime = timeFormat.parse(attendance.getBreakTime());
+						attendance.setBreakTime(timer.format(breakTime));
+						// 残業時間
+						overTime = timeFormat.parse(attendance.getOverTime());
+						attendance.setOverTime(timer.format(overTime));
+					}
 					// 日付
 					dayData = dayFormat.parse(attendance.getDay());
 					attendance.setDay(days.format(dayData));
@@ -752,7 +802,7 @@ public class EngravingController {
 			mav.addObject("attendanceList", attendanceList);
 			mav.addObject("authority", authority);
 			mav.addObject("employeeId", id);
-			if(!message.equals("")){
+			if (!message.equals("")) {
 				mav.addObject("message", message);
 			}
 
@@ -760,7 +810,9 @@ public class EngravingController {
 			mav.setViewName("attendanceRecord");
 
 			return mav;
-		} catch (Exception e) {
+		} catch (
+
+		Exception e) {
 			mav.setViewName("redirect:/logout");
 			mav.addObject("error", "DB接続エラーです。DBを確認してください。");
 			return mav;
@@ -779,9 +831,9 @@ public class EngravingController {
 			@RequestParam(value = "authority", defaultValue = "", required = false) String authority,
 			ModelAndView mav) {
 		try {
-			//メッセージを格納する変数
+			// メッセージを格納する変数
 			String message = "";
-			
+
 			User user = new User();
 
 //		入力データの確認
@@ -846,10 +898,10 @@ public class EngravingController {
 
 //		入力データをDBに保存
 			userinfo.saveAndFlush(user);
-			
+
 			message = "社員を登録しました";
-		
-			mav.addObject("message",message);
+
+			mav.addObject("message", message);
 
 			mav.setViewName("redirect:/employeeList");
 // 		ModelとView情報を返す
@@ -877,14 +929,29 @@ public class EngravingController {
 			@RequestParam(value = "day", defaultValue = "", required = false) String day, ModelAndView mav,
 			RedirectAttributes redirectAttributes) {
 		try {
-			//メッセージを格納する変数
+			// メッセージを格納する変数
 			String message = "";
-			
+
 			User user = (User) session.getAttribute("user");
 			if (user == null) {
 				String error = "セッションが切れました。再度ログインしてください。";
 				mav.addObject("error", error);
 				mav.setViewName("login");
+				return mav;
+			}
+//			入力内容の確認
+			int start = Integer.parseInt(startTime.replace(":", ""));
+			int fin = Integer.parseInt(finishTime.replace(":", ""));
+			if (start >= fin) {
+				mav.addObject("error", "退勤時間が出勤時間よりも早くなっています。");
+				mav.setViewName("redirect:/requestForminfo");
+				return mav;
+			}
+			int startE = Integer.parseInt(startEngrave.replace(":", ""));
+			int finE = Integer.parseInt(finishEngrave.replace(":", ""));
+			if (startE >= finE) {
+				mav.addObject("error", "退勤打刻時間が出勤打刻時間よりも早くなっています。");
+				mav.setViewName("redirect:/requestForminfo");
 				return mav;
 			}
 
@@ -963,7 +1030,7 @@ public class EngravingController {
 //			get送信
 				cmd = "redirect:/adminAttendanceRecord";
 			}
-			
+
 			message = "勤怠情報を変更しました";
 
 //		変更情報をMapに登録
@@ -986,7 +1053,8 @@ public class EngravingController {
 	 * リクエスト情報の受け取り
 	 */
 	@RequestMapping("/changeRequestList")
-	public ModelAndView changeRequestList(ModelAndView mav,@RequestParam(value="message", defaultValue = "", required = false) String message) {
+	public ModelAndView changeRequestList(ModelAndView mav,
+			@RequestParam(value = "message", defaultValue = "", required = false) String message) {
 		try {
 			// requestInfoの情報をすべて受け取る
 			ArrayList<Request> requestList = (ArrayList<Request>) requestinfo.findAll();
@@ -1025,10 +1093,10 @@ public class EngravingController {
 				}
 			}
 
-			if(!message.equals("")) {
-				mav.addObject("message",message);
+			if (!message.equals("")) {
+				mav.addObject("message", message);
 			}
-			
+
 			mav.addObject("requestDayList", requestDayList);
 
 			mav.setViewName("changeRequestList");
@@ -1049,9 +1117,9 @@ public class EngravingController {
 			@RequestParam(value = "requestId") String strRequestId, @RequestParam(value = "cmd") String cmd,
 			ModelAndView mav) {
 		try {
-			//メッセージを格納する変数
+			// メッセージを格納する変数
 			String message = "";
-			
+
 			// ユーザー情報の受け取り
 			User user = (User) session.getAttribute("user");
 			if (user == null) {
@@ -1161,7 +1229,7 @@ public class EngravingController {
 
 				attendanceinfo.saveAndFlush(attendance);
 				message = "勤務情報を変更しました";
-			}else {
+			} else {
 				message = "勤務情報変更リクエストを拒否しました";
 			}
 
@@ -1174,11 +1242,11 @@ public class EngravingController {
 				modelMap.addAttribute("changeList", changeList);
 				redirectAttributes.addFlashAttribute("map1", modelMap);
 				redirectAttributes.addFlashAttribute("move", "redirect:/changeRequestList");
-				redirectAttributes.addFlashAttribute("message",message );
+				redirectAttributes.addFlashAttribute("message", message);
 				mav.setViewName("redirect:/changeInsert");
 				return mav;
 			} else {
-				mav.addObject("message",message);
+				mav.addObject("message", message);
 				mav.setViewName("redirect:/changeRequestList");
 				return mav;
 			}
@@ -1192,8 +1260,7 @@ public class EngravingController {
 	// 変更履歴を登録する
 	@RequestMapping("/changeInsert")
 	public ModelAndView changeinsert(RedirectAttributes redirectAttributes, @ModelAttribute("map1") ModelMap map1,
-				@ModelAttribute("message") String message,
-				@ModelAttribute("move") String move, ModelAndView mav) {
+			@ModelAttribute("message") String message, @ModelAttribute("move") String move, ModelAndView mav) {
 		try {
 			ArrayList<Change> changeList = (ArrayList<Change>) map1.get("changeList");
 			changeinfo.saveAndFlush(changeList.get(0));
@@ -1204,9 +1271,9 @@ public class EngravingController {
 			redirectAttributes.addFlashAttribute("map1", modelMap);
 			redirectAttributes.addFlashAttribute("move", move);
 			redirectAttributes.addFlashAttribute("message", message);
-			
+
 			if (changeList.size() == 0) {
-				mav.addObject("message",message);
+				mav.addObject("message", message);
 				mav.setViewName(move);
 				return mav;
 			} else {
@@ -1258,9 +1325,9 @@ public class EngravingController {
 			@RequestParam(value = "authority", defaultValue = "", required = false) String authority,
 			RedirectAttributes redirectAttributes, ModelAndView mav) {
 		try {
-			//メッセージを格納する変数
+			// メッセージを格納する変数
 			String message = "";
-			
+
 			User user = new User();
 			User before = userinfo.findByEmployeeId(oldEmployeeId);
 
@@ -1410,7 +1477,7 @@ public class EngravingController {
 
 //		入力データをDBに保存
 			userinfo.saveAndFlush(user);
-			
+
 			message = "社員情報を変更しました";
 
 //		変更情報をMapに登録
@@ -1439,9 +1506,9 @@ public class EngravingController {
 
 				return mav;
 			}
-			//メッセージを格納する変数
+			// メッセージを格納する変数
 			String message = "社員を削除しました";
-			
+
 			user.setIsDeleted(true);
 			userinfo.saveAndFlush(user);
 			mav.addObject("message", message);
@@ -1458,7 +1525,7 @@ public class EngravingController {
 	@PostMapping("/requestForm")
 	public ModelAndView requestForm(@RequestParam(value = "changeStartTime", defaultValue = "") String changeStartTime,
 			@RequestParam(value = "changeFinishTime", defaultValue = "") String changeFinishTime,
-			@RequestParam(value = "comment", defaultValue = "記述なし") String comment,
+			@RequestParam(value = "comment", defaultValue = "") String comment,
 			@RequestParam("attendanceId") String attendanceId, @RequestParam("employeeId") String employeeId,
 			ModelAndView mav) {
 		try {
@@ -1467,6 +1534,11 @@ public class EngravingController {
 			int fin = Integer.parseInt(changeFinishTime.replace(":", ""));
 			if (start >= fin) {
 				mav.addObject("error", "退勤時間が出勤時間よりも早くなっています。");
+				mav.setViewName("redirect:/requestForminfo");
+				return mav;
+			}
+			if (comment.equals("")) {
+				mav.addObject("error", "変更理由は必ず入力してください。");
 				mav.setViewName("redirect:/requestForminfo");
 				return mav;
 			}
@@ -1500,7 +1572,7 @@ public class EngravingController {
 			@RequestParam(value = "employeeId", defaultValue = "", required = false) String employeeId,
 			ModelAndView mav) {
 		try {
-			//メッセージを格納する変数
+			// メッセージを格納する変数
 			String message = "";
 			// 結果を受け取る変数
 			ArrayList<Change> changeList = new ArrayList<Change>();
@@ -1529,7 +1601,7 @@ public class EngravingController {
 
 			// 結果の受け渡し
 			mav.addObject("changeList", changeList);
-			if(!message.equals("")) {
+			if (!message.equals("")) {
 				mav.addObject("message", message);
 			}
 			mav.setViewName("historicalCheck");
@@ -1552,27 +1624,34 @@ public class EngravingController {
 			@RequestParam(value = "year", defaultValue = "", required = false) String year,
 			@RequestParam(value = "month", defaultValue = "", required = false) String month, ModelAndView mav) {
 		try {
-			//メッセージを格納する変数
+			// メッセージを格納する変数
 			String message = "";
-			
+
 //		検索時の入力内容の確認
 //		検索の際に年月が半角の数列で検索されているかの判定
 			try {
-				if (!year.equals("") || !month.equals("")) {
+				if (!year.equals("")) {
 					int check = Integer.parseInt(year);
-					check = Integer.parseInt(month);
+
+				}
+				if (!month.equals("")) {
+					int check = Integer.parseInt(month);
 				}
 			} catch (NumberFormatException e) {
 				mav.addObject("error", "検索の年月は半角数字でお願いします。");
 				mav.setViewName("attendanceRecord");
 				return mav;
 			}
-//		桁数チェック
-			if (year.length() != 4 || month.length() > 2) {
-				mav.addObject("error", "年は４桁、月は２桁以内でお願いします。");
-				mav.setViewName("attendanceRecord");
-				return mav;
+//			桁数チェック
+			if (!year.equals("") || !month.equals("")) {
+				if (year.length() != 0 && year.length() > 4 ||month.length() > 2) {
+					mav.addObject("error", "年は４桁、月は２桁以内で入力してください。");
+					mav.setViewName("attendanceRecord");;
+
+					return mav;
+				}
 			}
+
 
 // 		月が1桁で入力されt場合の処理
 			if (month.length() == 1 && month != "") {
@@ -1594,7 +1673,7 @@ public class EngravingController {
 				day = monthData.format(date) + "%";
 				mav.addObject("month", monthFormat.format(date));
 			} else if (!year.equals("") && !month.equals("")) {// 年と月で検索された場合
-				message = year + "年" + month + "月"; 
+				message = year + "年" + month + "月";
 
 				day = year + "-" + month + "%";
 				mav.addObject("month", year + "年" + month + "月");
@@ -1631,15 +1710,15 @@ public class EngravingController {
 					cmd = "n";
 				}
 			} else if (!name.equals("") && employeeId.equals("")) {// 名前のみ
-				message += " 名前 : " +  name + "での検索結果";
+				message += " 名前 : " + name + "での検索結果";
 
 				userList = userinfo.findByNameLike("%" + name + "%");
 				if (userList.isEmpty()) {
 					cmd = "n";
 				}
-			}else if(name.equals("") && !employeeId.equals("")) {
-				message += "社員番号 : " + employeeId + "での検索結果"; 
-			}else {
+			} else if (name.equals("") && !employeeId.equals("")) {
+				message += "社員番号 : " + employeeId + "での検索結果";
+			} else {
 				message += "での検索結果";
 			}
 
@@ -1693,7 +1772,7 @@ public class EngravingController {
 			}
 
 			mav.addObject("message", message);
-			
+
 //		遷移先の指定
 			mav.setViewName("userHistoricalCheck");
 			return mav;
@@ -1735,10 +1814,14 @@ public class EngravingController {
 				Date startEngrave;
 				Date finishEngrave;
 				try {
-					startEngrave = time.parse(attendance.getStartEngrave());
-					finishEngrave = time.parse(attendance.getFinishEngrave());
-					mav.addObject("startTime", time.format(startEngrave));
-					mav.addObject("finishTime", time.format(finishEngrave));
+					if (attendance.getStartEngrave() != null) {
+						startEngrave = time.parse(attendance.getStartEngrave());
+						mav.addObject("startTime", time.format(startEngrave));
+					}
+					if (attendance.getFinishEngrave() != null) {
+						finishEngrave = time.parse(attendance.getFinishEngrave());
+						mav.addObject("finishTime", time.format(finishEngrave));
+					}
 				} catch (ParseException e) {
 				}
 			}
@@ -1775,10 +1858,14 @@ public class EngravingController {
 				Date startEngrave;
 				Date finishEngrave;
 				try {
-					startEngrave = time.parse(attendance.getStartEngrave());
-					finishEngrave = time.parse(attendance.getFinishEngrave());
-					mav.addObject("startTime", time.format(startEngrave));
-					mav.addObject("finishTime", time.format(finishEngrave));
+					if (attendance.getStartEngrave() != null) {
+						startEngrave = time.parse(attendance.getStartEngrave());
+						mav.addObject("startTime", time.format(startEngrave));
+					}
+					if (attendance.getFinishEngrave() != null) {
+						finishEngrave = time.parse(attendance.getFinishEngrave());
+						mav.addObject("finishTime", time.format(finishEngrave));
+					}
 				} catch (ParseException e) {
 				}
 			}
@@ -1822,10 +1909,9 @@ public class EngravingController {
 
 //	変更リクエストForm
 	@RequestMapping("/requestForminfo")
-	public ModelAndView requestForminfo(ModelAndView mav) {
+	public ModelAndView requestForminfo(ModelAndView mav, @ModelAttribute("error") String error) {
 		try {
 			User user = (User) session.getAttribute("user");
-			String error = "";
 			if (user == null) {
 				error = "セッションが切れました。再度ログインしてください。";
 				mav.addObject("error", error);
@@ -1841,6 +1927,9 @@ public class EngravingController {
 				attendance = list.get(0);
 				mav.addObject(user);
 				mav.addObject(attendance);
+				if (!error.equals("")) {
+					mav.addObject("error", error);
+				}
 				mav.setViewName("requestForm");
 			} else {
 //			当日の勤怠登録前には何も起きない
