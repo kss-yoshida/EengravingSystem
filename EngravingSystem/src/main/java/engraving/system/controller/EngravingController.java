@@ -564,21 +564,25 @@ public class EngravingController {
 					// 出勤打刻時間
 					startEngrave = timeFormat.parse(attendance.getStartEngrave());
 					attendance.setStartEngrave(time.format(startEngrave));
-					// 退勤打刻時間
-					finishEngrave = timeFormat.parse(attendance.getFinishEngrave());
-					attendance.setFinishEngrave(time.format(finishEngrave));
 					// 出勤時間
 					startTime = timeFormat.parse(attendance.getStartTime());
 					attendance.setStartTime(time.format(startTime));
-					// 退勤時間
-					finishTime = timeFormat.parse(attendance.getFinishTime());
-					attendance.setFinishTime(time.format(finishTime));
-					// 休憩時間
-					breakTime = timeFormat.parse(attendance.getBreakTime());
-					attendance.setBreakTime(timer.format(breakTime));
-					// 残業時間
-					overTime = timeFormat.parse(attendance.getOverTime());
-					attendance.setOverTime(timer.format(overTime));
+					
+					//退勤を押している場合
+					if(attendance.getFinishEngrave() != null) {
+						// 退勤時間
+						finishTime = timeFormat.parse(attendance.getFinishTime());
+						attendance.setFinishTime(time.format(finishTime));
+						// 退勤打刻時間
+						finishEngrave = timeFormat.parse(attendance.getFinishEngrave());
+						attendance.setFinishEngrave(time.format(finishEngrave));
+						// 休憩時間
+						breakTime = timeFormat.parse(attendance.getBreakTime());
+						attendance.setBreakTime(timer.format(breakTime));
+						// 残業時間
+						overTime = timeFormat.parse(attendance.getOverTime());
+						attendance.setOverTime(timer.format(overTime));
+					}
 					// 日付
 					dayData = dayFormat.parse(attendance.getDay());
 					attendance.setDay(days.format(dayData));
