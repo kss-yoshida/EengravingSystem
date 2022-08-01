@@ -21,6 +21,8 @@
 		<div class="container">
 		
 			<h3>変更履歴</h3><br>
+			<p class="error" th:if="${error!=null}">[[${error}]]</p>
+			<p class="message" th:if="${message!=null}">[[${message}]]</p>
 			<div class="engraving-flex" >
 					<form action="/historicalCheck" method="post">
 						<input type="text" name="employeeId">変更対象者番号
