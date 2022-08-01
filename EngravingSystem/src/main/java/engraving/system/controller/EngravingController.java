@@ -476,6 +476,12 @@ public class EngravingController {
 				if (!year.equals("") || !month.equals("")) {
 					int check = Integer.parseInt(year);
 					check = Integer.parseInt(month);
+					mav.addObject("authority", authority);
+
+			// 管理者が見る場合
+			if (authority.equals("0")) {
+				mav.addObject("employeeId", user.getEmployeeId());
+			}
 				}
 			} catch (NumberFormatException e) {
 				mav.addObject("error", "検索の年月は半角数字で入力してください。");
@@ -483,11 +489,18 @@ public class EngravingController {
 				return mav;
 			}
 //		桁数チェック
+			if(!year.equals("") || !month.equals("")){
 			if (year.length() != 4 || month.length() > 2) {
 				mav.addObject("error", "年は４桁、月は２桁以内で入力してください。");
 				mav.setViewName("attendanceRecord");
-				return mav;
+				mav.addObject("authority", authority);
+
+			// 管理者が見る場合
+			if (authority.equals("0")) {
+				mav.addObject("employeeId", user.getEmployeeId());
 			}
+				return mav;
+			}}
 
 			// 月が1桁で入力された場合の処理
 			if (month.length() == 1 && month != "") {
