@@ -20,6 +20,8 @@
 	    </header>
 		<div class="container">
 			<h3>変更申請一覧</h3><br>
+			<p class="error" th:if="${error!=null}">[[${error}]]</p>
+			<p class="message" th:if="${message!=null}">[[${message}]]</p>
 			<table class="change-request-table">
 				<tr>
 					<th id="change-request-normal">日時</th>
