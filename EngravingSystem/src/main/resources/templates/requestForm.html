@@ -20,6 +20,7 @@
 	<div class="container">
 		<h3>勤怠情報変更フォーム</h3>
 		<br>
+		<p class="error" th:if="${error!=null}">[[${error}]]</p>
 		<p>日付：[[${attendance.day}]]</p>
 		<form action="/requestForm" method="post">
 			<table class="change-form-table" th:object="${attendance}">
