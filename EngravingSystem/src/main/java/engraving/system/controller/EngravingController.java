@@ -50,6 +50,7 @@ public class EngravingController {
 	@RequestMapping(value = "/startEngraving", method = RequestMethod.POST)
 	public ModelAndView engravingStart(@RequestParam("cmd") String cmd, ModelAndView mav) {
 
+		try{
 		String error = "";
 		// 勤怠情報を格納するAttendanceの作成
 		User user = (User) session.getAttribute("user");
@@ -91,7 +92,7 @@ public class EngravingController {
 				startEngrave = time.parse(attendance.getStartEngrave());
 				String strStartTime = (time.format(startEngrave));
 				mav.addObject("startTime", strStartTime);
-			} catch (Exception e) {
+			} catch (ParseException e) {
 			}
 
 			Date finishEngrave;
@@ -99,7 +100,7 @@ public class EngravingController {
 				finishEngrave = time.parse(attendance.getFinishEngrave());
 				String strFinishTime = (time.format(finishEngrave));
 				mav.addObject("finishTime", strFinishTime);
-			} catch (Exception e) {
+			} catch (ParseException e) {
 			}
 		}
 
@@ -108,12 +109,17 @@ public class EngravingController {
 
 		// ModelとView情報を返す
 		return mav;
+			} catch (Exception e) {
+			mav.setViewName("login");
+			mav.addObject("error", "DB接続エラーです。DBを確認してください。");
+			return mav;
+		}
 	}
 
 	// 「finishEngraving」にアクセスがあった場合
 	@RequestMapping(value = "/finishEngraving", method = RequestMethod.POST)
 	public ModelAndView finishEngraving(@RequestParam("cmd") String cmd, ModelAndView mav) {
-
+try{
 		// 入力された情報を更新
 		Date date = new Date();
 		SimpleDateFormat day = new SimpleDateFormat("yyyyMMdd");
@@ -172,7 +178,7 @@ public class EngravingController {
 				startEngrave = time.parse(attendance.getStartEngrave());
 				String strStartTime = (time.format(startEngrave));
 				mav.addObject("startTime", strStartTime);
-			} catch (Exception e) {
+			} catch (ParseException e) {
 			}
 
 			Date finishEngrave;
@@ -180,7 +186,7 @@ public class EngravingController {
 				finishEngrave = time.parse(attendance.getFinishEngrave());
 				String strFinishTime = (time.format(finishEngrave));
 				mav.addObject("finishTime", strFinishTime);
-			} catch (Exception e) {
+			} catch (ParseException e) {
 			}
 		} else {// すでに打刻している場合の打刻時間を送る処理
 			if (attendanceList.size() != 0) {
@@ -196,7 +202,7 @@ public class EngravingController {
 				startEngrave = time.parse(attendance.getStartEngrave());
 				String strStartTime = (time.format(startEngrave));
 				mav.addObject("startTime", strStartTime);
-			} catch (Exception e) {
+			} catch (ParseException e) {
 			}
 
 			Date finishEngrave;
@@ -204,7 +210,7 @@ public class EngravingController {
 				finishEngrave = time.parse(attendance.getFinishEngrave());
 				String strFinishTime = (time.format(finishEngrave));
 				mav.addObject("finishTime", strFinishTime);
-			} catch (Exception e) {
+			} catch (ParseException e) {
 			}
 		}
 
@@ -213,6 +219,11 @@ public class EngravingController {
 
 		// ModelとView情報を返す
 		return mav;
+	} catch (Exception e) {
+			mav.setViewName("login");
+			mav.addObject("error", "DB接続エラーです。DBを確認してください。");
+			return mav;
+		}
 	}
 
 	/*
@@ -221,6 +232,7 @@ public class EngravingController {
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public ModelAndView login(ModelAndView mav, @RequestParam("password") String pass,
 			@RequestParam("employee_id") String id) {
+		try{
 //		ユーザーリストの取得
 		ArrayList<User> list = (ArrayList<User>) userinfo.findAll();
 		User user = new User();
@@ -274,7 +286,7 @@ public class EngravingController {
 					finishEngrave = time.parse(attendance.getFinishEngrave());
 					mav.addObject("startTime", time.format(startEngrave));
 					mav.addObject("finishTime", time.format(finishEngrave));
-				} catch (Exception e) {
+				} catch (ParseException e) {
 				}
 
 			}
@@ -287,6 +299,11 @@ public class EngravingController {
 			}
 		}
 		return mav;
+			} catch (Exception e) {
+			mav.setViewName("login");
+			mav.addObject("error", "DB接続エラーです。DBを確認してください。");
+			return mav;
+		}
 	}
 
 	/*
@@ -294,6 +311,7 @@ public class EngravingController {
 	 */
 	@RequestMapping("/employeeList")
 	public ModelAndView employeeList(ModelAndView mav) {
+		try{
 //		DBから社員リストを取得
 		ArrayList<User> userList = new ArrayList<User>();
 		userList = (ArrayList<User>) userinfo.findAll();
@@ -314,6 +332,11 @@ public class EngravingController {
 //		遷移先の指定
 		mav.setViewName("employeeList");
 		return mav;
+			} catch (Exception e) {
+			mav.setViewName("login");
+			mav.addObject("error", "DB接続エラーです。DBを確認してください。");
+			return mav;
+		}
 	}
 
 	/*
@@ -322,11 +345,12 @@ public class EngravingController {
 	@RequestMapping("/searchEmployee")
 	public ModelAndView search(ModelAndView mav, @RequestParam(value = "employeeId", defaultValue = "0") String id,
 			@RequestParam(value = "name", defaultValue = "") String name) {
+		try{
 		String error;
 //		DBから条件付きで社員リストを取得
 		ArrayList<User> userList = new ArrayList<User>();
 //		社員番号と名前が入力されている
-		if (!name.equals("") && id.equals("0")) {
+		if (!name.equals("") && !id.equals("0")) {
 			userList = userinfo.findByEmployeeIdAndName(id, name);
 		} else if (!name.equals("")) {
 //			名前のみ
@@ -357,24 +381,36 @@ public class EngravingController {
 //		遷移先の指定
 		mav.setViewName("employeeList");
 		return mav;
+			} catch (Exception e) {
+			mav.setViewName("login");
+			mav.addObject("error", "DB接続エラーです。DBを確認してください。");
+			return mav;
+		}
 	}
 
 	/*
 	 * 管理者登録削除
 	 */
 	@RequestMapping("/changeAuthority")
-	public String changeAdmin(ModelAndView mav, @RequestParam("authority") String authority,
+	public ModelAndView changeAdmin(ModelAndView mav, @RequestParam("authority") String authority,
 			@RequestParam("employeeId") String id) {
-		User user = userinfo.findByEmployeeId(id);
-		if (authority.equals("0")) {
-			user.setAuthority("1");
-		} else {
-			user.setAuthority("0");
+		try {
+			User user = userinfo.findByEmployeeId(id);
+			if (authority.equals("0")) {
+				user.setAuthority("1");
+			} else {
+				user.setAuthority("0");
+			}
+
+			userinfo.saveAndFlush(user);
+
+			mav.setViewName("redirect:/employeeList");
+			return mav;
+		} catch (Exception e) {
+			mav.setViewName("login");
+			mav.addObject("error", "DB接続エラーです。DBを確認してください。");
+			return mav;
 		}
-
-		userinfo.saveAndFlush(user);
-
-		return "redirect:/employeeList";
 	}
 
 	/*
@@ -382,9 +418,11 @@ public class EngravingController {
 	 * 
 	 */
 	@RequestMapping("/logout")
-	public String logout() {
+	public ModelAndView logout(ModelAndView mav) {
+		mav.addObject("message", "ログアウトしました");
 		session.removeAttribute("user");
-		return "login";
+		mav.setViewName("login");
+		return mav;
 	}
 
 	/*
@@ -394,6 +432,7 @@ public class EngravingController {
 	public ModelAndView attendanceRecorde(
 			@RequestParam(value = "year", defaultValue = "", required = false) String year,
 			@RequestParam(value = "month", defaultValue = "", required = false) String month, ModelAndView mav) {
+		try{
 		// ユーザー情報の受け取り
 		User user = (User) session.getAttribute("user");
 		if (user == null) {
@@ -498,7 +537,7 @@ public class EngravingController {
 
 				// データの格納
 				attendanceList.set(i, attendance);
-			} catch (Exception e) {
+			} catch (ParseException e) {
 			}
 		}
 
@@ -515,6 +554,11 @@ public class EngravingController {
 		mav.setViewName("attendanceRecord");
 
 		return mav;
+			} catch (Exception e) {
+			mav.setViewName("login");
+			mav.addObject("error", "DB接続エラーです。DBを確認してください。");
+			return mav;
+		}
 	}
 
 	/*
@@ -525,6 +569,7 @@ public class EngravingController {
 			@RequestParam(value = "year", defaultValue = "", required = false) String year,
 			@RequestParam(value = "month", defaultValue = "", required = false) String month,
 			@RequestParam(value = "employeeId", defaultValue = "", required = false) String id, ModelAndView mav) {
+		try{
 		// ユーザー情報の受け取り
 		User user = (User) session.getAttribute("user");
 		if (user == null) {
@@ -631,7 +676,7 @@ public class EngravingController {
 
 				// データの格納
 				attendanceList.set(i, attendance);
-			} catch (Exception e) {
+			} catch (ParseException e) {
 			}
 		}
 
@@ -644,6 +689,11 @@ public class EngravingController {
 		mav.setViewName("attendanceRecord");
 
 		return mav;
+			} catch (Exception e) {
+			mav.setViewName("login");
+			mav.addObject("error", "DB接続エラーです。DBを確認してください。");
+			return mav;
+		}
 	}
 
 	/*
@@ -657,7 +707,7 @@ public class EngravingController {
 			@RequestParam(value = "email", defaultValue = "", required = false) String email, MultipartFile photo,
 			@RequestParam(value = "authority", defaultValue = "", required = false) String authority,
 			ModelAndView mav) {
-
+try{
 		User user = new User();
 
 //		入力データの確認
@@ -706,7 +756,7 @@ public class EngravingController {
 				ios.close();
 				writer.dispose();
 
-			} catch (Exception e) {
+			} catch (IOException e) {
 				System.out.println(e);
 			}
 		}
@@ -729,6 +779,11 @@ public class EngravingController {
 		mav.setViewName("redirect:/employeeList");
 // 		ModelとView情報を返す
 		return mav;
+	} catch (Exception e) {
+			mav.setViewName("login");
+			mav.addObject("error", "DB接続エラーです。DBを確認してください。");
+			return mav;
+		}
 	}
 
 	/*
@@ -746,6 +801,7 @@ public class EngravingController {
 			@RequestParam(value = "employeeId", defaultValue = "", required = false) String employeeId,
 			@RequestParam(value = "day", defaultValue = "", required = false) String day, ModelAndView mav,
 			RedirectAttributes redirectAttributes) {
+		try{
 		User user = (User) session.getAttribute("user");
 		if (user == null) {
 			String error = "セッションが切れました。再度ログインしてください。";
@@ -838,6 +894,11 @@ public class EngravingController {
 
 		mav.setViewName("redirect:/changeInsert");
 		return mav;
+			} catch (Exception e) {
+			mav.setViewName("login");
+			mav.addObject("error", "DB接続エラーです。DBを確認してください。");
+			return mav;
+		}
 	}
 
 	/*
@@ -845,6 +906,7 @@ public class EngravingController {
 	 */
 	@RequestMapping("/changeRequestList")
 	public ModelAndView changeRequestList(ModelAndView mav) {
+		try{
 		// requestInfoの情報をすべて受け取る
 		ArrayList<Request> requestList = (ArrayList<Request>) requestinfo.findAll();
 
@@ -865,7 +927,7 @@ public class EngravingController {
 					// 日付のフォーマットを変更する
 					Date day = dayType.parse(attendance.getDay());
 					requestDay.setDay(dayFormat.format(day));
-				} catch (Exception e) {
+				} catch (ParseException e) {
 
 				}
 
@@ -887,6 +949,11 @@ public class EngravingController {
 		mav.setViewName("changeRequestList");
 
 		return mav;
+			} catch (Exception e) {
+			mav.setViewName("login");
+			mav.addObject("error", "DB接続エラーです。DBを確認してください。");
+			return mav;
+		}
 	}
 
 	/*
@@ -896,6 +963,7 @@ public class EngravingController {
 	public ModelAndView changeRequest(RedirectAttributes redirectAttributes,
 			@RequestParam(value = "requestId") String strRequestId, @RequestParam(value = "cmd") String cmd,
 			ModelAndView mav) {
+		try{
 		// ユーザー情報の受け取り
 		User user = (User) session.getAttribute("user");
 		if (user == null) {
@@ -974,7 +1042,7 @@ public class EngravingController {
 			attendance.setStartTime(time.format(startTime));
 			Date finishTime = timeFormat.parse(requestDay.getChangeFinishTime());
 			attendance.setFinishTime(time.format(finishTime));
-			}catch (Exception e){
+			}catch (ParseException e){
 			}
 
 			// 勤務時間（時間）の計算
@@ -1022,25 +1090,38 @@ public class EngravingController {
 			mav.setViewName("redirect:/changeRequestList");
 			return mav;
 		}
+			} catch (Exception e) {
+			mav.setViewName("login");
+			mav.addObject("error", "DB接続エラーです。DBを確認してください。");
+			return mav;
+		}
 	}
 
 	// 変更履歴を登録する
 	@RequestMapping("/changeInsert")
-	public String changeinsert(RedirectAttributes redirectAttributes, @ModelAttribute("map1") ModelMap map1,
-			@ModelAttribute("move") String move) {
-		ArrayList<Change> changeList = (ArrayList<Change>) map1.get("changeList");
-		changeinfo.saveAndFlush(changeList.get(0));
-		changeList.remove(0);
+	public ModelAndView changeinsert(RedirectAttributes redirectAttributes, @ModelAttribute("map1") ModelMap map1,
+			@ModelAttribute("move") String move, ModelAndView mav) {
+		try {
+			ArrayList<Change> changeList = (ArrayList<Change>) map1.get("changeList");
+			changeinfo.saveAndFlush(changeList.get(0));
+			changeList.remove(0);
 
-		ModelMap modelMap = new ModelMap();
-		modelMap.addAttribute("changeList", changeList);
-		redirectAttributes.addFlashAttribute("map1", modelMap);
-		redirectAttributes.addFlashAttribute("move", move);
+			ModelMap modelMap = new ModelMap();
+			modelMap.addAttribute("changeList", changeList);
+			redirectAttributes.addFlashAttribute("map1", modelMap);
+			redirectAttributes.addFlashAttribute("move", move);
 
-		if (changeList.size() == 0) {
-			return move;
-		} else {
-			return "redirect:/changeInsert";
+			mav.setViewName(move);
+			if (changeList.size() == 0) {
+				return mav;
+			} else {
+				mav.setViewName("redirect:/changeInsert");
+				return mav;
+			}
+		} catch (Exception e) {
+			mav.setViewName("login");
+			mav.addObject("error", "DB接続エラーです。DBを確認してください。");
+			return mav;
 		}
 	}
 
@@ -1049,6 +1130,7 @@ public class EngravingController {
 	 */
 	@RequestMapping(value = "/changeEmployee", method = RequestMethod.POST)
 	public ModelAndView changeEmployeeInfo(ModelAndView mav, @RequestParam(value = "employeeId") String empid) {
+		try{
 
 		User user = userinfo.findByEmployeeId(empid);
 		
@@ -1060,6 +1142,11 @@ public class EngravingController {
 		mav.addObject("user", user);
 		mav.setViewName("changeEmployeeInfo");
 		return mav;
+			} catch (Exception e) {
+			mav.setViewName("login");
+			mav.addObject("error", "DB接続エラーです。DBを確認してください。");
+			return mav;
+		}
 
 	}
 
@@ -1075,7 +1162,7 @@ public class EngravingController {
 			@RequestParam(value = "email", defaultValue = "", required = false) String email, MultipartFile photo,
 			@RequestParam(value = "authority", defaultValue = "", required = false) String authority,
 			RedirectAttributes redirectAttributes, ModelAndView mav) {
-
+try{
 		User user = new User();
 		User before = userinfo.findByEmployeeId(oldEmployeeId);
 
@@ -1132,7 +1219,7 @@ public class EngravingController {
 				ios.close();
 				writer.dispose();
 
-			} catch (Exception e) {
+			} catch (IOException e) {
 				System.out.println(e);
 			}
 		}
@@ -1234,21 +1321,32 @@ public class EngravingController {
 
 		mav.setViewName("redirect:/changeInsert");
 		return mav;
+	} catch (Exception e) {
+			mav.setViewName("login");
+			mav.addObject("error", "DB接続エラーです。DBを確認してください。");
+			return mav;
+		}
 	}
 
 	/* 社員削除機能 */
 	@RequestMapping(value = "/deleteEmployee", method = RequestMethod.POST)
 	public ModelAndView deleteEmployee(@RequestParam("employeeId") String id, ModelAndView mav) {
-		User user = userinfo.findByEmployeeId(id);
-		if (user == null || user.getIsDeleted()) {
-			mav.addObject("error", "削除しようとした社員はすでにDBに存在しません。");
+		try {
+			User user = userinfo.findByEmployeeId(id);
+			if (user == null || user.getIsDeleted()) {
+				mav.addObject("error", "削除しようとした社員はすでにDBに存在しません。");
 
+				return mav;
+			}
+			user.setIsDeleted(true);
+			userinfo.saveAndFlush(user);
+			mav.setViewName("redirect:/employeeList");
+			return mav;
+		} catch (Exception e) {
+			mav.setViewName("login");
+			mav.addObject("error", "DB接続エラーです。DBを確認してください。");
 			return mav;
 		}
-		user.setIsDeleted(true);
-		userinfo.saveAndFlush(user);
-		mav.setViewName("redirect:/employeeList");
-		return mav;
 	}
 
 	/* リクエスト登録 */
@@ -1258,6 +1356,7 @@ public class EngravingController {
 			@RequestParam(value = "comment", defaultValue = "記述なし") String comment,
 			@RequestParam("attendanceId") String attendanceId, @RequestParam("employeeId") String employeeId,
 			ModelAndView mav) {
+		try{
 //		入力内容の確認
 		int start = Integer.parseInt(changeStartTime.replace(":", ""));
 		int fin = Integer.parseInt(changeFinishTime.replace(":", ""));
@@ -1280,6 +1379,11 @@ public class EngravingController {
 		requestinfo.saveAndFlush(request);
 		mav.setViewName("redirect:/employeeMenu");
 		return mav;
+		} catch (Exception e) {
+			mav.setViewName("login");
+			mav.addObject("error", "DB接続エラーです。DBを確認してください。");
+			return mav;
+		}
 	}
 
 	/*
@@ -1290,6 +1394,7 @@ public class EngravingController {
 			@RequestParam(value = "adminId", defaultValue = "", required = false) String adminId,
 			@RequestParam(value = "employeeId", defaultValue = "", required = false) String employeeId,
 			ModelAndView mav) {
+		try{
 		// 結果を受け取る変数
 		ArrayList<Change> changeList = new ArrayList<Change>();
 
@@ -1314,6 +1419,11 @@ public class EngravingController {
 		mav.setViewName("historicalCheck");
 
 		return mav;
+			} catch (Exception e) {
+			mav.setViewName("login");
+			mav.addObject("error", "DB接続エラーです。DBを確認してください。");
+			return mav;
+		}
 	}
 
 	/*
@@ -1325,6 +1435,7 @@ public class EngravingController {
 			@RequestParam(value = "name", defaultValue = "", required = false) String name,
 			@RequestParam(value = "year", defaultValue = "", required = false) String year,
 			@RequestParam(value = "month", defaultValue = "", required = false) String month, ModelAndView mav) {
+		try{
 //		検索時の入力内容の確認
 //		検索の際に年月が半角の数列で検索されているかの判定
 		try {
@@ -1451,18 +1562,23 @@ public class EngravingController {
 //		遷移先の指定
 		mav.setViewName("userHistoricalCheck");
 		return mav;
+			} catch (Exception e) {
+			mav.setViewName("login");
+			mav.addObject("error", "DB接続エラーです。DBを確認してください。");
+			return mav;
+		}
 	}
 
 //以下画面遷移用リクエストマッピング
 	@RequestMapping("/loginForm")
 	public ModelAndView loginForm(ModelAndView mav) {
 		mav.setViewName("login");
-
 		return mav;
 	}
 
 	@RequestMapping("/employeeMenu")
 	public ModelAndView employeeMenu(ModelAndView mav) {
+		try{
 		User user = (User) session.getAttribute("user");
 		String error = "";
 		if (user == null) {
@@ -1488,15 +1604,21 @@ public class EngravingController {
 				finishEngrave = time.parse(attendance.getFinishEngrave());
 				mav.addObject("startTime", time.format(startEngrave));
 				mav.addObject("finishTime", time.format(finishEngrave));
-			} catch (Exception e) {
+			} catch (ParseException e) {
 			}
 		}
 		mav.setViewName("employeeMenu");
 		return mav;
+			} catch (Exception e) {
+			mav.setViewName("login");
+			mav.addObject("error", "DB接続エラーです。DBを確認してください。");
+			return mav;
+		}
 	}
 
 	@RequestMapping("/adminMenu")
 	public ModelAndView adminMenu(ModelAndView mav) {
+		try{
 		User user = (User) session.getAttribute("user");
 		String error = "";
 		if (user == null) {
@@ -1522,11 +1644,16 @@ public class EngravingController {
 				finishEngrave = time.parse(attendance.getFinishEngrave());
 				mav.addObject("startTime", time.format(startEngrave));
 				mav.addObject("finishTime", time.format(finishEngrave));
-			} catch (Exception e) {
+			} catch (ParseException e) {
 			}
 		}
 		mav.setViewName("adminMenu");
 		return mav;
+			} catch (Exception e) {
+			mav.setViewName("login");
+			mav.addObject("error", "DB接続エラーです。DBを確認してください。");
+			return mav;
+		}
 	}
 
 	@RequestMapping("/employeeRegistration")
@@ -1544,17 +1671,24 @@ public class EngravingController {
 	@RequestMapping("/changeAttendanceinfo")
 	public ModelAndView changeAttendanceinfo(@RequestParam("employeeId") String employeeId,
 			@RequestParam("attendanceId") String attendanceId, ModelAndView mav) {
+		try{
 		User user = userinfo.findByEmployeeId(employeeId);
 		Attendance attendance = attendanceinfo.findByAttendanceId(Integer.parseInt(attendanceId));
 		mav.addObject(user);
 		mav.addObject(attendance);
 		mav.setViewName("changeAttendance");
 		return mav;
+			} catch (Exception e) {
+			mav.setViewName("login");
+			mav.addObject("error", "DB接続エラーです。DBを確認してください。");
+			return mav;
+		}
 	}
 
 //	変更リクエストForm
 	@RequestMapping("/requestForminfo")
 	public ModelAndView requestForminfo(ModelAndView mav) {
+		try{
 		User user = (User) session.getAttribute("user");
 		String error = "";
 		if (user == null) {
@@ -1580,6 +1714,11 @@ public class EngravingController {
 		}
 
 		return mav;
+			} catch (Exception e) {
+			mav.setViewName("login");
+			mav.addObject("error", "DB接続エラーです。DBを確認してください。");
+			return mav;
+		}
 	}
 
 	/*
