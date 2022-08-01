@@ -19,6 +19,8 @@
 	</header>
 	<div class="container">
 		<h3>メニュー</h3>
+		<p class="error" th:if="${error!=null}">[[${error}]]</p>
+		<p class="message" th:if="${message!=null}">[[${message}]]</p>
 		<br>
 		<p>
 			<a href="/requestForminfo">勤怠情報変更フォーム</a>
