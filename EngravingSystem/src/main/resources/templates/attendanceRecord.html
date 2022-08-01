@@ -10,16 +10,26 @@
 	</head>
 	<body>
 		<header>
-	        <nav class="nav-normal">
-	            <ul >
-	                <li>打刻プログラム</li>
-		            <li th:switch="${authority}">
-			            <a th:case="0" href="/adminMenu" th:text="HOME"></a>
-			            <a th:case="1" href="/employeeMenu" th:text="HOME"></a>
-		            </li>
-	                <li><a href="/logout">ログアウト</a></li>
-	            </ul>
-	        </nav>
+			<div th:switch="${authority}">
+		        <nav th:case="0" class="nav-admin">
+		            <ul >
+		                <li>打刻プログラム</li>
+			            <li>
+				            <a href="/adminMenu" th:text="HOME"></a>
+			            </li>
+		                <li><a href="/logout">ログアウト</a></li>
+		            </ul>
+		        </nav>
+		          <nav th:case="1" class="nav-normal">
+		            <ul >
+		                <li>打刻プログラム</li>
+			            <li>
+				            <a href="/employeeMenu" th:text="HOME"></a>
+			            </li>
+		                <li><a href="/logout">ログアウト</a></li>
+		            </ul>
+		        </nav>
+			</div>
 	    </header>
 		<div class="container">
 			<h3>勤怠情報確認</h3><br>
@@ -52,16 +62,29 @@
 			<br>
 			<h4 class="text-left" th:text="${month}"></h4>
 			<table class="attendance-record-table">
-				<tr>
-					<th id="attendance-record-other">変更</th>
-					<th id="attendance-record-other">日付</th>
-					<th id="attendance-record-normal">打刻出勤時間</th>
-					<th id="attendance-record-normal">打刻退勤時間</th>
-					<th id="attendance-record-normal">出勤時間</th>
-					<th id="attendance-record-normal">退勤時間</th>
-					<th id="attendance-record-normal">休憩時間</th>
-					<th id="attendance-record-normal">残業時間</th>
-				</tr>
+					
+				<div th:switch="${authority}">
+					<tr class="attendance-record-admin"  th:case="0">
+						<th id="attendance-record-other">変更</th>
+						<th id="attendance-record-other">日付</th>
+						<th id="attendance-record-normal">打刻出勤時間</th>
+						<th id="attendance-record-normal">打刻退勤時間</th>
+						<th id="attendance-record-normal">出勤時間</th>
+						<th id="attendance-record-normal">退勤時間</th>
+						<th id="attendance-record-normal">休憩時間</th>
+						<th id="attendance-record-normal">残業時間</th>
+					</tr>
+					<tr class="attendance-record-employee" th:case="1">
+						<th id="attendance-record-other">変更</th>
+						<th id="attendance-record-other">日付</th>
+						<th id="attendance-record-normal">打刻出勤時間</th>
+						<th id="attendance-record-normal">打刻退勤時間</th>
+						<th id="attendance-record-normal">出勤時間</th>
+						<th id="attendance-record-normal">退勤時間</th>
+						<th id="attendance-record-normal">休憩時間</th>
+						<th id="attendance-record-normal">残業時間</th>
+					</tr>
+				</div>
 				<tr th:each="attendanceList : ${attendanceList}"  th:object="${attendanceList}">
 					<td id="attendance-record-other"><form action="/changeAttendanceinfo" method="post">
 						<input type="hidden" name="attendanceId"
