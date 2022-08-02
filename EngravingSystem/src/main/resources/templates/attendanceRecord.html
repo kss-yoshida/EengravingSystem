@@ -65,7 +65,7 @@
 					
 				<div th:switch="${authority}">
 					<tr class="attendance-record-admin"  th:case="0">
-						<th id="attendance-record-other">変更</th>
+						<th id="attendance-record-other" th:if="${authority=='0'}">変更</th>
 						<th id="attendance-record-other">日付</th>
 						<th id="attendance-record-normal">打刻出勤時間</th>
 						<th id="attendance-record-normal">打刻退勤時間</th>
@@ -86,7 +86,7 @@
 					</tr>
 				</div>
 				<tr th:each="attendanceList : ${attendanceList}"  th:object="${attendanceList}">
-					<td id="attendance-record-other"><form action="/changeAttendanceinfo" method="post">
+					<td id="attendance-record-other" th:if="${authority=='0'}"><form action="/changeAttendanceinfo" method="post">
 						<input type="hidden" name="attendanceId"
 							th:value="*{attendanceId}"><input type="hidden"
 							name="employeeId" th:value="*{employeeId}"> <input
