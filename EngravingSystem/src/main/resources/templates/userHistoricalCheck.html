@@ -25,9 +25,11 @@
 		<p class="error" th:if="${error!=null}">[[${error}]]</p>
 		<div class="engraving-flex">
 			<form action="/userHistoricalCheck" method="post">
-				<input type="text" name="employeeId">社員番号&emsp;<input type="text"
-					name="name">名前&emsp;<input type="text" name="year">年&emsp;<input
-					type="text" name="month">月&emsp;<input type="submit" value="検索">
+				<input type="text" name="employeeId">社員番号&emsp;
+				<input type="text" name="name">名前&emsp;
+				<input type="text" name="year">年&emsp;
+				<input type="text" name="month">月&emsp;
+				<input type="submit" value="検索">
 			</form>
 			<form action="/userHistoricalCheck" method="post">
 				<input type="submit" value="今月表示">
@@ -45,7 +47,7 @@
 			<tr th:each="logininfo: ${loginLogList}">
 				<td th:text="*{logininfo.loginTime}"></td>
 				<td th:text="*{logininfo.employeeId}"></td>
-					<td	th:text="*{logininfo.name}"></td>
+				<td th:text="*{logininfo.name}"></td>
 			</tr>
 		</table>
 	</div>
