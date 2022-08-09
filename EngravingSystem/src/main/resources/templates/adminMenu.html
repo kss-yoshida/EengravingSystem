@@ -46,7 +46,7 @@
 					type="submit" value="出勤" th:if="${startTime==null}">
 			</form>
 			<form action="finishEngraving" method="post">
-				<p th:if="${finishTime != null}" th:text="${startTime}"></p>
+				<p th:if="${finishTime != null}" th:text="${finishTime}"></p>
 				<p th:if="${finishTime == null}">&nbsp;</p>
 				<input type="hidden" name="cmd" value="adminMenu"> <input
 					type="submit" value="退勤"
