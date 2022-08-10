@@ -1409,7 +1409,9 @@ public class EngravingController {
 	// 変更履歴を登録する
 	@RequestMapping("/changeInsert")
 	public ModelAndView changeinsert(RedirectAttributes redirectAttributes, @ModelAttribute("map1") ModelMap map1,
-			@ModelAttribute("message") String message, @ModelAttribute("move") String move, ModelAndView mav) {
+			@ModelAttribute("message") String message, @ModelAttribute("move") String move,
+			@RequestParam(value = "cmd", defaultValue = "") String cmd,
+			@RequestParam(value = "oldEmployeeId", defaultValue = "") String oldEmployeeId, ModelAndView mav) {
 		try {
 			ArrayList<Change> changeList = (ArrayList<Change>) map1.get("changeList");
 			changeinfo.saveAndFlush(changeList.get(0));
@@ -1420,9 +1422,14 @@ public class EngravingController {
 			redirectAttributes.addFlashAttribute("map1", modelMap);
 			redirectAttributes.addFlashAttribute("move", move);
 			redirectAttributes.addFlashAttribute("message", message);
+			if (cmd.equals("change")) {
+				mav.addObject("cmd", cmd);
+				mav.addObject("oldEmployeeId", oldEmployeeId);
+			}
 
 			if (changeList.size() == 0) {
 				mav.addObject("message", message);
+				mav.addObject("employeeId", oldEmployeeId);
 				mav.setViewName(move);
 				return mav;
 			} else {
@@ -1435,7 +1442,6 @@ public class EngravingController {
 			return mav;
 		}
 	}
-
 	/*
 	 * 社員情報を送る処理
 	 */
