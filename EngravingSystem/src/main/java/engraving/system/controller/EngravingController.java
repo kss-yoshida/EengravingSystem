@@ -51,16 +51,15 @@ public class EngravingController {
 	public ModelAndView engravingStart(@RequestParam("cmd") String cmd, ModelAndView mav) {
 
 		try {
-			String error = "";
-			// 勤怠情報を格納するAttendanceの作成
+			//セッション情報の確認
 			User user = (User) session.getAttribute("user");
 			if (user == null) {
-				error = "セッションが切れました。再度ログインしてください。";
-				cmd = "login";
-				mav.addObject("error", error);
-				mav.setViewName(cmd);
+				mav.addObject("error","セッションが切れました。再度ログインしてください。");
+				mav.setViewName("login");
 				return mav;
 			}
+			String error = "";
+			// 勤怠情報を格納するAttendanceの作成
 			Attendance attendance = new Attendance();
 
 			// 日付の受け取りと格納
@@ -120,20 +119,19 @@ public class EngravingController {
 	@RequestMapping(value = "/finishEngraving", method = RequestMethod.POST)
 	public ModelAndView finishEngraving(@RequestParam("cmd") String cmd, ModelAndView mav) {
 		try {
+			//セッション情報の確認
+			User user = (User) session.getAttribute("user");
+			if (user == null) {
+				mav.addObject("error","セッションが切れました。再度ログインしてください。");
+				mav.setViewName("login");
+				return mav;
+			}
 			// 入力された情報を更新
 			Date date = new Date();
 			SimpleDateFormat day = new SimpleDateFormat("yyyyMMdd");
 			Attendance attendance;
 			// ユーザーの当日の打刻情報を呼び出す
-			User user = (User) session.getAttribute("user");
 			String error;
-			if (user == null) {
-				error = "セッションが切れました。再度ログインしてください。";
-				cmd = "login";
-				mav.addObject("error", error);
-				mav.setViewName(cmd);
-				return mav;
-			}
 			String employeeId = user.getEmployeeId();
 			ArrayList<Attendance> attendanceList = (ArrayList<Attendance>) attendanceinfo
 					.findByDayAndEmployeeId(day.format(date), employeeId);
@@ -329,6 +327,13 @@ public class EngravingController {
 	public ModelAndView employeeList(
 			@RequestParam(value = "message", defaultValue = "", required = false) String message, ModelAndView mav) {
 		try {
+			//セッション情報の確認
+			User user = (User) session.getAttribute("user");
+			if (user == null) {
+				mav.addObject("error","セッションが切れました。再度ログインしてください。");
+				mav.setViewName("login");
+				return mav;
+			}
 //		DBから社員リストを取得
 			ArrayList<User> userList = new ArrayList<User>();
 			userList = (ArrayList<User>) userinfo.findAll();
@@ -367,6 +372,13 @@ public class EngravingController {
 	public ModelAndView search(ModelAndView mav, @RequestParam(value = "employeeId", defaultValue = "") String id,
 			@RequestParam(value = "name", defaultValue = "") String name) {
 		try {
+			//セッション情報の確認
+			User user = (User) session.getAttribute("user");
+			if (user == null) {
+				mav.addObject("error","セッションが切れました。再度ログインしてください。");
+				mav.setViewName("login");
+				return mav;
+			}
 			// メッセージを格納する変数
 			String message = "";
 
@@ -423,6 +435,13 @@ public class EngravingController {
 	public ModelAndView changeAdmin(ModelAndView mav, @RequestParam("authority") String authority,
 			@RequestParam("employeeId") String id) {
 		try {
+			//セッション情報の確認
+			User user = (User) session.getAttribute("user");
+			if (user == null) {
+				mav.addObject("error","セッションが切れました。再度ログインしてください。");
+				mav.setViewName("login");
+				return mav;
+			}
 			// メッセージを格納する変数
 			String message = "";
 
@@ -478,12 +497,10 @@ public class EngravingController {
 			//エラーメッセージを格納する変数
 			String error = "";
 			
-			// ユーザー情報の受け取り
+			//セッション情報の確認
 			User user = (User) session.getAttribute("user");
 			if (user == null) {
-				error = "セッションが切れました。再度ログインしてください。";
-
-				mav.addObject("error", error);
+				mav.addObject("error","セッションが切れました。再度ログインしてください。");
 				mav.setViewName("login");
 				return mav;
 			}
@@ -670,19 +687,17 @@ public class EngravingController {
 			@RequestParam(value = "employeeId", defaultValue = "", required = false) String id,
 			@RequestParam(value = "message", defaultValue = "", required = false) String forMessage, ModelAndView mav) {
 		try {
-			// メッセージを格納する変数
-			String message = "";
-			String error = "";
-
-			// ユーザー情報の受け取り
+			//セッション情報の確認
 			User user = (User) session.getAttribute("user");
 			if (user == null) {
-				error = "セッションが切れました。再度ログインしてください。";
-
-				mav.addObject("error", error);
+				mav.addObject("error","セッションが切れました。再度ログインしてください。");
 				mav.setViewName("login");
 				return mav;
 			}
+			// メッセージを格納する変数
+			String message = "";
+			String error = "";
+			
 			String authority = user.getAuthority();
 
 			// 月が1桁で入力された場合の処理
@@ -870,17 +885,15 @@ public class EngravingController {
 			@RequestParam(value = "authority", defaultValue = "", required = false) String authority,
 			ModelAndView mav) {
 		try {
-			// メッセージを格納する変数
-			String message = "";
-
-			// ユーザー情報の受け取り
+			//セッション情報の確認
 			User user = (User) session.getAttribute("user");
 			if (user == null) {
-				String error = "セッションが切れました。再度ログインしてください。";
-				mav.addObject("error", error);
+				mav.addObject("error","セッションが切れました。再度ログインしてください。");
 				mav.setViewName("login");
 				return mav;
 			}
+			// メッセージを格納する変数
+			String message = "";
 
 //		入力データの確認
 			if (name.equals("") || password.equals("") || employeeId.equals("") || email.equals("")) {
@@ -988,11 +1001,10 @@ public class EngravingController {
 			// メッセージを格納する変数
 			String message = "";
 
-//			セッション情報の確認
+//			//セッション情報の確認
 			User user = (User) session.getAttribute("user");
 			if (user == null) {
-				String error = "セッションが切れました。再度ログインしてください。";
-				mav.addObject("error", error);
+				mav.addObject("error","セッションが切れました。再度ログインしてください。");
 				mav.setViewName("login");
 				return mav;
 			}
@@ -1193,6 +1205,13 @@ public class EngravingController {
 	public ModelAndView changeRequestList(ModelAndView mav,
 			@RequestParam(value = "message", defaultValue = "", required = false) String message) {
 		try {
+			//セッション情報の確認
+			User user = (User) session.getAttribute("user");
+			if (user == null) {
+				mav.addObject("error","セッションが切れました。再度ログインしてください。");
+				mav.setViewName("login");
+				return mav;
+			}
 			// requestInfoの情報をすべて受け取る
 			ArrayList<Request> requestList = (ArrayList<Request>) requestinfo.findAll();
 
@@ -1262,11 +1281,10 @@ public class EngravingController {
 			// メッセージを格納する変数
 			String message = "";
 
-			// ユーザー情報の受け取り
+			//セッション情報の確認
 			User user = (User) session.getAttribute("user");
 			if (user == null) {
-				String error = "セッションが切れました。再度ログインしてください。";
-				mav.addObject("error", error);
+				mav.addObject("error","セッションが切れました。再度ログインしてください。");
 				mav.setViewName("login");
 				return mav;
 			}
@@ -1448,6 +1466,13 @@ public class EngravingController {
 	@RequestMapping(value = "/changeEmployee", method = RequestMethod.POST)
 	public ModelAndView changeEmployeeInfo(ModelAndView mav, @RequestParam(value = "employeeId") String empid) {
 		try {
+			//セッション情報の確認
+			User sessionUser = (User) session.getAttribute("user");
+			if (sessionUser == null) {
+				mav.addObject("error","セッションが切れました。再度ログインしてください。");
+				mav.setViewName("login");
+				return mav;
+			}
 
 			User user = userinfo.findByEmployeeId(empid);
 
@@ -1480,6 +1505,13 @@ public class EngravingController {
 			@RequestParam(value = "authority", defaultValue = "", required = false) String authority,
 			RedirectAttributes redirectAttributes, ModelAndView mav) {
 		try {
+			//セッション情報の確認
+			User sessionUser = (User) session.getAttribute("user");
+			if (sessionUser == null) {
+				mav.addObject("error","セッションが切れました。再度ログインしてください。");
+				mav.setViewName("login");
+				return mav;
+			}
 			// メッセージを格納する変数
 			String message = "";
 
@@ -1674,6 +1706,13 @@ public class EngravingController {
 	public ModelAndView deleteEmployee(@RequestParam("employeeId") String id,
 			@RequestParam(value = "cmd", defaultValue = "") String cmd, ModelAndView mav) {
 		try {
+			//セッション情報の確認
+			User sessionUser = (User) session.getAttribute("user");
+			if (sessionUser == null) {
+				mav.addObject("error","セッションが切れました。再度ログインしてください。");
+				mav.setViewName("login");
+				return mav;
+			}
 			User user = userinfo.findByEmployeeId(id);
 			if (user == null || user.getIsDeleted()) {
 				mav.addObject("error", "削除しようとした社員はすでにDBに存在しません。");
@@ -1707,6 +1746,13 @@ public class EngravingController {
 			@RequestParam("attendanceId") String attendanceId, @RequestParam("employeeId") String employeeId,
 			ModelAndView mav) {
 		try {
+			//セッション情報の確認
+			User user = (User) session.getAttribute("user");
+			if (user == null) {
+				mav.addObject("error","セッションが切れました。再度ログインしてください。");
+				mav.setViewName("login");
+				return mav;
+			}
 //		入力内容の確認
 			if (!changeFinishTime.equals("")) {
 				int start = Integer.parseInt(changeStartTime.replace(":", ""));
@@ -1766,11 +1812,10 @@ public class EngravingController {
 			@RequestParam(value = "employeeId", defaultValue = "", required = false) String employeeId,
 			ModelAndView mav) {
 		try {
-			// セッション切れの処理
+			//セッション情報の確認
 			User user = (User) session.getAttribute("user");
 			if (user == null) {
-				String error = "セッションが切れました。再度ログインしてください。";
-				mav.addObject("error", error);
+				mav.addObject("error","セッションが切れました。再度ログインしてください。");
 				mav.setViewName("login");
 				return mav;
 			}
@@ -1826,11 +1871,10 @@ public class EngravingController {
 			@RequestParam(value = "year", defaultValue = "", required = false) String year,
 			@RequestParam(value = "month", defaultValue = "", required = false) String month, ModelAndView mav) {
 		try {
-			// セッションの確認
-			User sessionUser = (User) session.getAttribute("user");
-			if (sessionUser == null) {
-				String error = "セッションが切れました。再度ログインしてください。";
-				mav.addObject("error", error);
+			//セッション情報の確認
+			User user = (User) session.getAttribute("user");
+			if (user == null) {
+				mav.addObject("error","セッションが切れました。再度ログインしてください。");
 				mav.setViewName("login");
 				return mav;
 			}
@@ -2025,11 +2069,11 @@ public class EngravingController {
 	@RequestMapping("/employeeMenu")
 	public ModelAndView employeeMenu(ModelAndView mav) {
 		try {
+			//セッション情報の確認
 			User user = (User) session.getAttribute("user");
-			String error = "";
 			if (user == null) {
-				error = "セッションが切れました。再度ログインしてください。";
-				mav.addObject("error", error);
+				mav.addObject("error","セッションが切れました。再度ログインしてください。");
+				mav.setViewName("login");
 				return mav;
 			}
 //		ログインした社員の勤怠情報の取得
@@ -2069,11 +2113,11 @@ public class EngravingController {
 	@RequestMapping("/adminMenu")
 	public ModelAndView adminMenu(ModelAndView mav) {
 		try {
+			//セッション情報の確認
 			User user = (User) session.getAttribute("user");
-			String error = "";
 			if (user == null) {
-				error = "セッションが切れました。再度ログインしてください。";
-				mav.addObject("error", error);
+				mav.addObject("error","セッションが切れました。再度ログインしてください。");
+				mav.setViewName("login");
 				return mav;
 			}
 //		ログインした社員の勤怠情報の取得
@@ -2126,6 +2170,13 @@ public class EngravingController {
 	public ModelAndView changeAttendanceinfo(@RequestParam("employeeId") String employeeId,
 			@RequestParam("attendanceId") String attendanceId, ModelAndView mav) {
 		try {
+			//セッション情報の確認
+			User sessionUser = (User) session.getAttribute("user");
+			if (sessionUser == null) {
+				mav.addObject("error","セッションが切れました。再度ログインしてください。");
+				mav.setViewName("login");
+				return mav;
+			}
 			User user = userinfo.findByEmployeeId(employeeId);
 			Attendance attendance = attendanceinfo.findByAttendanceId(Integer.parseInt(attendanceId));
 			mav.addObject(user);
@@ -2143,10 +2194,10 @@ public class EngravingController {
 	@RequestMapping("/requestForminfo")
 	public ModelAndView requestForminfo(ModelAndView mav, @ModelAttribute("error") String error) {
 		try {
+			//セッション情報の確認
 			User user = (User) session.getAttribute("user");
 			if (user == null) {
-				error = "セッションが切れました。再度ログインしてください。";
-				mav.addObject("error", error);
+				mav.addObject("error","セッションが切れました。再度ログインしてください。");
 				mav.setViewName("login");
 				return mav;
 			}
