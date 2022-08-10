@@ -988,6 +988,7 @@ public class EngravingController {
 			// メッセージを格納する変数
 			String message = "";
 
+//			セッション情報の確認
 			User user = (User) session.getAttribute("user");
 			if (user == null) {
 				String error = "セッションが切れました。再度ログインしてください。";
@@ -995,34 +996,99 @@ public class EngravingController {
 				mav.setViewName("login");
 				return mav;
 			}
+
 //			入力内容の確認
-			int start = Integer.parseInt(startTime.replace(":", ""));
-			int fin = Integer.parseInt(finishTime.replace(":", ""));
-			if (start >= fin) {
-				mav.addObject("error", "退勤時間が出勤時間よりも早くなっています。");
-				mav.setViewName("redirect:/requestForminfo");
-				return mav;
-			}
-			int startE = Integer.parseInt(startEngrave.replace(":", ""));
-			int finE = Integer.parseInt(finishEngrave.replace(":", ""));
-			if (startE >= finE) {
-				mav.addObject("error", "退勤打刻時間が出勤打刻時間よりも早くなっています。");
-				mav.setViewName("redirect:/requestForminfo");
-				return mav;
-			}
+			if (!finishTime.equals("00:00:00")) {
+				int start = Integer.parseInt(startTime.replace(":", ""));
+				int fin = Integer.parseInt(finishTime.replace(":", ""));
+				int btime = Integer.parseInt(breakTime.replace(":", ""));
+//			文字列の長さを見て変更しているか確認.
+//			変更していたら未変更のものと桁を合わせるために100かける。(hhmmssにそろえる)
+//			出勤時間を変更していた場合
+				if (startTime.length() == 5) {
+					start *= 100;
+				}
+//			退勤時間を変更していた場合
+				if (finishTime.length() == 5) {
+					fin *= 100;
+				}
+				if (breakTime.length() == 5) {
+					btime *= 100;
+				}
 
+				if (start > fin) {
+					mav.addObject("error", "退勤時間が出勤時間よりも早くなっています");
+					mav.addObject("employeeId", employeeId);
+					mav.addObject("attendanceId", attendanceId);
+					mav.setViewName("redirect:/changeAttendanceinfo");
+					return mav;
+				}
+				if (start == fin) {
+					mav.addObject("error", "退勤時間と出勤時間が同じ時間です");
+					mav.addObject("employeeId", employeeId);
+					mav.addObject("attendanceId", attendanceId);
+					mav.setViewName("redirect:/changeAttendanceinfo");
+					return mav;
+				}
+				if (btime >= fin - start) {
+					mav.addObject("error", "休憩時間が長すぎます");
+					mav.addObject("employeeId", employeeId);
+					mav.addObject("attendanceId", attendanceId);
+					mav.setViewName("redirect:/changeAttendanceinfo");
+					return mav;
+				}
+			}
+//			変更前勤怠情報の取得
 			Attendance before = attendanceinfo.findByAttendanceId(Integer.parseInt(attendanceId));
+			if (before.getFinishTime() == null) {
+				before.setFinishTime("00:00:00");
+			}
+			if (before.getFinishEngrave() == null) {
+				before.setFinishEngrave("00:00:00");
+			}
+			if (before.getBreakTime() == null) {
+				before.setBreakTime("00:00:00");
+			}
+			if (before.getOverTime() == null) {
+				before.setOverTime("00:00:00");
+			}
 
+//			変更後勤怠情報のオブジェクト化
 			Attendance after = new Attendance();
 			after.setAttendanceId(Integer.parseInt(attendanceId));
 			after.setEmployeeId(before.getEmployeeId());
 			after.setDay(day);
 			after.setStartTime(startTime);
-			after.setFinishTime(finishTime);
 			after.setStartEngrave(startEngrave);
-			after.setFinishEngrave(finishEngrave);
-			after.setOverTime(overTime);
-			after.setBreakTime(breakTime);
+			if (!finishTime.equals("00:00:00")) {
+				after.setFinishTime(finishTime);
+				after.setOverTime(overTime);
+				after.setBreakTime(breakTime);
+			}
+
+//			勤怠情報が全く変更されていないときはエラー
+//			出退勤が行われているとき
+			if (after.getFinishTime() != null) {
+				if (before.getStartTime().equals(after.getStartTime())
+						&& before.getFinishTime().equals(after.getFinishTime())
+						&& before.getOverTime().equals(after.getOverTime())
+						&& before.getBreakTime().equals(after.getBreakTime())) {
+					mav.addObject("error", "勤怠情報が変更されていません");
+					mav.addObject("employeeId", employeeId);
+					mav.addObject("attendanceId", attendanceId);
+					mav.setViewName("redirect:/changeAttendanceinfo");
+					return mav;
+				}
+			} else {
+//			出勤のみの情報の時
+				if (before.getStartTime().equals(after.getStartTime())) {
+					mav.addObject("error", "勤怠情報が変更されていません");
+					mav.addObject("employeeId", employeeId);
+					mav.addObject("attendanceId", attendanceId);
+					mav.setViewName("redirect:/changeAttendanceinfo");
+					return mav;
+				}
+			}
 
 			ArrayList<Change> list = new ArrayList<Change>();
 
@@ -1042,38 +1108,53 @@ public class EngravingController {
 				change.setAfterData(after.getStartTime());
 				list.add(change);
 			}
-//		休憩時間
-			if (!before.getBreakTime().equals(after.getBreakTime())) {
-				Change change = new Change();
-				change.setAdminId(employeeId);
-				change.setIsUpdated(time);
-				change.setEmployeeId(before.getEmployeeId());
-				change.setDataName(before.getDay() + "の休憩時間");
-				change.setBeforeData(before.getBreakTime());
-				change.setAfterData(after.getBreakTime());
-				list.add(change);
-			}
-//		残業時間
-			if (!before.getOverTime().equals(after.getOverTime())) {
-				Change change = new Change();
-				change.setAdminId(employeeId);
-				change.setIsUpdated(time);
-				change.setEmployeeId(before.getEmployeeId());
-				change.setDataName(before.getDay() + "の残業時間");
-				change.setBeforeData(before.getOverTime());
-				change.setAfterData(after.getOverTime());
-				list.add(change);
-			}
-//		退勤時間
-			if (!before.getFinishTime().equals(after.getFinishTime())) {
-				Change change = new Change();
-				change.setAdminId(employeeId);
-				change.setIsUpdated(time);
-				change.setEmployeeId(before.getEmployeeId());
-				change.setDataName(before.getDay() + "の退勤時間");
-				change.setBeforeData(before.getFinishTime());
-				change.setAfterData(after.getFinishTime());
-				list.add(change);
+//			退勤時刻の入力がないときは比較を行わない
+			if (!finishTime.equals("00:00:00")) {
+//			退勤時間
+				if (!before.getFinishTime().equals(after.getFinishTime())) {
+					Change change = new Change();
+					change.setAdminId(employeeId);
+					change.setIsUpdated(time);
+					change.setEmployeeId(before.getEmployeeId());
+					change.setDataName(before.getDay() + "の退勤時間");
+					if (before.getFinishTime().equals("00:00:00")) {
+						change.setBeforeData("NULL");
+					} else {
+						change.setBeforeData(before.getFinishTime());
+					}
+					change.setAfterData(after.getFinishTime());
+					list.add(change);
+				}
+//			休憩時間
+				if (!before.getBreakTime().equals(after.getBreakTime())) {
+					Change change = new Change();
+					change.setAdminId(employeeId);
+					change.setIsUpdated(time);
+					change.setEmployeeId(before.getEmployeeId());
+					change.setDataName(before.getDay() + "の休憩時間");
+					if (before.getBreakTime().equals("00:00:00")) {
+						change.setBeforeData("NULL");
+					} else {
+						change.setBeforeData(before.getBreakTime());
+					}
+					change.setAfterData(after.getBreakTime());
+					list.add(change);
+				}
+//			残業時間
+				if (!before.getOverTime().equals(after.getOverTime())) {
+					Change change = new Change();
+					change.setAdminId(employeeId);
+					change.setIsUpdated(time);
+					change.setEmployeeId(before.getEmployeeId());
+					change.setDataName(before.getDay() + "の残業時間");
+					if (before.getOverTime().equals("00:00:00")) {
+						change.setBeforeData("NULL");
+					} else {
+						change.setBeforeData(before.getOverTime());
+					}
+					change.setAfterData(after.getOverTime());
+					list.add(change);
+				}
 			}
 
 //		勤怠情報変更の登録
@@ -1328,9 +1409,7 @@ public class EngravingController {
 	// 変更履歴を登録する
 	@RequestMapping("/changeInsert")
 	public ModelAndView changeinsert(RedirectAttributes redirectAttributes, @ModelAttribute("map1") ModelMap map1,
-			@ModelAttribute("message") String message, @ModelAttribute("move") String move,
-			@RequestParam(value = "cmd", defaultValue = "") String cmd,
-			@RequestParam(value = "oldEmployeeId", defaultValue = "") String oldEmployeeId, ModelAndView mav) {
+			@ModelAttribute("message") String message, @ModelAttribute("move") String move, ModelAndView mav) {
 		try {
 			ArrayList<Change> changeList = (ArrayList<Change>) map1.get("changeList");
 			changeinfo.saveAndFlush(changeList.get(0));
@@ -1341,14 +1420,9 @@ public class EngravingController {
 			redirectAttributes.addFlashAttribute("map1", modelMap);
 			redirectAttributes.addFlashAttribute("move", move);
 			redirectAttributes.addFlashAttribute("message", message);
-			if (cmd.equals("change")) {
-				mav.addObject("cmd", cmd);
-				mav.addObject("oldEmployeeId", oldEmployeeId);
-			}
 
 			if (changeList.size() == 0) {
 				mav.addObject("message", message);
-				mav.addObject("employeeId", oldEmployeeId);
 				mav.setViewName(move);
 				return mav;
 			} else {
@@ -1628,22 +1702,37 @@ public class EngravingController {
 			ModelAndView mav) {
 		try {
 //		入力内容の確認
-			int start = Integer.parseInt(changeStartTime.replace(":", ""));
-			int fin = Integer.parseInt(changeFinishTime.replace(":", ""));
-			if (start >= fin) {
-				mav.addObject("error", "退勤時間が出勤時間よりも早くなっています。");
-				mav.setViewName("redirect:/requestForminfo");
-				return mav;
-			}
-			if (comment.equals("")) {
-				mav.addObject("error", "変更理由は必ず入力してください。");
-				mav.setViewName("redirect:/requestForminfo");
-				return mav;
+			if (!changeFinishTime.equals("")) {
+				int start = Integer.parseInt(changeStartTime.replace(":", ""));
+				int fin = Integer.parseInt(changeFinishTime.replace(":", ""));
+//				出勤時間を変更していた場合
+				if (changeStartTime.length() == 5) {
+					start *= 100;
+				}
+//				退勤時間を変更していた場合
+				if (changeFinishTime.length() == 5) {
+					fin *= 100;
+					changeFinishTime = changeFinishTime + ":00";
+				}
+				if (start >= fin) {
+					mav.addObject("error", "退勤時間が出勤時間よりも早くなっています。");
+					mav.setViewName("redirect:/requestForminfo");
+					return mav;
+				}
+				if (comment.equals("")) {
+					mav.addObject("error", "変更理由は必ず入力してください。");
+					mav.setViewName("redirect:/requestForminfo");
+					return mav;
+				}
 			}
 
 //		入力内容をセット
 			Request request = new Request();
-			request.setChangeFinishTime(changeFinishTime);
+			if (changeFinishTime.equals("")) {
+				request.setChangeFinishTime(null);
+			} else {
+				request.setChangeFinishTime(changeFinishTime);
+			}
 			request.setChangeStartTime(changeStartTime);
 			request.setComment(comment);
 			request.setAttendanceId(Integer.parseInt(attendanceId));
@@ -1660,6 +1749,7 @@ public class EngravingController {
 			return mav;
 		}
 	}
+
 
 	/*
 	 * 変更履歴確認
@@ -1730,34 +1820,64 @@ public class EngravingController {
 			@RequestParam(value = "year", defaultValue = "", required = false) String year,
 			@RequestParam(value = "month", defaultValue = "", required = false) String month, ModelAndView mav) {
 		try {
-			// メッセージを格納する変数
-			String message = "";
-
-//		検索時の入力内容の確認
-//		検索の際に年月が半角の数列で検索されているかの判定
-			try {
-				if (!year.equals("")) {
-					int check = Integer.parseInt(year);
-
-				}
-				if (!month.equals("")) {
-					int check = Integer.parseInt(month);
-				}
-			} catch (NumberFormatException e) {
-				mav.addObject("error", "検索の年月は半角数字でお願いします。");
-				mav.setViewName("attendanceRecord");
+			// セッションの確認
+			User sessionUser = (User) session.getAttribute("user");
+			if (sessionUser == null) {
+				String error = "セッションが切れました。再度ログインしてください。";
+				mav.addObject("error", error);
+				mav.setViewName("login");
 				return mav;
 			}
-//			桁数チェック
-			if (!year.equals("") || !month.equals("")) {
-				if (year.length() != 0 && year.length() > 4 ||month.length() > 2) {
-					mav.addObject("error", "年は４桁、月は２桁以内で入力してください。");
-					mav.setViewName("attendanceRecord");;
 
-					return mav;
+			// メッセージやエラー文を格納する変数など
+			String message = "";
+			String error = "";
+			int check = 0;
+
+//		検索時の入力内容の確認
+			if (!year.equals("") || !month.equals("")) {
+				try {
+//					年の文字入力をしていないかチェック
+					if (!year.equals("")) {
+						check = Integer.parseInt(year);
+						check = 0;
+//						年の桁数チェック
+						if (year.length() != 0 && year.length() != 4) {
+							check += 1;
+						}
+					}
+//				月の範囲と文字入力のチェック
+					if (!month.equals("")) {
+						if (Integer.parseInt(month) > 12 || Integer.parseInt(month) < 1) {
+							check += 2;
+						}
+					}
+//			検索にエラーがあったらエラー文を分ける分岐
+					switch (check) {
+					case 0:
+						break;
+					case 1:
+						error = "年は４桁で入力してください";
+						break;
+					case 2:
+						error = "月は１～１２月の間で入力してください";
+						break;
+					case 3:
+						error = "年は４桁で、月は１～１２月の間で入力してください";
+						break;
+					}
+				} catch (NumberFormatException e) {
+					error = "検索の年月は半角数字でお願いします";
+				} finally {
+//					検索の入力内容にエラーがあった場合
+					if (!error.equals("")) {
+						mav.addObject("error", error);
+						mav.addObject("message", message);
+						mav.setViewName("userHistoricalCheck");
+						return mav;
+					}
 				}
 			}
-
 
 // 		月が1桁で入力されt場合の処理
 			if (month.length() == 1 && month != "") {
