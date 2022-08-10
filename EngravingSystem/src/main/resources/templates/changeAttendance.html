@@ -24,7 +24,9 @@
 			日付：[[${attendance.day}]]</p>
 		<p class="error" th:if="${error!=null}">[[${error}]]</p>
 		<form action="/changeAttendance" method="post">
-			<table class="change-attendance-table" th:object="${attendance}">
+			<!--出退勤を終えた後の変更について-->
+			<table class="change-attendance-table" th:object="${attendance}"
+				th:if="${attendance.finishTime!=null}">
 				<tr>
 					<th>内容</th>
 					<th>変更前</th>
@@ -56,14 +58,64 @@
 				<tr>
 					<th>出勤打刻時間</th>
 					<td>[[*{startEngrave}]]</td>
-					<td>変更不可<input type="hidden" th:value="*{startEngrave}"
-						name="startEngrave"></td>
+					<td>変更不可 <input type="hidden" name="startEngrave"
+						th:value="*{startEngrave}"></td>
 				</tr>
 				<tr>
 					<th>退勤打刻時間</th>
 					<td>[[*{finishEngrave}]]</td>
-					<td>変更不可<input type="hidden" th:value="*{finishEngrave}"
-						name="finishEngrave"></td>
+					<td>変更不可<input type="hidden" name="finishEngrave"
+						th:value="*{finishEngrave}"></td>
+				</tr>
+			</table>
+			<!--出勤のみの変更について-->
+			<table class="change-attendance-table" th:object="${attendance}"
+				th:if="${attendance.finishTime==null}">
+				<tr>
+					<td class="error" th:if="${attendance.finishTime==null}"
+						　colspan="3">退勤打刻前の勤怠情報です</td>
+				</tr>
+				<tr>
+					<th>内容</th>
+					<th>変更前</th>
+					<th>変更後</th>
+				</tr>
+				<tr>
+					<th>出勤時間</th>
+					<td>[[*{startTime}]]</td>
+					<td><input type="time" name="startTime"
+						th:value="*{startTime}"></td>
+				</tr>
+				<tr>
+					<th>出勤打刻時間</th>
+					<td>[[*{startEngrave}]]</td>
+					<td>変更不可 <input type="hidden" name="startEngrave"
+						th:value="*{startEngrave}"></td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td colspan="3">退勤打刻時間以外を追加できます</td>
+				</tr>
+				<tr>
+					<td colspan="3">退勤時間の入力がない場合は休憩、残業時間は登録されません</td>
+				</tr>
+
+				<tr>
+					<th>休憩時間</th>
+					<td></td>
+					<td><input type="time" name="breakTime" value="00:00:00"></td>
+				</tr>
+				<tr>
+					<th>退勤時間</th>
+					<td></td>
+					<td><input type="time" name="finishTime" value="00:00:00"></td>
+				</tr>
+				<tr>
+					<th>残業時間</th>
+					<td></td>
+					<td><input type="time" name="overTime" value="00:00:00"></td>
 				</tr>
 			</table>
 			<br>
