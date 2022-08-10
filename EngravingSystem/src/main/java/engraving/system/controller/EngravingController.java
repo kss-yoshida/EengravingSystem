@@ -436,8 +436,8 @@ public class EngravingController {
 			@RequestParam("employeeId") String id) {
 		try {
 			//セッション情報の確認
-			User user = (User) session.getAttribute("user");
-			if (user == null) {
+			User sessionUser = (User) session.getAttribute("user");
+			if (sessionUser == null) {
 				mav.addObject("error","セッションが切れました。再度ログインしてください。");
 				mav.setViewName("login");
 				return mav;
@@ -1872,8 +1872,8 @@ public class EngravingController {
 			@RequestParam(value = "month", defaultValue = "", required = false) String month, ModelAndView mav) {
 		try {
 			//セッション情報の確認
-			User user = (User) session.getAttribute("user");
-			if (user == null) {
+			User sessionUser = (User) session.getAttribute("user");
+			if (sessionUser == null) {
 				mav.addObject("error","セッションが切れました。再度ログインしてください。");
 				mav.setViewName("login");
 				return mav;
