@@ -1122,9 +1122,14 @@ public class EngravingController {
 					requestDay.setEmployeeId(request.getEmployeeId());
 					requestDay.setAttendanceId(request.getAttendanceId());
 					requestDay.setBeforeStartTime(attendance.getStartTime());
-					requestDay.setBeforeFinishTime(attendance.getFinishTime());
 					requestDay.setChangeStartTime(request.getChangeStartTime());
-					requestDay.setChangeFinishTime(request.getChangeFinishTime());
+					if (attendance.getFinishTime() == null) {
+						requestDay.setBeforeFinishTime("なし");
+						requestDay.setChangeFinishTime("なし");
+					} else {
+						requestDay.setBeforeFinishTime(attendance.getFinishTime());
+						requestDay.setChangeFinishTime(request.getChangeFinishTime());
+					}
 					requestDay.setComment(request.getComment());
 
 					requestDayList.add(requestDay);
