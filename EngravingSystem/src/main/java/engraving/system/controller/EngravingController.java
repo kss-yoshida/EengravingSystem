@@ -1217,45 +1217,47 @@ public class EngravingController {
 					changeList.add(change);
 				}
 
-				// 勤務時間・休憩時間・残業時間の設定
-				SimpleDateFormat timeFormat = new SimpleDateFormat("kk:mm:ss");
-				SimpleDateFormat time = new SimpleDateFormat("kk:mm");
-				try {
-					Date startTime = timeFormat.parse(requestDay.getChangeStartTime());
-					attendance.setStartTime(time.format(startTime));
-					Date finishTime = timeFormat.parse(requestDay.getChangeFinishTime());
-					attendance.setFinishTime(time.format(finishTime));
-				} catch (ParseException e) {
-				}
-
-				// 勤務時間（時間）の計算
-				int hour = Integer.parseInt(attendance.getFinishTime().substring(0, 2))
-						- Integer.parseInt(attendance.getStartTime().substring(0, 2));
-				// 勤務時間（分）の計算
-				int minute = Integer.parseInt(attendance.getFinishTime().substring(3, 5))
-						- Integer.parseInt(attendance.getStartTime().substring(3, 5));
-				if (minute < 0) {
-					minute = 60 + minute;
-					hour = hour - 1;
-				}
-				// 休憩時間・残業時間の計算と格納
-				if (hour < 9) {// 8時間未満の勤務の場合 
-					attendance.setBreakTime("01:00");
-					attendance.setOverTime("00:00");
-				} else {// ８時間以上の勤務の場合
-					if(hour == 9 && minute <= 15) {//勤務時間が9時間で時間が15分以内の場合
-						attendance.setBreakTime("01:" + minute);
+				if(!attendance.getFinishTime().equals("")) {
+					// 勤務時間・休憩時間・残業時間の設定
+					SimpleDateFormat timeFormat = new SimpleDateFormat("kk:mm:ss");
+					SimpleDateFormat time = new SimpleDateFormat("kk:mm");
+					try {
+						Date startTime = timeFormat.parse(requestDay.getChangeStartTime());
+						attendance.setStartTime(time.format(startTime));
+						Date finishTime = timeFormat.parse(requestDay.getChangeFinishTime());
+						attendance.setFinishTime(time.format(finishTime));
+					} catch (ParseException e) {
+					}
+	
+					// 勤務時間（時間）の計算
+					int hour = Integer.parseInt(attendance.getFinishTime().substring(0, 2))
+							- Integer.parseInt(attendance.getStartTime().substring(0, 2));
+					// 勤務時間（分）の計算
+					int minute = Integer.parseInt(attendance.getFinishTime().substring(3, 5))
+							- Integer.parseInt(attendance.getStartTime().substring(3, 5));
+					if (minute < 0) {
+						minute = 60 + minute;
+						hour = hour - 1;
+					}
+					// 休憩時間・残業時間の計算と格納
+					if (hour < 9) {// 8時間未満の勤務の場合 
+						attendance.setBreakTime("01:00");
 						attendance.setOverTime("00:00");
-					}else {
-						attendance.setBreakTime("01:15");
-						// 残業時間の計算
-						hour = hour - 9;
-						minute = minute - 15;
-						if (minute < 0) {
-							minute = 60 + minute;
-							hour = hour - 1;
+					} else {// ８時間以上の勤務の場合
+						if(hour == 9 && minute <= 15) {//勤務時間が9時間で時間が15分以内の場合
+							attendance.setBreakTime("01:" + minute);
+							attendance.setOverTime("00:00");
+						}else {
+							attendance.setBreakTime("01:15");
+							// 残業時間の計算
+							hour = hour - 9;
+							minute = minute - 15;
+							if (minute < 0) {
+								minute = 60 + minute;
+								hour = hour - 1;
+							}
+							attendance.setOverTime(hour + ":" + minute);
 						}
-						attendance.setOverTime(hour + ":" + minute);
 					}
 				}
 
