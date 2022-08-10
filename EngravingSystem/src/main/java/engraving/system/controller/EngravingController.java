@@ -607,18 +607,23 @@ public class EngravingController {
 					// 出勤時間
 					startTime = timeFormat.parse(attendance.getStartTime());
 					attendance.setStartTime(time.format(startTime));
+					//退勤打刻時間
 					if (attendance.getFinishEngrave() != null) {
-						// 退勤打刻時間
 						finishEngrave = timeFormat.parse(attendance.getFinishEngrave());
 						attendance.setFinishEngrave(time.format(finishEngrave));
-
-						// 退勤時間
+					}
+					// 退勤時間
+					if(attendance.getFinishTime() != null) {
 						finishTime = timeFormat.parse(attendance.getFinishTime());
 						attendance.setFinishTime(time.format(finishTime));
-						// 休憩時間
+					}
+					// 休憩時間
+					if(attendance.getBreakTime() != null) {
 						breakTime = timeFormat.parse(attendance.getBreakTime());
 						attendance.setBreakTime(timer.format(breakTime));
-						// 残業時間
+					}
+					// 残業時間
+					if(attendance.getOverTime() != null) {
 						overTime = timeFormat.parse(attendance.getOverTime());
 						attendance.setOverTime(timer.format(overTime));
 					}
@@ -801,17 +806,23 @@ public class EngravingController {
 					// 出勤時間
 					startTime = timeFormat.parse(attendance.getStartTime());
 					attendance.setStartTime(time.format(startTime));
+					//退勤打刻時間
 					if (attendance.getFinishEngrave() != null) {
-						// 退勤打刻時間
 						finishEngrave = timeFormat.parse(attendance.getFinishEngrave());
 						attendance.setFinishEngrave(time.format(finishEngrave));
-						// 退勤時間
+					}
+					// 退勤時間
+					if(attendance.getFinishTime() != null) {
 						finishTime = timeFormat.parse(attendance.getFinishTime());
 						attendance.setFinishTime(time.format(finishTime));
-						// 休憩時間
+					}
+					// 休憩時間
+					if(attendance.getBreakTime() != null) {
 						breakTime = timeFormat.parse(attendance.getBreakTime());
 						attendance.setBreakTime(timer.format(breakTime));
-						// 残業時間
+					}
+					// 残業時間
+					if(attendance.getOverTime() != null) {
 						overTime = timeFormat.parse(attendance.getOverTime());
 						attendance.setOverTime(timer.format(overTime));
 					}
