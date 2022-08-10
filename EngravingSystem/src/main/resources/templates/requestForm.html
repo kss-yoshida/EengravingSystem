@@ -24,6 +24,9 @@
 		<p>日付：[[${attendance.day}]]</p>
 		<form action="/requestForm" method="post">
 			<table class="change-form-table" th:object="${attendance}">
+				<tr th:if="*{finishTime==null}">
+					<td class="error" colspan="3">退勤打刻前のリクエストになります</td>
+				</tr>
 				<tr>
 					<th>内容</th>
 					<th>変更前</th>
@@ -35,7 +38,7 @@
 					<td><input type="time" name="changeStartTime"
 						th:value="*{startTime}"></td>
 				</tr>
-				<tr>
+				<tr th:if="*{finishTime!=null}">
 					<th>退勤時間</th>
 					<td>[[*{finishTime}]]</td>
 					<td><input type="time" name="changeFinishTime"
