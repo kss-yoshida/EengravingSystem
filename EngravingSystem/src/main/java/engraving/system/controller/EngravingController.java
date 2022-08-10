@@ -864,6 +864,7 @@ public class EngravingController {
 	public ModelAndView employeeRegistrationPost(
 			@RequestParam(value = "name", defaultValue = "", required = false) String name,
 			@RequestParam(value = "employeeId", defaultValue = "", required = false) String employeeId,
+			@RequestParam(value = "oldEmployeeId", defaultValue = "", required = false) String oldEmployeeId,
 			@RequestParam(value = "password", defaultValue = "", required = false) String password,
 			@RequestParam(value = "email", defaultValue = "", required = false) String email, MultipartFile photo,
 			@RequestParam(value = "authority", defaultValue = "", required = false) String authority,
@@ -872,7 +873,14 @@ public class EngravingController {
 			// メッセージを格納する変数
 			String message = "";
 
-			User user = new User();
+			// ユーザー情報の受け取り
+			User user = (User) session.getAttribute("user");
+			if (user == null) {
+				String error = "セッションが切れました。再度ログインしてください。";
+				mav.addObject("error", error);
+				mav.setViewName("login");
+				return mav;
+			}
 
 //		入力データの確認
 			if (name.equals("") || password.equals("") || employeeId.equals("") || email.equals("")) {
@@ -884,6 +892,17 @@ public class EngravingController {
 				mav.addObject("error", "パスワードは最低でも８桁設定してください");
 				mav.setViewName("employeeRegistration");
 				return mav;
+			}
+			User check = userinfo.findByEmployeeId(employeeId);
+			if (check != null) {
+				if (!check.getEmployeeId().equals(user.getEmployeeId())) {
+					if (check.getIsDeleted() == false) {
+						mav.addObject("error", "社員番号が重複しています。");
+						mav.addObject("user", user);
+						mav.setViewName("employeeRegistration");
+						return mav;
+					}
+				}
 			}
 
 //		写真の取り込み処理
@@ -950,7 +969,6 @@ public class EngravingController {
 			return mav;
 		}
 	}
-
 	/*
 	 * 勤怠情報変更
 	 */
@@ -1310,7 +1328,9 @@ public class EngravingController {
 	// 変更履歴を登録する
 	@RequestMapping("/changeInsert")
 	public ModelAndView changeinsert(RedirectAttributes redirectAttributes, @ModelAttribute("map1") ModelMap map1,
-			@ModelAttribute("message") String message, @ModelAttribute("move") String move, ModelAndView mav) {
+			@ModelAttribute("message") String message, @ModelAttribute("move") String move,
+			@RequestParam(value = "cmd", defaultValue = "") String cmd,
+			@RequestParam(value = "oldEmployeeId", defaultValue = "") String oldEmployeeId, ModelAndView mav) {
 		try {
 			ArrayList<Change> changeList = (ArrayList<Change>) map1.get("changeList");
 			changeinfo.saveAndFlush(changeList.get(0));
@@ -1321,9 +1341,14 @@ public class EngravingController {
 			redirectAttributes.addFlashAttribute("map1", modelMap);
 			redirectAttributes.addFlashAttribute("move", move);
 			redirectAttributes.addFlashAttribute("message", message);
+			if (cmd.equals("change")) {
+				mav.addObject("cmd", cmd);
+				mav.addObject("oldEmployeeId", oldEmployeeId);
+			}
 
 			if (changeList.size() == 0) {
 				mav.addObject("message", message);
+				mav.addObject("employeeId", oldEmployeeId);
 				mav.setViewName(move);
 				return mav;
 			} else {
@@ -1369,7 +1394,7 @@ public class EngravingController {
 	public ModelAndView changeEmployeeInfoPost(
 			@RequestParam(value = "name", defaultValue = "", required = false) String name,
 			@RequestParam(value = "employeeId", defaultValue = "", required = false) String employeeId,
-			@RequestParam(value = "employeeId", defaultValue = "", required = false) String oldEmployeeId,
+			@RequestParam(value = "oldEmployeeId", defaultValue = "", required = false) String oldEmployeeId,
 			@RequestParam(value = "password", defaultValue = "", required = false) String password,
 			@RequestParam(value = "email", defaultValue = "", required = false) String email, MultipartFile photo,
 			@RequestParam(value = "authority", defaultValue = "", required = false) String authority,
@@ -1388,17 +1413,24 @@ public class EngravingController {
 				mav.setViewName("changeEmployeeInfo");
 				return mav;
 			}
-			User check = userinfo.findByEmployeeId(employeeId);
-			if (!check.getEmployeeId().equals(before.getEmployeeId())) {
-				mav.addObject("error", "社員番号が重複しています。");
+
+			if (password.length() < 8) {
+				mav.addObject("error", "パスワードは最低でも８桁設定してください");
 				mav.addObject("user", before);
 				mav.setViewName("changeEmployeeInfo");
 				return mav;
 			}
-			if (password.length() < 8) {
-				mav.addObject("error", "パスワードは最低でも８桁設定してください");
-				mav.setViewName("employeeRegistration");
-				return mav;
+
+			User check = userinfo.findByEmployeeId(employeeId);
+			if (check != null) {
+				if (!check.getEmployeeId().equals(before.getEmployeeId())) {
+					if (check.getIsDeleted() == false) {
+						mav.addObject("error", "社員番号が重複しています。");
+						mav.addObject("user", before);
+						mav.setViewName("changeEmployeeInfo");
+						return mav;
+					}
+				}
 			}
 
 			if (!(photo.getOriginalFilename().equals(""))) {
@@ -1453,6 +1485,7 @@ public class EngravingController {
 			Date date = new Date();
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
 			String time = sdf.format(date);
+			String cmd = "";
 //		社員番号
 			if (!before.getEmployeeId().equals(user.getEmployeeId())) {
 				Change change = new Change();
@@ -1463,6 +1496,9 @@ public class EngravingController {
 				change.setBeforeData(before.getEmployeeId());
 				change.setAfterData(user.getEmployeeId());
 				list.add(change);
+				cmd = "change";
+				mav.addObject("cmd", cmd);
+				mav.addObject("oldEmployeeId", before.getEmployeeId());
 			}
 //		社員名
 			if (!before.getName().equals(user.getName())) {
@@ -1498,15 +1534,19 @@ public class EngravingController {
 				list.add(change);
 			}
 //		写真
-			if (!(photo == null) && !before.getPhoto().equals(user.getPhoto())) {
-				Change change = new Change();
-				change.setAdminId(employeeId);
-				change.setIsUpdated(time);
-				change.setEmployeeId(before.getEmployeeId());
-				change.setDataName("写真");
-				change.setBeforeData(before.getPhoto());
-				change.setAfterData(user.getPhoto());
-				list.add(change);
+			if (!(photo.getOriginalFilename().equals(""))) {
+				if (before.getPhoto() != null) {
+					if (!before.getPhoto().equals(user.getPhoto())) {
+						Change change = new Change();
+						change.setAdminId(employeeId);
+						change.setIsUpdated(time);
+						change.setEmployeeId(before.getEmployeeId());
+						change.setDataName("写真");
+						change.setBeforeData(before.getPhoto());
+						change.setAfterData(user.getPhoto());
+						list.add(change);
+					}
+				}
 			}
 //		権限
 			if (!before.getAuthority().equals(user.getAuthority())) {
@@ -1528,15 +1568,18 @@ public class EngravingController {
 //		入力データをDBに保存
 			userinfo.saveAndFlush(user);
 
-			message = "社員情報を変更しました";
+			message = "社員情報を変更しました。";
 
 //		変更情報をMapに登録
 			ModelMap md = new ModelMap();
 			md.addAttribute("changeList", list);
 			redirectAttributes.addFlashAttribute("map1", md);
 			redirectAttributes.addFlashAttribute("message", message);
-			redirectAttributes.addFlashAttribute("move", "redirect:/employeeList");
-
+			if (!cmd.equals("change")) {
+				redirectAttributes.addFlashAttribute("move", "redirect:/employeeList");
+			} else {
+				redirectAttributes.addFlashAttribute("move", "redirect:/deleteEmployee");
+			}
 			mav.setViewName("redirect:/changeInsert");
 			return mav;
 		} catch (Exception e) {
@@ -1547,8 +1590,9 @@ public class EngravingController {
 	}
 
 	/* 社員削除機能 */
-	@RequestMapping(value = "/deleteEmployee", method = RequestMethod.POST)
-	public ModelAndView deleteEmployee(@RequestParam("employeeId") String id, ModelAndView mav) {
+	@RequestMapping("/deleteEmployee")
+	public ModelAndView deleteEmployee(@RequestParam("employeeId") String id,
+			@RequestParam(value = "cmd", defaultValue = "") String cmd, ModelAndView mav) {
 		try {
 			User user = userinfo.findByEmployeeId(id);
 			if (user == null || user.getIsDeleted()) {
@@ -1557,8 +1601,12 @@ public class EngravingController {
 				return mav;
 			}
 			// メッセージを格納する変数
-			String message = "社員を削除しました";
-
+			String message;
+			if (cmd.equals("")) {
+				message = "社員を削除しました";
+			} else {
+				message = "社員情報を更新しました。";
+			}
 			user.setIsDeleted(true);
 			userinfo.saveAndFlush(user);
 			mav.addObject("message", message);
