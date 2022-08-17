@@ -1113,7 +1113,7 @@ public class EngravingController {
 //		出勤時間
 			if (!before.getStartTime().equals(after.getStartTime())) {
 				Change change = new Change();
-				change.setAdminId(employeeId);
+				change.setAdminId(user.getEmployeeId());
 				change.setIsUpdated(time);
 				change.setEmployeeId(before.getEmployeeId());
 				change.setDataName(before.getDay() + "の出勤時間");
@@ -1126,7 +1126,7 @@ public class EngravingController {
 //			退勤時間
 				if (!before.getFinishTime().equals(after.getFinishTime())) {
 					Change change = new Change();
-					change.setAdminId(employeeId);
+					change.setAdminId(user.getEmployeeId());
 					change.setIsUpdated(time);
 					change.setEmployeeId(before.getEmployeeId());
 					change.setDataName(before.getDay() + "の退勤時間");
@@ -1141,7 +1141,7 @@ public class EngravingController {
 //			休憩時間
 				if (!before.getBreakTime().equals(after.getBreakTime())) {
 					Change change = new Change();
-					change.setAdminId(employeeId);
+					change.setAdminId(user.getEmployeeId());
 					change.setIsUpdated(time);
 					change.setEmployeeId(before.getEmployeeId());
 					change.setDataName(before.getDay() + "の休憩時間");
@@ -1156,7 +1156,7 @@ public class EngravingController {
 //			残業時間
 				if (!before.getOverTime().equals(after.getOverTime())) {
 					Change change = new Change();
-					change.setAdminId(employeeId);
+					change.setAdminId(user.getEmployeeId());
 					change.setIsUpdated(time);
 					change.setEmployeeId(before.getEmployeeId());
 					change.setDataName(before.getDay() + "の残業時間");
