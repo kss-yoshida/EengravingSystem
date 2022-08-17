@@ -2167,19 +2167,6 @@ public class EngravingController {
 		return mav;
 	}
 
-	@RequestMapping("/changeEmployeeInfo")
-	public ModelAndView changeEmployeeInfo(ModelAndView mav) {
-		//セッション情報の確認
-			User sessionUser = (User) session.getAttribute("user");
-			if (sessionUser == null) {
-				mav.addObject("error","セッションが切れました。再度ログインしてください。");
-				mav.setViewName("login");
-				return mav;
-			}
-		mav.setViewName("changeEmployeeInfo");
-		return mav;
-	}
-
 	@RequestMapping("/changeAttendanceinfo")
 	public ModelAndView changeAttendanceinfo(@RequestParam("employeeId") String employeeId,
 			@RequestParam("attendanceId") String attendanceId, ModelAndView mav) {
