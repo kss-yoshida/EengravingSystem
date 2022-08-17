@@ -1073,6 +1073,7 @@ public class EngravingController {
 			after.setStartTime(startTime);
 			after.setStartEngrave(startEngrave);
 			if (!finishTime.equals("00:00:00")) {
+				after.setFinishEngrave(finishEngrave);
 				after.setFinishTime(finishTime);
 				after.setOverTime(overTime);
 				after.setBreakTime(breakTime);
@@ -2169,12 +2170,13 @@ public class EngravingController {
 
 	@RequestMapping("/changeAttendanceinfo")
 	public ModelAndView changeAttendanceinfo(@RequestParam("employeeId") String employeeId,
-			@RequestParam("attendanceId") String attendanceId, ModelAndView mav) {
+			@RequestParam("attendanceId") String attendanceId,
+			@RequestParam(value = "error", defaultValue = "") String error, ModelAndView mav) {
 		try {
-			//セッション情報の確認
+			// セッション情報の確認
 			User sessionUser = (User) session.getAttribute("user");
 			if (sessionUser == null) {
-				mav.addObject("error","セッションが切れました。再度ログインしてください。");
+				mav.addObject("error", "セッションが切れました。再度ログインしてください。");
 				mav.setViewName("login");
 				return mav;
 			}
@@ -2182,6 +2184,9 @@ public class EngravingController {
 			Attendance attendance = attendanceinfo.findByAttendanceId(Integer.parseInt(attendanceId));
 			mav.addObject(user);
 			mav.addObject(attendance);
+			if (!error.equals("")) {
+				mav.addObject("error", error);
+			}
 			mav.setViewName("changeAttendance");
 			return mav;
 		} catch (Exception e) {
