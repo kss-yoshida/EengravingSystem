@@ -483,7 +483,7 @@ public class EngravingController {
 		return mav;
 	}
 
-	/*
+		/*
 	 * 勤怠情報確認機能
 	 */
 	@RequestMapping(value = "/attendanceRecord")
@@ -494,70 +494,70 @@ public class EngravingController {
 		try {
 			// メッセージを格納する変数
 			String message = "";
-			//エラーメッセージを格納する変数
+			// エラーメッセージを格納する変数
 			String error = "";
-			
-			//セッション情報の確認
+
+			// セッション情報の確認
 			User user = (User) session.getAttribute("user");
 			if (user == null) {
-				mav.addObject("error","セッションが切れました。再度ログインしてください。");
+				mav.addObject("error", "セッションが切れました。再度ログインしてください。");
 				mav.setViewName("login");
 				return mav;
 			}
-			
+
 			String employeeId = user.getEmployeeId();
-			String authority = user.getAuthority();	
+			String authority = user.getAuthority();
 
 //			検索時の入力内容の確認
 			int check = 0;
-				if (!year.equals("") || !month.equals("")) {
-					try {
+			if (!year.equals("") || !month.equals("")) {
+				try {
 //						年の文字入力をしていないかチェック
-						if (!year.equals("")) {
-							check = Integer.parseInt(year);
-							check = 0;
+					if (!year.equals("")) {
+						check = Integer.parseInt(year);
+						check = 0;
 //							年の桁数チェック
-							if (year.length() != 0 && year.length() != 4) {
-								check += 1;
-							}
-						}
-//					月の範囲と文字入力のチェック
-						if (!month.equals("")) {
-							if (Integer.parseInt(month) > 12 || Integer.parseInt(month) < 1) {
-								check += 2;
-							}
-						}
-//				検索にエラーがあったらエラー文を分ける分岐
-						switch (check) {
-						case 0:
-							break;
-						case 1:
-							error = "年は４桁で入力してください";
-							break;
-						case 2:
-							error = "月は１～１２月の間で入力してください";
-							break;
-						case 3:
-							error = "年は４桁で、月は１～１２月の間で入力してください";
-							break;
-						}
-					} catch (NumberFormatException e) {
-						error = "検索の年月は半角数字でお願いします";
-					} finally {
-//						検索の入力内容にエラーがあった場合
-						if (!error.equals("")) {
-							mav.addObject("error", error);
-							mav.addObject("message", message);
-							// 管理者が見る場合
-							if (authority.equals("0")) {
-								mav.addObject("employeeId", user.getEmployeeId());
-							}
-							mav.addObject("authority", authority);
-							mav.setViewName("attendanceRecord");
-							return mav;
+						if (year.length() != 0 && year.length() != 4) {
+							check += 1;
 						}
 					}
+//					月の範囲と文字入力のチェック
+					if (!month.equals("")) {
+						if (Integer.parseInt(month) > 12 || Integer.parseInt(month) < 1) {
+							check += 2;
+						}
+					}
+//				検索にエラーがあったらエラー文を分ける分岐
+					switch (check) {
+					case 0:
+						break;
+					case 1:
+						error = "年は４桁で入力してください";
+						break;
+					case 2:
+						error = "月は１～１２月の間で入力してください";
+						break;
+					case 3:
+						error = "年は４桁で、月は１～１２月の間で入力してください";
+						break;
+					}
+				} catch (NumberFormatException e) {
+					error = "検索の年月は半角数字でお願いします";
+				} finally {
+//						検索の入力内容にエラーがあった場合
+					if (!error.equals("")) {
+						mav.addObject("error", error);
+						mav.addObject("message", message);
+						// 管理者が見る場合
+						if (authority.equals("0")) {
+							mav.addObject("employeeId", user.getEmployeeId());
+						}
+						mav.addObject("authority", authority);
+						mav.setViewName("attendanceRecord");
+						return mav;
+					}
 				}
+			}
 
 			// 月が1桁で入力された場合の処理
 			if (month.length() == 1 && month != "") {
@@ -599,6 +599,10 @@ public class EngravingController {
 			// ユーザーの勤怠情報の受け取り
 			ArrayList<Attendance> attendanceList = attendanceinfo.findByEmployeeIdAndDayLike(employeeId, day);
 
+			// 検索結果があるかどうかの確認
+			if (attendanceList.size() == 0) {
+				error = "検索結果が存在しません。";
+			}
 			// 形の変換のためのフォーマット
 			SimpleDateFormat time = new SimpleDateFormat("HH時mm分");
 			SimpleDateFormat timer = new SimpleDateFormat("HH時間mm分");
@@ -624,23 +628,23 @@ public class EngravingController {
 					// 出勤時間
 					startTime = timeFormat.parse(attendance.getStartTime());
 					attendance.setStartTime(time.format(startTime));
-					//退勤打刻時間
+					// 退勤打刻時間
 					if (attendance.getFinishEngrave() != null) {
 						finishEngrave = timeFormat.parse(attendance.getFinishEngrave());
 						attendance.setFinishEngrave(time.format(finishEngrave));
 					}
 					// 退勤時間
-					if(attendance.getFinishTime() != null) {
+					if (attendance.getFinishTime() != null) {
 						finishTime = timeFormat.parse(attendance.getFinishTime());
 						attendance.setFinishTime(time.format(finishTime));
 					}
 					// 休憩時間
-					if(attendance.getBreakTime() != null) {
+					if (attendance.getBreakTime() != null) {
 						breakTime = timeFormat.parse(attendance.getBreakTime());
 						attendance.setBreakTime(timer.format(breakTime));
 					}
 					// 残業時間
-					if(attendance.getOverTime() != null) {
+					if (attendance.getOverTime() != null) {
 						overTime = timeFormat.parse(attendance.getOverTime());
 						attendance.setOverTime(timer.format(overTime));
 					}
@@ -659,6 +663,10 @@ public class EngravingController {
 			if (!message.equals("")) {
 				mav.addObject("message", message);
 			}
+			if (!error.equals("")) {
+				mav.addObject("error", error);
+			}
+
 			mav.addObject("authority", authority);
 
 			// 管理者が見る場合
@@ -687,17 +695,17 @@ public class EngravingController {
 			@RequestParam(value = "employeeId", defaultValue = "", required = false) String id,
 			@RequestParam(value = "message", defaultValue = "", required = false) String forMessage, ModelAndView mav) {
 		try {
-			//セッション情報の確認
+			// セッション情報の確認
 			User user = (User) session.getAttribute("user");
 			if (user == null) {
-				mav.addObject("error","セッションが切れました。再度ログインしてください。");
+				mav.addObject("error", "セッションが切れました。再度ログインしてください。");
 				mav.setViewName("login");
 				return mav;
 			}
 			// メッセージを格納する変数
 			String message = "";
 			String error = "";
-			
+
 			String authority = user.getAuthority();
 
 			// 月が1桁で入力された場合の処理
@@ -707,54 +715,54 @@ public class EngravingController {
 
 //			検索時の入力内容の確認
 			int check = 0;
-				if (!year.equals("") || !month.equals("")) {
-					try {
+			if (!year.equals("") || !month.equals("")) {
+				try {
 //						年の文字入力をしていないかチェック
-						if (!year.equals("")) {
-							check = Integer.parseInt(year);
-							check = 0;
+					if (!year.equals("")) {
+						check = Integer.parseInt(year);
+						check = 0;
 //							年の桁数チェック
-							if (year.length() != 0 && year.length() != 4) {
-								check += 1;
-							}
-						}
-//					月の範囲と文字入力のチェック
-						if (!month.equals("")) {
-							if (Integer.parseInt(month) > 12 || Integer.parseInt(month) < 1) {
-								check += 2;
-							}
-						}
-//				検索にエラーがあったらエラー文を分ける分岐
-						switch (check) {
-						case 0:
-							break;
-						case 1:
-							error = "年は４桁で入力してください";
-							break;
-						case 2:
-							error = "月は１～１２月の間で入力してください";
-							break;
-						case 3:
-							error = "年は４桁で、月は１～１２月の間で入力してください";
-							break;
-						}
-					} catch (NumberFormatException e) {
-						error = "検索の年月は半角数字でお願いします";
-					} finally {
-//						検索の入力内容にエラーがあった場合
-						if (!error.equals("")) {
-							mav.addObject("error", error);
-							mav.addObject("message", message);
-							// 管理者が見る場合
-							if (authority.equals("0")) {
-								mav.addObject("employeeId", user.getEmployeeId());
-							}
-							mav.addObject("authority", authority);
-							mav.setViewName("attendanceRecord");
-							return mav;
+						if (year.length() != 0 && year.length() != 4) {
+							check += 1;
 						}
 					}
+//					月の範囲と文字入力のチェック
+					if (!month.equals("")) {
+						if (Integer.parseInt(month) > 12 || Integer.parseInt(month) < 1) {
+							check += 2;
+						}
+					}
+//				検索にエラーがあったらエラー文を分ける分岐
+					switch (check) {
+					case 0:
+						break;
+					case 1:
+						error = "年は４桁で入力してください";
+						break;
+					case 2:
+						error = "月は１～１２月の間で入力してください";
+						break;
+					case 3:
+						error = "年は４桁で、月は１～１２月の間で入力してください";
+						break;
+					}
+				} catch (NumberFormatException e) {
+					error = "検索の年月は半角数字でお願いします";
+				} finally {
+//						検索の入力内容にエラーがあった場合
+					if (!error.equals("")) {
+						mav.addObject("error", error);
+						mav.addObject("message", message);
+						// 管理者が見る場合
+						if (authority.equals("0")) {
+							mav.addObject("employeeId", user.getEmployeeId());
+						}
+						mav.addObject("authority", authority);
+						mav.setViewName("attendanceRecord");
+						return mav;
+					}
 				}
+			}
 
 			// 検索する日付を格納する変数
 			String day;
@@ -791,6 +799,10 @@ public class EngravingController {
 			// ユーザーの勤怠情報の受け取り
 			ArrayList<Attendance> attendanceList = attendanceinfo.findByEmployeeIdAndDayLike(id, day);
 
+			// 検索結果があるかどうかの確認
+			if (attendanceList.size() == 0) {
+				error = "検索結果が存在しません。";
+			}
 			String strFormat = ("dd日");
 			if (!year.equals("") && month.equals("")) {
 				strFormat = "MM月dd日";
@@ -821,23 +833,23 @@ public class EngravingController {
 					// 出勤時間
 					startTime = timeFormat.parse(attendance.getStartTime());
 					attendance.setStartTime(time.format(startTime));
-					//退勤打刻時間
+					// 退勤打刻時間
 					if (attendance.getFinishEngrave() != null) {
 						finishEngrave = timeFormat.parse(attendance.getFinishEngrave());
 						attendance.setFinishEngrave(time.format(finishEngrave));
 					}
 					// 退勤時間
-					if(attendance.getFinishTime() != null) {
+					if (attendance.getFinishTime() != null) {
 						finishTime = timeFormat.parse(attendance.getFinishTime());
 						attendance.setFinishTime(time.format(finishTime));
 					}
 					// 休憩時間
-					if(attendance.getBreakTime() != null) {
+					if (attendance.getBreakTime() != null) {
 						breakTime = timeFormat.parse(attendance.getBreakTime());
 						attendance.setBreakTime(timer.format(breakTime));
 					}
 					// 残業時間
-					if(attendance.getOverTime() != null) {
+					if (attendance.getOverTime() != null) {
 						overTime = timeFormat.parse(attendance.getOverTime());
 						attendance.setOverTime(timer.format(overTime));
 					}
@@ -857,6 +869,9 @@ public class EngravingController {
 			mav.addObject("employeeId", id);
 			if (!message.equals("")) {
 				mav.addObject("message", message);
+			}
+			if (!error.equals("")) {
+				mav.addObject("error", error);
 			}
 
 			// 遷移先の指定
