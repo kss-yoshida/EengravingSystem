@@ -1004,7 +1004,7 @@ public class EngravingController {
 //			//セッション情報の確認
 			User user = (User) session.getAttribute("user");
 			if (user == null) {
-				mav.addObject("error","セッションが切れました。再度ログインしてください。");
+				mav.addObject("error", "セッションが切れました。再度ログインしてください。");
 				mav.setViewName("login");
 				return mav;
 			}
@@ -1175,10 +1175,13 @@ public class EngravingController {
 //		遷移先コントローラーの選択
 			String cmd;
 			if (user.getEmployeeId().equals(employeeId)) {
+				// 管理者が自身の勤怠情報を変更したとき
 				cmd = "redirect:/attendanceRecord";
 			} else {
-//			get送信
+				// 管理者が他社員の勤怠情報を変更したとき
+				mav.addObject("employeeId", after.getEmployeeId());
 				cmd = "redirect:/adminAttendanceRecord";
+				mav.addObject("employeeId", employeeId);
 			}
 
 			message = "勤怠情報を変更しました";
@@ -1430,7 +1433,8 @@ public class EngravingController {
 	public ModelAndView changeinsert(RedirectAttributes redirectAttributes, @ModelAttribute("map1") ModelMap map1,
 			@ModelAttribute("message") String message, @ModelAttribute("move") String move,
 			@RequestParam(value = "cmd", defaultValue = "") String cmd,
-			@RequestParam(value = "oldEmployeeId", defaultValue = "") String oldEmployeeId, ModelAndView mav) {
+			@RequestParam(value = "oldEmployeeId", defaultValue = "") String oldEmployeeId,
+			@RequestParam(value = "employeeId", defaultValue = "") String employeeId, ModelAndView mav) {
 		try {
 			ArrayList<Change> changeList = (ArrayList<Change>) map1.get("changeList");
 			changeinfo.saveAndFlush(changeList.get(0));
@@ -1447,8 +1451,13 @@ public class EngravingController {
 			}
 
 			if (changeList.size() == 0) {
+				// 管理者が勤怠情報変更を行い他社員の勤怠情報一覧に戻るとき
+				if (move.equals("redirect:/adminAttendanceRecord")) {
+					mav.addObject("employeeId", employeeId);
+				} else {
+					mav.addObject("employeeId", oldEmployeeId);
+				}
 				mav.addObject("message", message);
-				mav.addObject("employeeId", oldEmployeeId);
 				mav.setViewName(move);
 				return mav;
 			} else {
