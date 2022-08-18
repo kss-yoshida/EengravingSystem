@@ -51,6 +51,7 @@
 				<tr>
 					<th>写真</th>
 					<td th:if="${user.photo!=null}"><img th:src="${user.photo}"/></td>
+					<td th:if="${user.photo==null}"></td>
 					<td><input th:value="${user.getPhoto}" type="file" name="photo"></td>
 				</tr>
 				<tr>
