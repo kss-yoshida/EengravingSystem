@@ -603,12 +603,18 @@ public class EngravingController {
 			if (attendanceList.size() == 0) {
 				error = "検索結果が存在しません。";
 			}
+				
+			String strFormat = ("dd日");
+			if (!year.equals("") && month.equals("")) {
+				strFormat = "MM月dd日";
+			}
 			// 形の変換のためのフォーマット
 			SimpleDateFormat time = new SimpleDateFormat("HH時mm分");
 			SimpleDateFormat timer = new SimpleDateFormat("HH時間mm分");
-			SimpleDateFormat days = new SimpleDateFormat("dd日");
+			SimpleDateFormat days = new SimpleDateFormat(strFormat);
 			SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
 			SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd");
+
 
 			// 勤怠情報の形の変換
 
