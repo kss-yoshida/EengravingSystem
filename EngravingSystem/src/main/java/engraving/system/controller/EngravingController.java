@@ -1550,6 +1550,15 @@ public class EngravingController {
 				mav.setViewName("changeEmployeeInfo");
 				return mav;
 			}
+			
+			//情報が変更されていない場合
+			if (name.equals(before.getName()) && employeeId.equals(before.getEmployeeId()) &&
+					password.equals(before.getPassword()) && email.equals(before.getEmail()) && photo.getOriginalFilename().equals("")) {
+				mav.addObject("error", "情報を変更してください。");
+				mav.addObject("user", before);
+				mav.setViewName("changeEmployeeInfo");
+				return mav;
+			}
 
 			if (password.length() < 8) {
 				mav.addObject("error", "パスワードは最低でも８桁設定してください");
@@ -1612,7 +1621,7 @@ public class EngravingController {
 			user.setPassword(password);
 			user.setEmail(email);
 			user.setAuthority(authority);
-			if (!(photo.getOriginalFilename().equals(""))) {
+			if (!(photo.getOriginalFilename().equals("")) || before.getPhoto() != null) {
 				user.setPhoto(employeeId + ".jpg");
 			}
 
@@ -1673,16 +1682,23 @@ public class EngravingController {
 //		写真
 			if (!(photo.getOriginalFilename().equals(""))) {
 				if (before.getPhoto() != null) {
-					if (!before.getPhoto().equals(user.getPhoto())) {
-						Change change = new Change();
-						change.setAdminId(employeeId);
-						change.setIsUpdated(time);
-						change.setEmployeeId(before.getEmployeeId());
-						change.setDataName("写真");
-						change.setBeforeData(before.getPhoto());
-						change.setAfterData(user.getPhoto());
-						list.add(change);
-					}
+					Change change = new Change();
+					change.setAdminId(employeeId);
+					change.setIsUpdated(time);
+					change.setEmployeeId(before.getEmployeeId());
+					change.setDataName("写真の変更");
+					change.setBeforeData(before.getPhoto());
+					change.setAfterData(user.getPhoto());
+					list.add(change);
+				}else {
+					Change change = new Change();
+					change.setAdminId(employeeId);
+					change.setIsUpdated(time);
+					change.setEmployeeId(before.getEmployeeId());
+					change.setDataName("写真の追加");
+					change.setBeforeData("無し");
+					change.setAfterData(user.getPhoto());
+					list.add(change);
 				}
 			}
 //		権限
