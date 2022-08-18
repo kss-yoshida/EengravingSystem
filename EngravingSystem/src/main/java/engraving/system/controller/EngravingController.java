@@ -1482,6 +1482,7 @@ public class EngravingController {
 				mav.setViewName(move);
 				return mav;
 			} else {
+				mav.addObject("employeeId", employeeId);
 				mav.setViewName("redirect:/changeInsert");
 				return mav;
 			}
