@@ -72,8 +72,9 @@
 			<table class="change-attendance-table" th:object="${attendance}"
 				th:if="${attendance.finishTime==null}">
 				<tr>
-					<td class="error" th:if="${attendance.finishTime==null}"
-						　colspan="3">退勤打刻前の勤怠情報です</td>
+					<td class="error" th:if="${attendance.finishTime==null}" colspan="3">
+						退勤打刻前の勤怠情報です
+					</td>
 				</tr>
 				<tr>
 					<th>内容</th>
