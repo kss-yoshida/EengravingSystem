@@ -600,7 +600,7 @@ public class EngravingController {
 			ArrayList<Attendance> attendanceList = attendanceinfo.findByEmployeeIdAndDayLike(employeeId, day);
 
 			// 検索結果があるかどうかの確認
-			if (attendanceList.size() == 0) {
+			if (attendanceList.size() == 0 && !year.equals("") || !month.equals("")) {
 				error = "検索結果が存在しません。";
 			}
 				
@@ -806,7 +806,7 @@ public class EngravingController {
 			ArrayList<Attendance> attendanceList = attendanceinfo.findByEmployeeIdAndDayLike(id, day);
 
 			// 検索結果があるかどうかの確認
-			if (attendanceList.size() == 0) {
+			if (attendanceList.size() == 0 && !year.equals("") || !month.equals("")) {
 				error = "検索結果が存在しません。";
 			}
 			String strFormat = ("dd日");
