@@ -897,7 +897,7 @@ public class EngravingController {
 	 * 社員登録処理
 	 */
 	@RequestMapping(value = "/employeeRegistration", method = RequestMethod.POST)
-	public ModelAndView employeeRegistrationPost(
+	public ModelAndView employeeRegistration(
 			@RequestParam(value = "name", defaultValue = "", required = false) String name,
 			@RequestParam(value = "employeeId", defaultValue = "", required = false) String employeeId,
 			@RequestParam(value = "oldEmployeeId", defaultValue = "", required = false) String oldEmployeeId,
@@ -2202,8 +2202,8 @@ public class EngravingController {
 		}
 	}
 
-	@RequestMapping("/employeeRegistration")
-	public ModelAndView employeeRegistration(ModelAndView mav) {
+	@RequestMapping("/employeeRegistrationinfo")
+	public ModelAndView employeeRegistrationinfo(ModelAndView mav) {
 		//セッション情報の確認
 			User sessionUser = (User) session.getAttribute("user");
 			if (sessionUser == null) {
