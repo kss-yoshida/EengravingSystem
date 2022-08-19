@@ -1,4 +1,48 @@
-package engraving.system.controller;
+@RequestMapping("/employeeMenu")
+	public ModelAndView employeeMenu(ModelAndView mav,
+			@RequestParam(value = "message", defaultValue = "") String message) {
+		try {
+			// セッション情報の確認
+			User user = (User) session.getAttribute("user");
+			if (user == null) {
+				mav.addObject("error", "セッションが切れました。再度ログインしてください。");
+				mav.setViewName("login");
+				return mav;
+			}
+//		ログインした社員の勤怠情報の取得
+			Date date = new Date();
+			SimpleDateFormat day = new SimpleDateFormat("yyyyMMdd");
+			String employeeId = user.getEmployeeId();
+			ArrayList<Attendance> attendanceList = (ArrayList<Attendance>) attendanceinfo
+					.findByDayAndEmployeeId(day.format(date), employeeId);
+			Attendance attendance = new Attendance();
+			if (attendanceList.size() != 0) {
+//		ログイン日の出勤情報があった場合
+				attendance = attendanceList.get(0);
+				SimpleDateFormat time = new SimpleDateFormat("kk:mm");
+				Date startEngrave;
+				Date finishEngrave;
+				try {
+					if (attendance.getStartEngrave() != null) {
+						startEngrave = time.parse(attendance.getStartEngrave());
+						mav.addObject("startTime", time.format(startEngrave));
+					}
+					if (attendance.getFinishEngrave() != null) {
+						finishEngrave = time.parse(attendance.getFinishEngrave());
+						mav.addObject("finishTime", time.format(finishEngrave));
+					}
+				} catch (ParseException e) {
+				}
+			}
+			mav.setViewName("employeeMenu");
+			mav.addObject("message", message);
+			return mav;
+		} catch (Exception e) {
+			mav.setViewName("redirect:/logout");
+			mav.addObject("error", "DB接続エラーです。DBを確認してください。");
+			return mav;
+		}
+	}package engraving.system.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -2116,12 +2160,13 @@ public class EngravingController {
 	}
 
 	@RequestMapping("/employeeMenu")
-	public ModelAndView employeeMenu(ModelAndView mav) {
+	public ModelAndView employeeMenu(ModelAndView mav,
+			@RequestParam(value = "message", defaultValue = "") String message) {
 		try {
-			//セッション情報の確認
+			// セッション情報の確認
 			User user = (User) session.getAttribute("user");
 			if (user == null) {
-				mav.addObject("error","セッションが切れました。再度ログインしてください。");
+				mav.addObject("error", "セッションが切れました。再度ログインしてください。");
 				mav.setViewName("login");
 				return mav;
 			}
@@ -2151,6 +2196,7 @@ public class EngravingController {
 				}
 			}
 			mav.setViewName("employeeMenu");
+			mav.addObject("message", message);
 			return mav;
 		} catch (Exception e) {
 			mav.setViewName("redirect:/logout");
