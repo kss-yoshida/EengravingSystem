@@ -1841,6 +1841,7 @@ public class EngravingController {
 
 //		DBに登録
 			requestinfo.saveAndFlush(request);
+			mav.addObject("message","変更リクエストを送信しました");
 			mav.setViewName("redirect:/employeeMenu");
 			return mav;
 		} catch (Exception e) {
