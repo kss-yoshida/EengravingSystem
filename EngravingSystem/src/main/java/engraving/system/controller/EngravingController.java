@@ -325,7 +325,8 @@ public class EngravingController {
 	 */
 	@RequestMapping("/employeeList")
 	public ModelAndView employeeList(
-			@RequestParam(value = "message", defaultValue = "", required = false) String message, ModelAndView mav) {
+			@RequestParam(value = "message", defaultValue = "", required = false) String message
+			,@RequestParam(value = "cmd", defaultValue = "", required = false) String cmd, ModelAndView mav) {
 		try {
 			//セッション情報の確認
 			User user = (User) session.getAttribute("user");
@@ -337,19 +338,34 @@ public class EngravingController {
 //		DBから社員リストを取得
 			ArrayList<User> userList = new ArrayList<User>();
 			userList = (ArrayList<User>) userinfo.findAll();
+			ArrayList<User> employeeList = new ArrayList<User>();
 //		リストが空でなければmavに登録
 			if (userList.size() != 0) {
 
-				// 写真を表示できる形に変換する処理
 				for (int i = 0; i < userList.size(); i++) {
-					User userPhoto = userList.get(i);
-					if (userPhoto.getPhoto() != null) {
-						userPhoto.setPhoto(photoView(userPhoto.getPhoto()));
-						userList.set(i, userPhoto);
+					User userDate = userList.get(i);
+					// 写真を表示できる形に変換する処理
+					if (userDate.getPhoto() != null) {
+						userDate.setPhoto(photoView(userDate.getPhoto()));
+						userList.set(i, userDate);
+					}
+					//削除していない情報を登録する
+					if(cmd.equals("")) {
+						if(userList.get(i).getIsDeleted() == false) {
+							employeeList.add(userDate);
+						}
+					}else {
+						if(userList.get(i).getIsDeleted() == true) {
+							employeeList.add(userDate);
+							message = "削除済みの社員を表示しています";
+							cmd = "delete";
+							mav.addObject("cmd",cmd);
+							mav.addObject("message", message);
+						}
 					}
 				}
 
-				mav.addObject("employeeList", userList);
+				mav.addObject("employeeList", employeeList);
 			}
 			// 変更履歴登録画面から来た場合の処理
 			if (!message.equals("")) {
@@ -1762,7 +1778,7 @@ public class EngravingController {
 				return mav;
 			}
 			User user = userinfo.findByEmployeeId(id);
-			if (user == null || user.getIsDeleted()) {
+			if (user == null ) {
 				mav.addObject("error", "削除しようとした社員はすでにDBに存在しません。");
 
 				return mav;
@@ -1772,9 +1788,13 @@ public class EngravingController {
 			if (cmd.equals("")) {
 				message = "社員を削除しました";
 			} else {
-				message = "社員情報を更新しました。";
+				message = "社員情報を復元しました。";
 			}
-			user.setIsDeleted(true);
+			if(user.getIsDeleted()==false) {
+				user.setIsDeleted(true);
+			}else {
+				user.setIsDeleted(false);
+			}
 			userinfo.saveAndFlush(user);
 			mav.addObject("message", message);
 			mav.setViewName("redirect:/employeeList");
