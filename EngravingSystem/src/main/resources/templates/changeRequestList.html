@@ -1,95 +1,60 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-<meta charset="UTF-8">
-<link rel="stylesheet" href="css/menu.css">
-<link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/adminMenu.css">
-<link rel="stylesheet" href="css/employeeList.css">
-<title>社員一覧</title>
-</head>
-<body>
-	<header>
-		<nav class="nav-admin">
-			<ul>
-				<li>打刻プログラム</li>
-				<li><a href="/adminMenu">HOME</a></li>
-				<li><a href="/logout">ログアウト</a></li>
-			</ul>
-		</nav>
-	</header>
-	<div class="container">
-		<h3>社員一覧</h3>
-		<br>
-		<p class="error" th:if="${error!=null}">[[${error}]]</p>
-		<p class="message" th:if="${message!=null}">[[${message}]]</p>
-		<div  class="engraving-flex">
-			<form th:if="${cmd==null}" action="/searchEmployee" method="post">
-				<input type="text" name="employeeId">社員番号 
-				<input type="text"name="name">名前 
-				<input type="submit" value="検索">
-			</form>
-			<form th:if="${cmd==null}" action="/employeeList" method="post">
-				<input type="submit" value="全検索">
-			</form>
-			<form th:if="${cmd!=null}" action="/employeeList" method="post">
-				<input type="submit" value="登録社員表示に戻る">
-			</form>
-			<form th:if="${cmd==null}" action="/employeeList" method="post">
-				<input type="hidden" value="delete" name="cmd">
-				<input type="submit" value="削除済み社員確認">
-			</form>
-		</div><br>
-		<table class="employee-list-table">
-			<tr>
-				<th id="employee-list-table">写真</th>
-				<th id="employee-list-num">社員番号</th>
-				<th id="employee-list-attendance">勤怠確認</th>
-				<th id="employee-list-table">氏名</th>
-				<th id="employee-list-table">管理者登録・削除</th>
-				<th id="employee-list-table">社員詳細・変更/削除</th>
-			</tr>
-			<th:block th:each="user : ${employeeList}">
+	<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" href="css/menu.css">
+		<link rel="stylesheet" href="css/style.css">
+		<link rel="stylesheet" href="css/adminMenu.css">
+		<link rel="stylesheet" href="css/changeRequestList.css">
+		<title>変更申請一覧</title>
+	</head>
+	<body>
+		<header>
+	        <nav class="nav-admin">
+	            <ul>
+	                <li>打刻プログラム</li>
+	                <li><a href="/adminMenu" th:text="HOME"></a></li>
+	                <li><a href="/logout">ログアウト</a></li>
+	            </ul>
+	        </nav>
+	    </header>
+		<div class="container">
+			<h3>変更申請一覧</h3><br>
+			<p class="error" th:if="${error!=null}">[[${error}]]</p>
+			<p class="message" th:if="${message!=null}">[[${message}]]</p>
+			<table class="change-request-table">
 				<tr>
-					<td id="employee-list-table"><img th:if="${user.photo!=null}"  th:src="${user.photo}"/></td>
-					<td id="employee-list-num">
-							[[*{user.employeeId}]]
-					</td>
-					<td id="employee-list-attendance">
-						<form action="/adminAttendanceRecord" method="post">
-							<input type="hidden" name="employeeId" th:value="*{user.employeeId}">
-							<input type="submit" value="勤怠確認">
-						</form>
-					</td>
-					<td id="employee-list-table" th:text="*{user.name}"></td>
-					<td id="employee-list-table">
-						<form action="/changeAuthority" th:switch="*{user.authority}">
-							<input type="hidden" name="employeeId" th:value="*{user.employeeId}"> 
-							<input type="hidden" name="authority" value="1" th:if="*{user.authority == '1'}">
-							<input type="submit" value="登録" th:case="1"> 
-							<input type="hidden" name="authority" value="0" th:if="*{user.authority == '0'}"> 
-							<input type="submit" value="削除" th:case="0">
-						</form>
-					</td>
-					<td id="employee-list-table">
+					<th id="change-request-normal">日時</th>
+					<th id="change-request-normal">変更対象者番号</th>
+					<th id="change-request-normal">出勤時間<br>
+					(変更前/変更後)</th>
+					<th id="change-request-normal">退勤時間<br>
+					(変更前/変更後)</th>
+					<th id="change-request-other">コメント</th>
+					<th id="change-request">認/否</th>
+				</tr>
+				<tr th:each="requestDayList:${requestDayList}" th:object="${requestDayList}">
+					<td id="change-request-normal" th:text="*{day}"></td>
+					<td id="change-request-normal" th:text="*{employeeId}"></td>
+					<td id="change-request-normal" th:text="|*{beforeStartTime}/*{changeStartTime}|"></td>
+					<td id="change-request-normal" th:text="|*{beforeFinishTime}/*{changeFinishTime}|"></td>
+					<td id="change-request-other-td" th:text="*{comment}"></td>
+					<td id="change-request">
 						<div class="engraving-flex">
-							<form action="/changeEmployee" method="post">
-								<input type="hidden" name="employeeId" th:value="*{user.employeeId}"> <input type="submit" value="詳細・変更">
+							<form action="changeRequest" method="post">
+								<input type="hidden" name="requestId" th:value="*{requestId}">
+								<input type="hidden" name = "cmd" value="input">
+								<input type="submit" value="認">
 							</form>
-							<form th:if="*{user.isDeleted==false}" action="/deleteEmployee" method="post">
-								<input type="hidden"name="employeeId"th:value="*{user.employeeId}">
-								<input type="submit" value="削除">
-							</form>
-							<form th:if="*{user.isDeleted==true}" action="/deleteEmployee" method="post">
-								<input type="hidden" name="cmd" value="re">
-								<input type="hidden"name="employeeId"th:value="*{user.employeeId}">
-								<input type="submit" value="復元">
+							<form action="changeRequest" method="post">
+								<input type="hidden" name="requestId" th:value="*{requestId}">
+								<input type="hidden" name = "cmd" value="delete">
+								<input type="submit" value="否">
 							</form>
 						</div>
 					</td>
 				</tr>
-			</th:block>
-		</table>
-	</div>
-</body>
+			</table>
+		</div>
+	</body>
 </html>
