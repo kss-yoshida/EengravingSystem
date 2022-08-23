@@ -1658,7 +1658,7 @@ public class EngravingController {
 //		社員番号
 			if (!before.getEmployeeId().equals(user.getEmployeeId())) {
 				Change change = new Change();
-				change.setAdminId(employeeId);
+				change.setAdminId(sessionUser.getEmployeeId());
 				change.setIsUpdated(time);
 				change.setEmployeeId(before.getEmployeeId());
 				change.setDataName("社員番号");
@@ -1672,7 +1672,7 @@ public class EngravingController {
 //		社員名
 			if (!before.getName().equals(user.getName())) {
 				Change change = new Change();
-				change.setAdminId(employeeId);
+				change.setAdminId(sessionUser.getEmployeeId());
 				change.setIsUpdated(time);
 				change.setEmployeeId(before.getEmployeeId());
 				change.setDataName("社員名");
@@ -1683,7 +1683,7 @@ public class EngravingController {
 //		パスワード
 			if (!before.getPassword().equals(user.getPassword())) {
 				Change change = new Change();
-				change.setAdminId(employeeId);
+				change.setAdminId(sessionUser.getEmployeeId());
 				change.setIsUpdated(time);
 				change.setEmployeeId(before.getEmployeeId());
 				change.setDataName("パスワード");
@@ -1694,7 +1694,7 @@ public class EngravingController {
 //		Email
 			if (!before.getEmail().equals(user.getEmail())) {
 				Change change = new Change();
-				change.setAdminId(employeeId);
+				change.setAdminId(sessionUser.getEmployeeId());
 				change.setIsUpdated(time);
 				change.setEmployeeId(before.getEmployeeId());
 				change.setDataName("Emailアドレス");
@@ -1706,7 +1706,7 @@ public class EngravingController {
 			if (!(photo.getOriginalFilename().equals(""))) {
 				if (before.getPhoto() != null) {
 					Change change = new Change();
-					change.setAdminId(employeeId);
+					change.setAdminId(sessionUser.getEmployeeId());
 					change.setIsUpdated(time);
 					change.setEmployeeId(before.getEmployeeId());
 					change.setDataName("写真の変更");
@@ -1715,7 +1715,7 @@ public class EngravingController {
 					list.add(change);
 				}else {
 					Change change = new Change();
-					change.setAdminId(employeeId);
+					change.setAdminId(sessionUser.getEmployeeId());
 					change.setIsUpdated(time);
 					change.setEmployeeId(before.getEmployeeId());
 					change.setDataName("写真の追加");
@@ -1727,7 +1727,7 @@ public class EngravingController {
 //		権限
 			if (!before.getAuthority().equals(user.getAuthority())) {
 				Change change = new Change();
-				change.setAdminId(employeeId);
+				change.setAdminId(sessionUser.getEmployeeId());
 				change.setIsUpdated(time);
 				change.setEmployeeId(before.getEmployeeId());
 				change.setDataName("権限");
